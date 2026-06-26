@@ -1,755 +1,971 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>2HH Marketing Dashboard</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              50:  '#f0f4ff',
-              100: '#dde6ff',
-              200: '#c3d1ff',
-              300: '#9db1ff',
-              400: '#7086fb',
-              500: '#4f60f5',
-              600: '#3a42e9',
-              700: '#3033ce',
-              800: '#2b2fa7',
-              900: '#292d84',
-            }
-          },
-          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] }
-        }
-      }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; }
-    .card {
-      background: rgba(255,255,255,0.05);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 16px;
-      padding: 24px;
-      transition: transform .2s, box-shadow .2s;
-    }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.3); }
-    .badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
-    }
-    .badge-up   { background: rgba(52,211,153,.15); color: #34d399; }
-    .badge-down { background: rgba(248,113,113,.15); color: #f87171; }
-    .select-styled {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px; color: #e2e8f0;
-      padding: 6px 12px; font-size: 13px; cursor: pointer; outline: none;
-      transition: border-color .2s;
-    }
-    .select-styled:focus { border-color: #7086fb; }
-    .select-styled option { background: #1e2035; color: #e2e8f0; }
-    .btn-primary {
-      background: linear-gradient(135deg,#4f60f5,#7086fb);
-      color: #fff; border: none; border-radius: 8px;
-      padding: 8px 18px; font-size: 13px; font-weight: 600;
-      cursor: pointer; transition: opacity .2s, transform .1s;
-    }
-    .btn-primary:hover  { opacity: .9; transform: translateY(-1px); }
-    .btn-primary:active { transform: translateY(0); }
-    .btn-danger {
-      background: rgba(248,113,113,.15); color: #f87171;
-      border: 1px solid rgba(248,113,113,.3); border-radius: 6px;
-      padding: 3px 10px; font-size: 12px; cursor: pointer; transition: background .2s;
-    }
-    .btn-danger:hover { background: rgba(248,113,113,.3); }
-    .input-styled {
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 8px; color: #e2e8f0;
-      padding: 8px 12px; font-size: 13px; outline: none; width: 100%;
-      transition: border-color .2s;
-    }
-    .input-styled::placeholder { color: rgba(255,255,255,0.3); }
-    .input-styled:focus { border-color: #7086fb; }
-    .modal-overlay {
-      position: fixed; inset: 0; z-index: 50;
-      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
-      display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity .25s;
-    }
-    .modal-overlay.open { opacity: 1; pointer-events: all; }
-    .modal-box {
-      background: #1a1d30; border: 1px solid rgba(255,255,255,.12);
-      border-radius: 20px; padding: 32px; width: min(96vw, 520px);
-      transform: scale(.95); transition: transform .25s;
-    }
-    .modal-overlay.open .modal-box { transform: scale(1); }
-    .tab-btn {
-      padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 500;
-      cursor: pointer; border: none; transition: background .2s, color .2s;
-      background: transparent; color: #94a3b8;
-    }
-    .tab-btn.active { background: rgba(79,96,245,.25); color: #7086fb; }
-    .tab-btn:hover:not(.active) { background: rgba(255,255,255,.05); color: #e2e8f0; }
-    .channel-tag {
-      display: flex; align-items: center; gap: 8px;
-      background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
-      border-radius: 8px; padding: 8px 12px; margin-bottom: 8px;
-      font-size: 13px; color: #e2e8f0;
-    }
-    .channel-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; }
-    .sparkline { height: 48px; }
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.15); border-radius: 3px; }
-    canvas { max-width: 100%; }
-    @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:none} }
-    .fade-in { animation: fadeIn .4s ease forwards; }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>2HH Marketing Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:#0d0f1e;color:#e2e8f0;min-height:100vh}
+.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px}
+.card-hover{transition:transform .2s,box-shadow .2s}
+.card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
+.inp{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#e2e8f0;padding:7px 11px;font-size:13px;outline:none;width:100%;transition:border-color .2s}
+.inp::placeholder{color:rgba(255,255,255,.3)}
+.inp:focus{border-color:#7086fb}
+.inp option{background:#1a1d30}
+.sel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#e2e8f0;padding:7px 11px;font-size:13px;outline:none;transition:border-color .2s;cursor:pointer}
+.sel:focus{border-color:#7086fb}
+.sel option{background:#1a1d30}
+.btn{border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:linear-gradient(135deg,#4f60f5,#7086fb);color:#fff}
+.btn-primary:hover{opacity:.88}
+.btn-danger{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3)}
+.btn-danger:hover{background:rgba(248,113,113,.3)}
+.btn-sm{padding:5px 12px;font-size:12px}
+.badge-up{display:inline-flex;align-items:center;background:rgba(52,211,153,.15);color:#34d399;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-dn{display:inline-flex;align-items:center;background:rgba(248,113,113,.15);color:#f87171;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-neu{display:inline-flex;align-items:center;background:rgba(148,163,184,.15);color:#94a3b8;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.tab-nav-btn{padding:9px 20px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:background .2s,color .2s;background:transparent;color:#64748b}
+.tab-nav-btn.active{background:rgba(79,96,245,.25);color:#7086fb;font-weight:600}
+.tab-nav-btn:hover:not(.active){background:rgba(255,255,255,.05);color:#e2e8f0}
+.section-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px}
+.section-sub{font-size:12px;color:#64748b;margin-bottom:16px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:10px 12px;color:#64748b;font-weight:500;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
+.tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1;vertical-align:middle}
+.tbl tr:hover td{background:rgba(255,255,255,.03)}
+.tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl th.num{text-align:right}
+.tbl tr.total-row td{background:rgba(79,96,245,.12);color:#fff;font-weight:600;border-top:1px solid rgba(79,96,245,.4)}
+.modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.modal-overlay.open{opacity:1;pointer-events:all}
+.modal-box{background:#13162a;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;width:min(95vw,480px);transform:scale(.95);transition:transform .25s;max-height:90vh;overflow-y:auto}
+.modal-overlay.open .modal-box{transform:scale(1)}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.fade-up{animation:fadeUp .35s ease forwards}
+.sparkline-wrap{height:40px}
+.pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.pill-fb{background:rgba(24,119,242,.2);color:#60a5fa}
+.pill-gg{background:rgba(52,211,153,.2);color:#34d399}
+.pill-all{background:rgba(167,139,250,.2);color:#a78bfa}
+input[type=number]::-webkit-inner-spin-button{opacity:.4}
+</style>
 </head>
-<body class="bg-[#0f1020] text-slate-100 min-h-screen">
+<body>
 
-<!-- ───────── NAV ───────── -->
-<nav class="sticky top-0 z-40 bg-[#0f1020]/80 backdrop-blur border-b border-white/5 px-4 sm:px-8 py-3 flex items-center justify-between">
+<!-- NAV -->
+<nav class="sticky top-0 z-40 px-4 sm:px-8 py-3 flex items-center justify-between border-b border-white/5" style="background:rgba(13,15,30,.9);backdrop-filter:blur(14px)">
   <div class="flex items-center gap-3">
-    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-brand-500 to-brand-300 flex items-center justify-center text-white font-bold text-sm">2H</div>
-    <span class="font-700 text-base tracking-tight">2HH <span class="text-brand-400">Marketing</span></span>
-    <span class="hidden sm:block text-slate-500 text-xs ml-1">Data Dashboard</span>
+    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style="background:linear-gradient(135deg,#4f60f5,#7086fb)">2H</div>
+    <span class="font-bold tracking-tight">2HH <span style="color:#7086fb">Marketing</span></span>
+    <span class="hidden sm:block text-slate-500 text-xs">Dashboard</span>
   </div>
-  <div class="flex items-center gap-3">
-    <span id="live-clock" class="text-slate-400 text-xs font-mono hidden sm:block"></span>
-    <button onclick="openModal()" class="btn-primary flex items-center gap-1.5">
-      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-      <span class="hidden sm:inline">Admin Settings</span>
-      <span class="sm:hidden">設定</span>
-    </button>
+  <div class="flex items-center gap-2 text-xs text-slate-400">
+    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block" style="animation:pulse 2s infinite"></span>
+    <span id="live-clock"></span>
   </div>
 </nav>
 
-<!-- ───────── DATE BAR ───────── -->
-<div class="px-4 sm:px-8 pt-6 pb-2 flex flex-wrap items-center justify-between gap-3">
-  <div>
-    <h1 class="text-xl sm:text-2xl font-800 text-white">業務數據總覽</h1>
-    <p class="text-slate-400 text-sm mt-0.5">三分店即時數據 · <span id="date-label"></span></p>
-  </div>
-  <div class="flex items-center gap-2">
-    <div class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
-    <span class="text-xs text-slate-400">即時更新中</span>
+<!-- PAGE TABS -->
+<div class="px-4 sm:px-8 pt-5 pb-0">
+  <div class="flex gap-1 bg-white/5 rounded-xl p-1 w-fit">
+    <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">📊 儀表板</button>
+    <button class="tab-nav-btn" onclick="showTab('ads',this)">📣 廣告分析</button>
+    <button class="tab-nav-btn" onclick="showTab('entry',this)">✏️ 資料輸入</button>
   </div>
 </div>
 
-<!-- ───────── MAIN ───────── -->
-<main class="px-4 sm:px-8 pb-12 space-y-6 mt-4">
+<!-- ═══════════════════════════════════════
+     TAB 1: DASHBOARD
+══════════════════════════════════════════ -->
+<div id="tab-dashboard" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5">
 
-  <!-- ── SUMMARY CARDS ── -->
-  <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 fade-in">
-
-    <!-- Total CON -->
-    <div class="card col-span-1 sm:col-span-2 xl:col-span-1 flex flex-col gap-3"
-         style="background:linear-gradient(135deg,rgba(79,96,245,.25),rgba(112,134,251,.1));border-color:rgba(79,96,245,.4)">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-300 text-sm font-500">每日總 CON 數</span>
-        <span class="badge badge-up">▲ 8.3%</span>
-      </div>
-      <div class="text-5xl font-800 text-white tracking-tight" id="total-con">247</div>
-      <div class="text-slate-400 text-xs">vs 昨日 228 筆</div>
-      <div id="sparkline-total" class="sparkline mt-1"></div>
+  <!-- filter bar -->
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-bold text-white">業務數據總覽</h1>
+      <p class="text-slate-400 text-sm" id="db-date-label"></p>
     </div>
-
-    <!-- Seoul -->
-    <div class="card flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-300 text-sm font-500">🇰🇷 首爾 Seoul</span>
-        <span class="badge badge-up">▲ 5.1%</span>
-      </div>
-      <div class="text-3xl font-700 text-white" id="seoul-con">89</div>
-      <div class="text-slate-400 text-xs">佔比 <span class="text-brand-400 font-600">36%</span></div>
-      <div id="sparkline-seoul" class="sparkline mt-1"></div>
+    <div class="flex gap-2 items-center flex-wrap">
+      <select class="sel text-xs" id="db-month-filter" onchange="renderDashboard()"></select>
+      <select class="sel text-xs" id="db-branch-filter" onchange="renderDashboard()">
+        <option value="all">全部分店</option>
+        <option value="seoul">🇰🇷 首爾</option>
+        <option value="hsinchu">🏙️ 新竹</option>
+        <option value="taichung">🏔️ 台中</option>
+      </select>
     </div>
+  </div>
 
-    <!-- Hsinchu -->
-    <div class="card flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-300 text-sm font-500">🏙️ 新竹 Hsinchu</span>
-        <span class="badge badge-up">▲ 12.4%</span>
-      </div>
-      <div class="text-3xl font-700 text-white" id="hsinchu-con">94</div>
-      <div class="text-slate-400 text-xs">佔比 <span class="text-emerald-400 font-600">38%</span></div>
-      <div id="sparkline-hsinchu" class="sparkline mt-1"></div>
+  <!-- summary cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 fade-up">
+    <div class="card card-hover col-span-2 lg:col-span-1" style="background:linear-gradient(135deg,rgba(79,96,245,.2),rgba(112,134,251,.08));border-color:rgba(79,96,245,.35)">
+      <div class="text-slate-300 text-xs mb-1">每日平均 CON</div>
+      <div class="text-4xl font-extrabold text-white" id="kpi-avg-con">—</div>
+      <div class="text-slate-400 text-xs mt-1">本月累計 <span id="kpi-total-con" class="text-white font-semibold">—</span> 筆</div>
     </div>
-
-    <!-- Taichung -->
-    <div class="card flex flex-col gap-3">
-      <div class="flex items-center justify-between">
-        <span class="text-slate-300 text-sm font-500">🏔️ 台中 Taichung</span>
-        <span class="badge badge-down">▼ 2.7%</span>
-      </div>
-      <div class="text-3xl font-700 text-white" id="taichung-con">64</div>
-      <div class="text-slate-400 text-xs">佔比 <span class="text-violet-400 font-600">26%</span></div>
-      <div id="sparkline-taichung" class="sparkline mt-1"></div>
+    <div class="card card-hover">
+      <div class="text-slate-300 text-xs mb-1">🇰🇷 首爾</div>
+      <div class="text-2xl font-bold text-white" id="kpi-seoul-con">—</div>
+      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-seoul-pct" class="font-semibold" style="color:#7086fb">—</span></div>
     </div>
-  </section>
+    <div class="card card-hover">
+      <div class="text-slate-300 text-xs mb-1">🏙️ 新竹</div>
+      <div class="text-2xl font-bold text-white" id="kpi-hsinchu-con">—</div>
+      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-hsinchu-pct" class="font-semibold" style="color:#34d399">—</span></div>
+    </div>
+    <div class="card card-hover">
+      <div class="text-slate-300 text-xs mb-1">🏔️ 台中</div>
+      <div class="text-2xl font-bold text-white" id="kpi-taichung-con">—</div>
+      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-taichung-pct" class="font-semibold" style="color:#a78bfa">—</span></div>
+    </div>
+  </div>
 
-  <!-- ── ROW 2: PIE + REVENUE ── -->
-  <section class="grid grid-cols-1 lg:grid-cols-2 gap-4 fade-in" style="animation-delay:.08s">
-
-    <!-- New vs Returning -->
-    <div class="card flex flex-col gap-4">
+  <!-- revenue + NR row -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+    <div class="card lg:col-span-2 flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 class="font-600 text-white text-base">新舊客比例</h2>
-          <p class="text-slate-400 text-xs mt-0.5">New vs. Returning Customers</p>
+        <div class="section-title mb-0">每日營業額趨勢 (NT$)</div>
+        <div class="flex gap-1 bg-white/5 rounded-lg p-0.5">
+          <button class="tab-nav-btn active" style="padding:4px 12px;font-size:12px" onclick="switchRevType('line',this)">折線</button>
+          <button class="tab-nav-btn" style="padding:4px 12px;font-size:12px" onclick="switchRevType('bar',this)">長條</button>
         </div>
-        <select id="nrFilter" class="select-styled" onchange="updateNRChart()">
-          <option value="all">全部分店</option>
-          <option value="seoul">首爾 Seoul</option>
-          <option value="hsinchu">新竹 Hsinchu</option>
-          <option value="taichung">台中 Taichung</option>
+      </div>
+      <div style="height:240px;position:relative"><canvas id="rev-chart"></canvas></div>
+    </div>
+    <div class="card flex flex-col gap-3">
+      <div class="section-title mb-0">新舊客比例</div>
+      <div style="height:200px;position:relative"><canvas id="nr-chart"></canvas></div>
+      <div class="flex justify-center gap-5 text-xs text-slate-400">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#7086fb"></span>新客</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#34d399"></span>回頭客</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI row -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.05));border-color:rgba(52,211,153,.3)">
+      <div class="text-xs text-slate-300 mb-1">本月總營業額</div>
+      <div class="text-xl font-bold" style="color:#34d399" id="kpi-rev">NT$ —</div>
+    </div>
+    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(139,92,246,.05));border-color:rgba(167,139,250,.3)">
+      <div class="text-xs text-slate-300 mb-1">平均客單價</div>
+      <div class="text-xl font-bold" style="color:#a78bfa" id="kpi-arpu">NT$ —</div>
+    </div>
+    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.05));border-color:rgba(251,191,36,.3)">
+      <div class="text-xs text-slate-300 mb-1">有效天數</div>
+      <div class="text-xl font-bold text-amber-400" id="kpi-days">— 天</div>
+    </div>
+    <div class="card card-hover">
+      <div class="text-xs text-slate-300 mb-1">回頭率</div>
+      <div class="text-xl font-bold" style="color:#7086fb" id="kpi-return-rate">— %</div>
+      <div class="w-full bg-white/10 rounded-full h-1.5 mt-2"><div id="kpi-return-bar" class="h-1.5 rounded-full" style="background:#7086fb;width:0%"></div></div>
+    </div>
+  </div>
+
+  <!-- daily table -->
+  <div class="card">
+    <div class="section-title">每日到診明細</div>
+    <p class="section-sub">Daily Visit Records</p>
+    <div class="overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>日期</th>
+            <th>分店</th>
+            <th class="num">到診(CON)</th>
+            <th class="num">新客</th>
+            <th class="num">回頭客</th>
+            <th class="num">營業額 NT$</th>
+            <th class="num">客單價</th>
+          </tr>
+        </thead>
+        <tbody id="daily-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TAB 2: ADS
+══════════════════════════════════════════ -->
+<div id="tab-ads" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
+
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-bold text-white">廣告成效分析</h1>
+      <p class="text-slate-400 text-sm">FB &amp; Google 月度廣告數據</p>
+    </div>
+    <div class="flex gap-2 flex-wrap">
+      <button class="btn btn-primary btn-sm" onclick="openAdModal()">✏️ 輸入廣告數據</button>
+      <div class="flex items-center gap-2 text-xs text-slate-400">
+        <span>稅率</span>
+        <input id="tax-rate" type="number" class="inp text-xs" style="width:60px" value="5" min="0" max="50" onchange="renderAds()"/>
+        <span>%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ad summary cards -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+    <div class="card" style="border-color:rgba(96,165,250,.3);background:rgba(24,119,242,.1)">
+      <div class="text-xs mb-1 flex items-center gap-1"><span class="pill pill-fb">FB</span><span class="text-slate-300">總花費(稅後)</span></div>
+      <div class="text-xl font-bold text-blue-400" id="ad-fb-total">NT$ —</div>
+      <div class="text-xs text-slate-400 mt-1">CON: <span id="ad-fb-con" class="text-white">—</span> / CPL: <span id="ad-fb-cpl" class="text-white">—</span></div>
+    </div>
+    <div class="card" style="border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)">
+      <div class="text-xs mb-1 flex items-center gap-1"><span class="pill pill-gg">Google</span><span class="text-slate-300">總花費(稅後)</span></div>
+      <div class="text-xl font-bold text-emerald-400" id="ad-gg-total">NT$ —</div>
+      <div class="text-xs text-slate-400 mt-1">CON: <span id="ad-gg-con" class="text-white">—</span> / CPL: <span id="ad-gg-cpl" class="text-white">—</span></div>
+    </div>
+    <div class="card" style="border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)">
+      <div class="text-xs mb-1"><span class="pill pill-all">合計</span><span class="text-slate-300 ml-1">廣告總花費(稅後)</span></div>
+      <div class="text-xl font-bold text-violet-400" id="ad-all-total">NT$ —</div>
+      <div class="text-xs text-slate-400 mt-1">FB佔 <span id="ad-fb-pct" class="text-white">—</span> / Google佔 <span id="ad-gg-pct" class="text-white">—</span></div>
+    </div>
+    <div class="card">
+      <div class="text-xs text-slate-300 mb-1">整體 CPL / Per CON</div>
+      <div class="text-xl font-bold text-white" id="ad-total-cpl">— / —</div>
+      <div class="text-xs text-slate-400 mt-1">總 CON: <span id="ad-total-con" class="text-white">—</span></div>
+    </div>
+  </div>
+
+  <!-- monthly table FB -->
+  <div class="card">
+    <div class="section-title">FB 廣告月度明細</div>
+    <p class="section-sub">Facebook Ads Monthly Breakdown</p>
+    <div class="overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th class="num">廣告花費</th>
+            <th class="num">稅後花費</th>
+            <th class="num">CON 數</th>
+            <th class="num">CPL</th>
+            <th class="num">佔總花費%</th>
+          </tr>
+        </thead>
+        <tbody id="fb-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- monthly table Google -->
+  <div class="card">
+    <div class="section-title">Google 廣告月度明細</div>
+    <p class="section-sub">Google Ads Monthly Breakdown</p>
+    <div class="overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th class="num">廣告花費</th>
+            <th class="num">稅後花費</th>
+            <th class="num">CON 數</th>
+            <th class="num">CPL</th>
+            <th class="num">佔總花費%</th>
+          </tr>
+        </thead>
+        <tbody id="gg-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- combined summary table -->
+  <div class="card">
+    <div class="section-title">FB + Google 月度合計</div>
+    <p class="section-sub">Combined Monthly Summary with Revenue Metrics</p>
+    <div class="overflow-x-auto">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>月份</th>
+            <th class="num">廣告總花費(稅後)</th>
+            <th class="num">FB佔%</th>
+            <th class="num">Google佔%</th>
+            <th class="num">廣告總CON</th>
+            <th class="num">CPL</th>
+            <th class="num">營業總業績</th>
+            <th class="num">Per CON</th>
+            <th class="num">ROI</th>
+          </tr>
+        </thead>
+        <tbody id="combined-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- charts row -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card flex flex-col gap-2">
+      <div class="section-title mb-0">月度廣告花費趨勢</div>
+      <div style="height:220px;position:relative"><canvas id="ad-spend-chart"></canvas></div>
+    </div>
+    <div class="card flex flex-col gap-2">
+      <div class="section-title mb-0">月度 CPL 比較</div>
+      <div style="height:220px;position:relative"><canvas id="cpl-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TAB 3: DATA ENTRY
+══════════════════════════════════════════ -->
+<div id="tab-entry" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
+  <div>
+    <h1 class="text-xl font-bold text-white">資料輸入</h1>
+    <p class="text-slate-400 text-sm">手動輸入每日到診及業績數據</p>
+  </div>
+
+  <!-- entry form -->
+  <div class="card max-w-2xl">
+    <div class="section-title">新增每日記錄</div>
+    <p class="section-sub">Add Daily Visit Record</p>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">日期</label>
+        <input type="date" id="e-date" class="inp"/>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">分店</label>
+        <select id="e-branch" class="sel w-full">
+          <option value="seoul">🇰🇷 首爾 Seoul</option>
+          <option value="hsinchu">🏙️ 新竹 Hsinchu</option>
+          <option value="taichung">🏔️ 台中 Taichung</option>
         </select>
       </div>
-      <div class="flex items-center justify-center" style="height:260px">
-        <canvas id="nrChart"></canvas>
-      </div>
-      <div class="flex justify-center gap-6 text-xs text-slate-400">
-        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-400 inline-block"></span>新客 New</div>
-        <div class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-400 inline-block"></span>回頭客 Returning</div>
-      </div>
-    </div>
-
-    <!-- Revenue -->
-    <div class="card flex flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 class="font-600 text-white text-base">每週營業額趨勢</h2>
-          <p class="text-slate-400 text-xs mt-0.5">Weekly Revenue Trend (NT$)</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="flex gap-1 bg-white/5 rounded-lg p-0.5">
-            <button class="tab-btn active" onclick="switchRevView('line',this)">折線</button>
-            <button class="tab-btn" onclick="switchRevView('bar',this)">長條</button>
-          </div>
-          <select id="revFilter" class="select-styled" onchange="updateRevenueChart()">
-            <option value="all">全部分店</option>
-            <option value="seoul">首爾</option>
-            <option value="hsinchu">新竹</option>
-            <option value="taichung">台中</option>
-          </select>
-        </div>
-      </div>
-      <div style="height:260px;position:relative">
-        <canvas id="revenueChart"></canvas>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ROW 3: CHANNEL + MONTHLY SUMMARY ── -->
-  <section class="grid grid-cols-1 lg:grid-cols-3 gap-4 fade-in" style="animation-delay:.16s">
-
-    <!-- Channel Chart -->
-    <div class="card lg:col-span-2 flex flex-col gap-4">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 class="font-600 text-white text-base">客人來源分析</h2>
-          <p class="text-slate-400 text-xs mt-0.5">Customer Acquisition Channels</p>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="flex gap-1 bg-white/5 rounded-lg p-0.5">
-            <button class="tab-btn active" onclick="switchChView('bar',this)">長條</button>
-            <button class="tab-btn" onclick="switchChView('pie',this)">圓餅</button>
-          </div>
-          <button onclick="openModal()" class="btn-primary text-xs flex items-center gap-1">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>新增來源
-          </button>
-        </div>
-      </div>
-      <div style="height:280px;position:relative">
-        <canvas id="channelChart"></canvas>
-      </div>
-    </div>
-
-    <!-- KPI Tiles -->
-    <div class="flex flex-col gap-4">
-      <div class="card flex flex-col gap-2" style="background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.05));border-color:rgba(52,211,153,.3)">
-        <span class="text-slate-300 text-xs font-500">本月累計營業額</span>
-        <div class="text-2xl font-700 text-emerald-400">NT$ 1,284,500</div>
-        <div class="text-slate-400 text-xs flex items-center gap-1"><span class="badge badge-up">▲ 14.2%</span> vs 上月</div>
-      </div>
-      <div class="card flex flex-col gap-2" style="background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(139,92,246,.05));border-color:rgba(167,139,250,.3)">
-        <span class="text-slate-300 text-xs font-500">平均客單價</span>
-        <div class="text-2xl font-700 text-violet-400">NT$ 2,380</div>
-        <div class="text-slate-400 text-xs flex items-center gap-1"><span class="badge badge-up">▲ 3.8%</span> vs 上月</div>
-      </div>
-      <div class="card flex flex-col gap-2" style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.05));border-color:rgba(251,191,36,.3)">
-        <span class="text-slate-300 text-xs font-500">本月新增會員</span>
-        <div class="text-2xl font-700 text-amber-400">1,847</div>
-        <div class="text-slate-400 text-xs flex items-center gap-1"><span class="badge badge-up">▲ 22.1%</span> vs 上月</div>
-      </div>
-      <div class="card flex flex-col gap-2">
-        <span class="text-slate-300 text-xs font-500">回頭率 Return Rate</span>
-        <div class="text-2xl font-700 text-brand-400">61.4%</div>
-        <div class="w-full bg-white/10 rounded-full h-1.5 mt-1">
-          <div class="bg-brand-400 h-1.5 rounded-full" style="width:61.4%"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── ROW 4: DAILY BREAKDOWN TABLE ── -->
-  <section class="card fade-in" style="animation-delay:.24s">
-    <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
       <div>
-        <h2 class="font-600 text-white text-base">近7日各分店 CON 明細</h2>
-        <p class="text-slate-400 text-xs mt-0.5">Daily Branch Conversion Breakdown</p>
+        <label class="text-xs text-slate-400 block mb-1">到診數 (CON)</label>
+        <input type="number" id="e-con" class="inp" placeholder="0" min="0"/>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">新客數</label>
+        <input type="number" id="e-new" class="inp" placeholder="0" min="0"/>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">回頭客數</label>
+        <input type="number" id="e-ret" class="inp" placeholder="0" min="0"/>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">營業額 NT$</label>
+        <input type="number" id="e-rev" class="inp" placeholder="0" min="0"/>
+      </div>
+    </div>
+    <div class="mt-4 flex gap-2">
+      <button class="btn btn-primary" onclick="addDailyRecord()">儲存記錄</button>
+      <span id="entry-msg" class="text-xs text-emerald-400 self-center hidden">✓ 已儲存！</span>
+    </div>
+  </div>
+
+  <!-- records list -->
+  <div class="card">
+    <div class="flex items-center justify-between mb-3">
+      <div class="section-title mb-0">所有記錄</div>
+      <div class="flex gap-2 items-center">
+        <select class="sel text-xs" id="list-month-filter" onchange="renderEntryList()"></select>
+        <select class="sel text-xs" id="list-branch-filter" onchange="renderEntryList()">
+          <option value="all">全部分店</option>
+          <option value="seoul">首爾</option>
+          <option value="hsinchu">新竹</option>
+          <option value="taichung">台中</option>
+        </select>
       </div>
     </div>
     <div class="overflow-x-auto">
-      <table class="w-full text-sm">
+      <table class="tbl">
         <thead>
-          <tr class="border-b border-white/10">
-            <th class="text-left py-2 px-3 text-slate-400 font-500 text-xs">日期</th>
-            <th class="text-right py-2 px-3 text-slate-400 font-500 text-xs">🇰🇷 首爾</th>
-            <th class="text-right py-2 px-3 text-slate-400 font-500 text-xs">🏙️ 新竹</th>
-            <th class="text-right py-2 px-3 text-slate-400 font-500 text-xs">🏔️ 台中</th>
-            <th class="text-right py-2 px-3 text-slate-400 font-500 text-xs">合計</th>
-            <th class="text-right py-2 px-3 text-slate-400 font-500 text-xs">日環比</th>
+          <tr>
+            <th>日期</th><th>分店</th><th class="num">CON</th><th class="num">新客</th>
+            <th class="num">回頭客</th><th class="num">營業額</th><th class="num">操作</th>
           </tr>
         </thead>
-        <tbody id="conTable"></tbody>
+        <tbody id="entry-tbody"></tbody>
       </table>
     </div>
-  </section>
+  </div>
+</div>
 
-</main>
-
-<!-- ───────── ADMIN MODAL ───────── -->
-<div id="adminModal" class="modal-overlay" onclick="closeModalOutside(event)">
+<!-- AD INPUT MODAL -->
+<div id="ad-modal" class="modal-overlay" onclick="closeAdModalOutside(event)">
   <div class="modal-box">
-    <div class="flex items-center justify-between mb-6">
-      <div>
-        <h3 class="text-white font-700 text-lg">Admin Settings</h3>
-        <p class="text-slate-400 text-xs mt-0.5">管理客人來源渠道</p>
-      </div>
-      <button onclick="closeModal()" class="text-slate-500 hover:text-white transition-colors">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
+    <div class="flex items-center justify-between mb-5">
+      <div><h3 class="text-white font-bold text-base">輸入廣告數據</h3><p class="text-slate-400 text-xs mt-0.5">Ad Spend Data Entry</p></div>
+      <button onclick="closeAdModal()" class="text-slate-500 hover:text-white">✕</button>
     </div>
-
-    <!-- Existing channels -->
-    <div class="mb-5">
-      <p class="text-slate-300 text-xs font-600 mb-2 uppercase tracking-wider">目前來源渠道</p>
-      <div id="channelList"></div>
+    <div class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="text-xs text-slate-400 block mb-1">月份</label>
+          <input type="month" id="ad-month" class="inp"/>
+        </div>
+        <div class="flex items-end"><span class="text-slate-400 text-xs">選擇月份後輸入各平台數據</span></div>
+      </div>
+      <div class="rounded-xl p-3 space-y-2" style="background:rgba(24,119,242,.1);border:1px solid rgba(96,165,250,.2)">
+        <div class="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-1"><span class="pill pill-fb">FB</span> Facebook Ads</div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label><input type="number" id="ad-fb-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">CON 數</label><input type="number" id="ad-fb-con-in" class="inp" placeholder="0" min="0"/></div>
+        </div>
+      </div>
+      <div class="rounded-xl p-3 space-y-2" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">
+        <div class="text-xs font-semibold text-emerald-400 mb-2 flex items-center gap-1"><span class="pill pill-gg">Google</span> Google Ads</div>
+        <div class="grid grid-cols-2 gap-2">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label><input type="number" id="ad-gg-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">CON 數</label><input type="number" id="ad-gg-con-in" class="inp" placeholder="0" min="0"/></div>
+        </div>
+      </div>
+      <div class="rounded-xl p-3 space-y-2" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
+        <div class="text-xs font-semibold text-slate-300 mb-2">該月營業額 NT$</div>
+        <input type="number" id="ad-rev-in" class="inp" placeholder="留空則自動從每日記錄計算" min="0"/>
+      </div>
     </div>
-
-    <!-- Add new channel -->
-    <div class="border-t border-white/10 pt-5">
-      <p class="text-slate-300 text-xs font-600 mb-3 uppercase tracking-wider">新增來源渠道</p>
-      <div class="flex gap-2 mb-3">
-        <input id="newChannelName" class="input-styled" placeholder="渠道名稱 (e.g. Instagram)" />
-        <button onclick="addChannel()" class="btn-primary whitespace-nowrap">新增來源</button>
-      </div>
-      <div class="flex gap-2">
-        <input id="newChannelData" class="input-styled" placeholder="數量 (e.g. 45)" type="number" min="0" />
-      </div>
-      <p class="text-slate-500 text-xs mt-2">新增後圖表即時更新 · 資料儲存於本地 Session</p>
+    <div class="mt-5 flex gap-2">
+      <button class="btn btn-primary" onclick="saveAdData()">儲存</button>
+      <button class="btn btn-danger btn-sm" onclick="deleteAdMonth()" style="display:none" id="ad-delete-btn">刪除此月數據</button>
+      <span id="ad-msg" class="text-xs text-emerald-400 self-center hidden">✓ 已儲存！</span>
     </div>
   </div>
 </div>
 
 <script>
-// ─── DATA ──────────────────────────────────────────────────────────────────
-const PALETTE = [
-  '#7086fb','#34d399','#a78bfa','#fb923c','#f472b6','#38bdf8','#facc15',
-  '#4ade80','#c084fc','#fb7185','#22d3ee','#fbbf24'
-];
+// ──────────────────────────────────────────────────────────────
+// STORAGE
+// ──────────────────────────────────────────────────────────────
+const STORAGE_DAILY = 'dash_daily_v2';
+const STORAGE_ADS   = 'dash_ads_v2';
 
-const weekdays = ['週一','週二','週三','週四','週五','週六','週日'];
+function loadDaily(){ return JSON.parse(localStorage.getItem(STORAGE_DAILY)||'[]'); }
+function saveDaily(d){ localStorage.setItem(STORAGE_DAILY, JSON.stringify(d)); }
+function loadAds()  { return JSON.parse(localStorage.getItem(STORAGE_ADS)||'[]'); }
+function saveAds(d) { localStorage.setItem(STORAGE_ADS, JSON.stringify(d)); }
 
-const revenueData = {
-  all:     [128500,145200,132800,168400,154700,189300,201100],
-  seoul:   [ 46000, 52000, 47500, 60000, 55000, 68000, 72000],
-  hsinchu: [ 48500, 54200, 49300, 63400, 58700, 72300, 77100],
-  taichung:[ 34000, 39000, 36000, 45000, 41000, 49000, 52000],
-};
-
-const nrData = {
-  all:     { new: 142, ret: 105 },
-  seoul:   { new:  51, ret:  38 },
-  hsinchu: { new:  56, ret:  38 },
-  taichung:{ new:  35, ret:  29 },
-};
-
-const defaultChannels = [
-  { name: 'Google',  value: 98,  color: PALETTE[0] },
-  { name: 'FB',      value: 74,  color: PALETTE[1] },
-  { name: '口碑',    value: 53,  color: PALETTE[2] },
-];
-
-const tableData = [
-  { date:'06/20', seoul:82,  hsinchu:88, taichung:61 },
-  { date:'06/21', seoul:79,  hsinchu:91, taichung:58 },
-  { date:'06/22', seoul:85,  hsinchu:87, taichung:66 },
-  { date:'06/23', seoul:90,  hsinchu:95, taichung:70 },
-  { date:'06/24', seoul:84,  hsinchu:89, taichung:62 },
-  { date:'06/25', seoul:88,  hsinchu:92, taichung:65 },
-  { date:'06/26', seoul:89,  hsinchu:94, taichung:64 },
-];
-
-// ─── STATE ─────────────────────────────────────────────────────────────────
-let channels = JSON.parse(sessionStorage.getItem('channels') || 'null') || defaultChannels.map(c=>({...c}));
-let channelChartType = 'bar';
-let revenueChartType = 'line';
-
-function saveChannels() {
-  sessionStorage.setItem('channels', JSON.stringify(channels));
-}
-
-// ─── INIT ──────────────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  setDateLabel();
-  startClock();
-  buildTable();
-  buildSparklines();
-  initNRChart();
-  initRevenueChart();
-  initChannelChart();
-  renderChannelList();
-});
-
-function setDateLabel() {
-  const d = new Date();
-  document.getElementById('date-label').textContent =
-    d.toLocaleDateString('zh-TW', {year:'numeric',month:'long',day:'numeric',weekday:'long'});
-}
-
-function startClock() {
-  const el = document.getElementById('live-clock');
-  const tick = () => {
-    el.textContent = new Date().toLocaleTimeString('zh-TW', {hour12:false});
-  };
-  tick(); setInterval(tick, 1000);
-}
-
-// ─── TABLE ─────────────────────────────────────────────────────────────────
-function buildTable() {
-  const tbody = document.getElementById('conTable');
-  let prev = null;
-  tbody.innerHTML = tableData.map(r => {
-    const total = r.seoul + r.hsinchu + r.taichung;
-    let badge = '';
-    if (prev !== null) {
-      const diff = total - prev;
-      const pct  = ((diff / prev) * 100).toFixed(1);
-      badge = diff >= 0
-        ? `<span class="badge badge-up text-xs">▲ ${pct}%</span>`
-        : `<span class="badge badge-down text-xs">▼ ${Math.abs(pct)}%</span>`;
+// ──────────────────────────────────────────────────────────────
+// SEED DATA (first run)
+// ──────────────────────────────────────────────────────────────
+function seedIfEmpty(){
+  if(loadDaily().length > 0) return;
+  const branches = ['seoul','hsinchu','taichung'];
+  const records = [];
+  const today = new Date();
+  for(let w=0;w<8;w++){
+    for(let b of branches){
+      const d = new Date(today);
+      d.setDate(d.getDate() - w);
+      const con   = Math.floor(Math.random()*40+50);
+      const nw    = Math.floor(con * (0.45+Math.random()*0.2));
+      const ret   = con - nw;
+      const rev   = con * (Math.floor(Math.random()*800+1800));
+      records.push({
+        id: Date.now()+Math.random(),
+        date: d.toISOString().slice(0,10),
+        branch: b,
+        con, new_c: nw, ret_c: ret, revenue: rev
+      });
     }
-    prev = total;
-    const isToday = r.date === '06/26';
-    return `<tr class="border-b border-white/5 hover:bg-white/5 transition-colors ${isToday?'bg-brand-500/10':''}">
-      <td class="py-2.5 px-3 font-500 text-slate-200 text-xs">${r.date}${isToday?' <span class="text-brand-400 text-xs">(今日)</span>':''}</td>
-      <td class="py-2.5 px-3 text-right text-slate-200 text-xs">${r.seoul}</td>
-      <td class="py-2.5 px-3 text-right text-slate-200 text-xs">${r.hsinchu}</td>
-      <td class="py-2.5 px-3 text-right text-slate-200 text-xs">${r.taichung}</td>
-      <td class="py-2.5 px-3 text-right font-600 text-white text-xs">${total}</td>
-      <td class="py-2.5 px-3 text-right text-xs">${badge}</td>
+  }
+  saveDaily(records);
+
+  const ads = [];
+  for(let m=0;m<4;m++){
+    const d = new Date(today.getFullYear(), today.getMonth()-m, 1);
+    const month = d.toISOString().slice(0,7);
+    ads.push({
+      month,
+      fb:{ spend: Math.floor(Math.random()*10000+12000), con: Math.floor(Math.random()*40+60) },
+      gg:{ spend: Math.floor(Math.random()*8000+10000),  con: Math.floor(Math.random()*30+80) },
+      rev_override: null
+    });
+  }
+  saveAds(ads);
+}
+
+// ──────────────────────────────────────────────────────────────
+// UTILS
+// ──────────────────────────────────────────────────────────────
+const fmt  = n => n==null||isNaN(n) ? '—' : Math.round(n).toLocaleString('zh-TW');
+const fmtR = n => n==null||isNaN(n) ? '—' : 'NT$ '+Math.round(n).toLocaleString('zh-TW');
+const pct  = (a,b) => b===0 ? '—' : (a/b*100).toFixed(1)+'%';
+
+const BRANCH_LABELS = {seoul:'🇰🇷 首爾', hsinchu:'🏙️ 新竹', taichung:'🏔️ 台中'};
+const BRANCH_COLORS = {seoul:'#7086fb', hsinchu:'#34d399', taichung:'#a78bfa'};
+
+function getMonths(){
+  const daily = loadDaily();
+  const ads   = loadAds();
+  const months = new Set([
+    ...daily.map(r=>r.date.slice(0,7)),
+    ...ads.map(a=>a.month)
+  ]);
+  return Array.from(months).sort().reverse();
+}
+
+function populateMonthSelects(){
+  const months = getMonths();
+  ['db-month-filter','list-month-filter'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    const cur = el.value;
+    el.innerHTML = '<option value="all">全部月份</option>' +
+      months.map(m=>`<option value="${m}">${m}</option>`).join('');
+    if(cur) el.value = cur;
+  });
+}
+
+function taxRate(){ return 1 + (parseFloat(document.getElementById('tax-rate')?.value||5)/100); }
+
+// ──────────────────────────────────────────────────────────────
+// TAB SWITCHING
+// ──────────────────────────────────────────────────────────────
+function showTab(tab, btn){
+  document.querySelectorAll('.tab-page').forEach(p=>p.classList.add('hidden'));
+  document.querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.remove('hidden');
+  btn.classList.add('active');
+  if(tab==='dashboard') renderDashboard();
+  if(tab==='ads') renderAds();
+  if(tab==='entry') { populateMonthSelects(); renderEntryList(); }
+}
+
+// ──────────────────────────────────────────────────────────────
+// DASHBOARD RENDER
+// ──────────────────────────────────────────────────────────────
+let revChart=null, nrChart=null;
+let revChartType='line';
+
+function renderDashboard(){
+  const monthFilter  = document.getElementById('db-month-filter')?.value||'all';
+  const branchFilter = document.getElementById('db-branch-filter')?.value||'all';
+  let daily = loadDaily();
+
+  if(monthFilter!=='all') daily = daily.filter(r=>r.date.slice(0,7)===monthFilter);
+  if(branchFilter!=='all') daily = daily.filter(r=>r.branch===branchFilter);
+
+  daily.sort((a,b)=>a.date.localeCompare(b.date));
+
+  // totals
+  const totalCon = daily.reduce((s,r)=>s+r.con,0);
+  const totalRev = daily.reduce((s,r)=>s+r.revenue,0);
+  const totalNew = daily.reduce((s,r)=>s+r.new_c,0);
+  const totalRet = daily.reduce((s,r)=>s+(r.ret_c||0),0);
+  const days     = new Set(daily.map(r=>r.date)).size;
+
+  const byBranch = b => daily.filter(r=>r.branch===b).reduce((s,r)=>s+r.con,0);
+  const seoulCon = byBranch('seoul'), hsinchuCon = byBranch('hsinchu'), taichungCon = byBranch('taichung');
+
+  setText('kpi-avg-con', days>0 ? Math.round(totalCon/days) : '—');
+  setText('kpi-total-con', fmt(totalCon));
+  setText('kpi-seoul-con', fmt(seoulCon));
+  setText('kpi-hsinchu-con', fmt(hsinchuCon));
+  setText('kpi-taichung-con', fmt(taichungCon));
+  setText('kpi-seoul-pct', pct(seoulCon, totalCon));
+  setText('kpi-hsinchu-pct', pct(hsinchuCon, totalCon));
+  setText('kpi-taichung-pct', pct(taichungCon, totalCon));
+  setText('kpi-rev', fmtR(totalRev));
+  setText('kpi-arpu', totalCon>0 ? fmtR(totalRev/totalCon) : '—');
+  setText('kpi-days', days+' 天');
+  const rr = totalCon>0 ? (totalRet/totalCon*100).toFixed(1) : 0;
+  setText('kpi-return-rate', rr+'%');
+  document.getElementById('kpi-return-bar').style.width = rr+'%';
+
+  // date label
+  document.getElementById('db-date-label').textContent =
+    new Date().toLocaleDateString('zh-TW',{year:'numeric',month:'long',day:'numeric',weekday:'long'});
+
+  // revenue chart: group by date, sum revenue
+  const dateMap = {};
+  daily.forEach(r=>{ dateMap[r.date]=(dateMap[r.date]||0)+r.revenue; });
+  const sortedDates = Object.keys(dateMap).sort();
+  const revLabels = sortedDates.map(d=>d.slice(5));
+  const revVals   = sortedDates.map(d=>dateMap[d]);
+
+  if(revChart){ revChart.destroy(); revChart=null; }
+  const ctx1 = document.getElementById('rev-chart').getContext('2d');
+  const grad = ctx1.createLinearGradient(0,0,0,240);
+  grad.addColorStop(0,'rgba(112,134,251,.3)'); grad.addColorStop(1,'rgba(112,134,251,0)');
+  revChart = new Chart(ctx1,{
+    type: revChartType,
+    data:{ labels: revLabels, datasets:[{
+      label:'營業額',data:revVals,
+      borderColor:'#7086fb',
+      backgroundColor: revChartType==='bar'?'#7086fb':grad,
+      borderWidth:2,pointRadius:3,fill:revChartType==='line',tension:.4,
+      borderRadius: revChartType==='bar'?5:0
+    }]},
+    options:{ responsive:true,maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{
+        backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
+        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
+        callbacks:{label:c=>' NT$ '+c.raw.toLocaleString()}}},
+      scales:{ x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},
+               y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}}}
+  });
+
+  // NR doughnut
+  if(nrChart){ nrChart.destroy(); nrChart=null; }
+  const ctx2 = document.getElementById('nr-chart').getContext('2d');
+  nrChart = new Chart(ctx2,{
+    type:'doughnut',
+    data:{labels:['新客','回頭客'],datasets:[{data:[totalNew,totalRet],backgroundColor:['#7086fb','#34d399'],borderColor:'transparent',hoverOffset:6}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#e2e8f0',
+        callbacks:{label:c=>{const t=c.dataset.data.reduce((a,b)=>a+b,0);return ` ${c.label}: ${c.raw} (${t>0?(c.raw/t*100).toFixed(1):'0'}%)` }}}}}
+  });
+
+  // daily table
+  const tbody = document.getElementById('daily-tbody');
+  if(!daily.length){ tbody.innerHTML='<tr><td colspan="7" class="text-center text-slate-500 py-8">尚無記錄，請前往「資料輸入」頁面新增</td></tr>'; return; }
+  tbody.innerHTML = daily.slice().reverse().map(r=>`
+    <tr>
+      <td>${r.date}</td>
+      <td><span style="color:${BRANCH_COLORS[r.branch]||'#fff'}">${BRANCH_LABELS[r.branch]||r.branch}</span></td>
+      <td class="num font-semibold text-white">${r.con}</td>
+      <td class="num">${r.new_c||0}</td>
+      <td class="num">${r.ret_c||0}</td>
+      <td class="num">${r.revenue>0?fmtR(r.revenue):'—'}</td>
+      <td class="num">${r.revenue>0&&r.con>0?fmtR(r.revenue/r.con):'—'}</td>
+    </tr>`).join('');
+}
+
+function switchRevType(type, btn){
+  btn.closest('.flex').querySelectorAll('.tab-nav-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  revChartType=type; renderDashboard();
+}
+
+// ──────────────────────────────────────────────────────────────
+// ADS RENDER
+// ──────────────────────────────────────────────────────────────
+let adSpendChart=null, cplChart=null;
+
+function renderAds(){
+  const ads   = loadAds().slice().sort((a,b)=>a.month.localeCompare(b.month));
+  const daily = loadDaily();
+  const tr    = taxRate();
+
+  // per-month revenue from daily records (fallback)
+  function monthRev(month){
+    const ad = ads.find(a=>a.month===month);
+    if(ad && ad.rev_override) return ad.rev_override;
+    return daily.filter(r=>r.date.slice(0,7)===month).reduce((s,r)=>s+r.revenue,0);
+  }
+
+  // totals
+  const fbTotalSpend  = ads.reduce((s,a)=>s+a.fb.spend,0);
+  const ggTotalSpend  = ads.reduce((s,a)=>s+a.gg.spend,0);
+  const fbTotalAfter  = fbTotalSpend*tr;
+  const ggTotalAfter  = ggTotalSpend*tr;
+  const allAfter      = fbTotalAfter+ggTotalAfter;
+  const fbTotalCon    = ads.reduce((s,a)=>s+a.fb.con,0);
+  const ggTotalCon    = ads.reduce((s,a)=>s+a.gg.con,0);
+  const allCon        = fbTotalCon+ggTotalCon;
+
+  setText('ad-fb-total', fmtR(fbTotalAfter));
+  setText('ad-fb-con',   fmt(fbTotalCon));
+  setText('ad-fb-cpl',   fbTotalCon>0?fmtR(fbTotalAfter/fbTotalCon):'—');
+  setText('ad-gg-total', fmtR(ggTotalAfter));
+  setText('ad-gg-con',   fmt(ggTotalCon));
+  setText('ad-gg-cpl',   ggTotalCon>0?fmtR(ggTotalAfter/ggTotalCon):'—');
+  setText('ad-all-total',fmtR(allAfter));
+  setText('ad-fb-pct',   pct(fbTotalAfter,allAfter));
+  setText('ad-gg-pct',   pct(ggTotalAfter,allAfter));
+  setText('ad-total-con',fmt(allCon));
+
+  const totalCPL    = allCon>0?allAfter/allCon:null;
+  const totalRevAll = ads.reduce((s,a)=>s+monthRev(a.month),0);
+  const percon      = allCon>0?totalRevAll/allCon:null;
+  setText('ad-total-cpl', (totalCPL?fmtR(totalCPL):'—') + ' / ' + (percon?fmtR(percon):'—'));
+
+  // FB table
+  const allMonthSpend = ads.map(a=>(a.fb.spend+a.gg.spend)*tr);
+  const totalAllAfterEach = allMonthSpend.reduce((s,v)=>s+v,0);
+
+  document.getElementById('fb-tbody').innerHTML = ads.length===0
+    ? '<tr><td colspan="6" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
+    : ads.map(a=>{
+      const after = a.fb.spend*tr;
+      const cpl   = a.fb.con>0?after/a.fb.con:null;
+      const totalM= (a.fb.spend+a.gg.spend)*tr;
+      return `<tr>
+        <td><span class="font-semibold text-white">${a.month}</span></td>
+        <td class="num">${fmtR(a.fb.spend)}</td>
+        <td class="num text-blue-400 font-semibold">${fmtR(after)}</td>
+        <td class="num">${fmt(a.fb.con)}</td>
+        <td class="num">${cpl?fmtR(cpl):'—'}</td>
+        <td class="num">${pct(after,totalM)}</td>
+      </tr>`;
+    }).join('') + `<tr class="total-row">
+      <td>合計</td><td class="num">${fmtR(fbTotalSpend)}</td>
+      <td class="num">${fmtR(fbTotalAfter)}</td>
+      <td class="num">${fmt(fbTotalCon)}</td>
+      <td class="num">${fbTotalCon>0?fmtR(fbTotalAfter/fbTotalCon):'—'}</td>
+      <td class="num">${pct(fbTotalAfter,allAfter)}</td>
     </tr>`;
-  }).join('');
-}
 
-// ─── SPARKLINES ────────────────────────────────────────────────────────────
-function sparkline(id, data, color) {
-  const el = document.getElementById(id);
-  const canvas = document.createElement('canvas');
-  canvas.height = 48;
-  el.appendChild(canvas);
-  new Chart(canvas, {
-    type: 'line',
-    data: {
-      labels: ['','','','','','',''],
-      datasets: [{ data, borderColor: color, borderWidth: 2,
-        pointRadius: 0, fill: true,
-        backgroundColor: color.replace(')',',0.15)').replace('rgb','rgba') }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: false } },
-      scales: { x: { display: false }, y: { display: false } },
-      animation: { duration: 800 }
+  // Google table
+  document.getElementById('gg-tbody').innerHTML = ads.length===0
+    ? '<tr><td colspan="6" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
+    : ads.map(a=>{
+      const after = a.gg.spend*tr;
+      const cpl   = a.gg.con>0?after/a.gg.con:null;
+      const totalM= (a.fb.spend+a.gg.spend)*tr;
+      return `<tr>
+        <td><span class="font-semibold text-white">${a.month}</span></td>
+        <td class="num">${fmtR(a.gg.spend)}</td>
+        <td class="num text-emerald-400 font-semibold">${fmtR(after)}</td>
+        <td class="num">${fmt(a.gg.con)}</td>
+        <td class="num">${cpl?fmtR(cpl):'—'}</td>
+        <td class="num">${pct(after,totalM)}</td>
+      </tr>`;
+    }).join('') + `<tr class="total-row">
+      <td>合計</td><td class="num">${fmtR(ggTotalSpend)}</td>
+      <td class="num">${fmtR(ggTotalAfter)}</td>
+      <td class="num">${fmt(ggTotalCon)}</td>
+      <td class="num">${ggTotalCon>0?fmtR(ggTotalAfter/ggTotalCon):'—'}</td>
+      <td class="num">${pct(ggTotalAfter,allAfter)}</td>
+    </tr>`;
+
+  // Combined table
+  document.getElementById('combined-tbody').innerHTML = ads.length===0
+    ? '<tr><td colspan="9" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
+    : ads.map(a=>{
+      const fbA   = a.fb.spend*tr, ggA=a.gg.spend*tr, allA=fbA+ggA;
+      const con   = a.fb.con+a.gg.con;
+      const cpl   = con>0?allA/con:null;
+      const rev   = monthRev(a.month);
+      const pc    = con>0?rev/con:null;
+      const roi   = allA>0?rev/allA:null;
+      return `<tr>
+        <td><span class="font-semibold text-white">${a.month}</span></td>
+        <td class="num text-violet-400 font-semibold">${fmtR(allA)}</td>
+        <td class="num"><span class="pill pill-fb">${pct(fbA,allA)}</span></td>
+        <td class="num"><span class="pill pill-gg">${pct(ggA,allA)}</span></td>
+        <td class="num">${fmt(con)}</td>
+        <td class="num">${cpl?fmtR(cpl):'—'}</td>
+        <td class="num">${rev>0?fmtR(rev):'—'}</td>
+        <td class="num">${pc?fmtR(pc):'—'}</td>
+        <td class="num">${roi?roi.toFixed(2)+'x':'—'}</td>
+      </tr>`;
+    }).join('') + (()=>{
+      const totalAllA = allAfter;
+      const allC = allCon;
+      const cplT = allC>0?totalAllA/allC:null;
+      const revT = ads.reduce((s,a)=>s+monthRev(a.month),0);
+      const pcT  = allC>0?revT/allC:null;
+      const roiT = totalAllA>0?revT/totalAllA:null;
+      return `<tr class="total-row">
+        <td>合計</td>
+        <td class="num">${fmtR(totalAllA)}</td>
+        <td class="num">${pct(fbTotalAfter,totalAllA)}</td>
+        <td class="num">${pct(ggTotalAfter,totalAllA)}</td>
+        <td class="num">${fmt(allC)}</td>
+        <td class="num">${cplT?fmtR(cplT):'—'}</td>
+        <td class="num">${revT>0?fmtR(revT):'—'}</td>
+        <td class="num">${pcT?fmtR(pcT):'—'}</td>
+        <td class="num">${roiT?roiT.toFixed(2)+'x':'—'}</td>
+      </tr>`;
+    })();
+
+  // charts
+  const months = ads.map(a=>a.month.slice(5)+' 月');
+  const fbSpends = ads.map(a=>Math.round(a.fb.spend*tr));
+  const ggSpends = ads.map(a=>Math.round(a.gg.spend*tr));
+  const fbCPLs = ads.map(a=>a.fb.con>0?Math.round(a.fb.spend*tr/a.fb.con):0);
+  const ggCPLs = ads.map(a=>a.gg.con>0?Math.round(a.gg.spend*tr/a.gg.con):0);
+
+  if(adSpendChart){ adSpendChart.destroy(); adSpendChart=null; }
+  if(cplChart){ cplChart.destroy(); cplChart=null; }
+
+  const chartOpts = (yLabel) => ({
+    responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},
+      tooltip:{backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#94a3b8',bodyColor:'#e2e8f0',
+        callbacks:{label:c=>` ${c.dataset.label}: NT$ ${c.raw.toLocaleString()}`}}},
+    scales:{
+      x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:11}}},
+      y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}
     }
+  });
+
+  adSpendChart = new Chart(document.getElementById('ad-spend-chart').getContext('2d'),{
+    type:'bar',
+    data:{labels:months,datasets:[
+      {label:'FB(稅後)',data:fbSpends,backgroundColor:'rgba(96,165,250,.7)',borderRadius:4},
+      {label:'Google(稅後)',data:ggSpends,backgroundColor:'rgba(52,211,153,.7)',borderRadius:4}
+    ]},
+    options:{...chartOpts(),plugins:{...chartOpts().plugins},scales:{...chartOpts().scales}}
+  });
+
+  cplChart = new Chart(document.getElementById('cpl-chart').getContext('2d'),{
+    type:'line',
+    data:{labels:months,datasets:[
+      {label:'FB CPL',data:fbCPLs,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2},
+      {label:'Google CPL',data:ggCPLs,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2}
+    ]},
+    options:{...chartOpts(),plugins:{...chartOpts().plugins},scales:{...chartOpts().scales}}
   });
 }
 
-function buildSparklines() {
-  const totalVals = tableData.map(r => r.seoul+r.hsinchu+r.taichung);
-  sparkline('sparkline-total',   totalVals,          '#7086fb');
-  sparkline('sparkline-seoul',   tableData.map(r=>r.seoul),    '#7086fb');
-  sparkline('sparkline-hsinchu', tableData.map(r=>r.hsinchu),  '#34d399');
-  sparkline('sparkline-taichung',tableData.map(r=>r.taichung), '#a78bfa');
+// ──────────────────────────────────────────────────────────────
+// ENTRY
+// ──────────────────────────────────────────────────────────────
+function addDailyRecord(){
+  const date   = document.getElementById('e-date').value;
+  const branch = document.getElementById('e-branch').value;
+  const con    = parseInt(document.getElementById('e-con').value)||0;
+  const nw     = parseInt(document.getElementById('e-new').value)||0;
+  const ret    = parseInt(document.getElementById('e-ret').value)||0;
+  const rev    = parseFloat(document.getElementById('e-rev').value)||0;
+  if(!date){ alert('請選擇日期'); return; }
+  const records = loadDaily();
+  // find existing same date+branch → update
+  const idx = records.findIndex(r=>r.date===date&&r.branch===branch);
+  const rec = {id:idx>=0?records[idx].id:Date.now(), date, branch, con, new_c:nw, ret_c:ret, revenue:rev};
+  if(idx>=0) records[idx]=rec; else records.push(rec);
+  saveDaily(records);
+  populateMonthSelects();
+  renderEntryList();
+  const msg=document.getElementById('entry-msg');
+  msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
 }
 
-// ─── NR CHART ──────────────────────────────────────────────────────────────
-let nrChart;
-function initNRChart() {
-  const ctx = document.getElementById('nrChart').getContext('2d');
-  const d = nrData.all;
-  nrChart = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: ['新客 New', '回頭客 Returning'],
-      datasets: [{
-        data: [d.new, d.ret],
-        backgroundColor: ['#7086fb','#34d399'],
-        borderColor: 'transparent',
-        hoverOffset: 8
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      cutout: '65%',
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1e2035', borderColor: 'rgba(255,255,255,.1)', borderWidth: 1,
-          titleColor: '#94a3b8', bodyColor: '#e2e8f0',
-          callbacks: {
-            label: ctx => {
-              const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
-              return ` ${ctx.label}: ${ctx.raw} (${((ctx.raw/total)*100).toFixed(1)}%)`;
-            }
-          }
-        }
-      }
-    }
-  });
+function deleteDailyRecord(id){
+  if(!confirm('確定刪除？')) return;
+  saveDaily(loadDaily().filter(r=>r.id!==id));
+  populateMonthSelects(); renderEntryList();
 }
 
-function updateNRChart() {
-  const key = document.getElementById('nrFilter').value;
-  const d = nrData[key];
-  nrChart.data.datasets[0].data = [d.new, d.ret];
-  nrChart.update('active');
+function renderEntryList(){
+  const monthF  = document.getElementById('list-month-filter')?.value||'all';
+  const branchF = document.getElementById('list-branch-filter')?.value||'all';
+  let data = loadDaily();
+  if(monthF!=='all')  data=data.filter(r=>r.date.slice(0,7)===monthF);
+  if(branchF!=='all') data=data.filter(r=>r.branch===branchF);
+  data.sort((a,b)=>b.date.localeCompare(a.date));
+  const tbody=document.getElementById('entry-tbody');
+  if(!data.length){ tbody.innerHTML='<tr><td colspan="7" class="text-center text-slate-500 py-8">尚無記錄</td></tr>'; return; }
+  tbody.innerHTML = data.map(r=>`
+    <tr>
+      <td>${r.date}</td>
+      <td style="color:${BRANCH_COLORS[r.branch]||'#fff'}">${BRANCH_LABELS[r.branch]||r.branch}</td>
+      <td class="num">${r.con}</td>
+      <td class="num">${r.new_c||0}</td>
+      <td class="num">${r.ret_c||0}</td>
+      <td class="num">${r.revenue>0?fmtR(r.revenue):'—'}</td>
+      <td class="num">
+        <button class="btn btn-danger btn-sm" onclick="editRecord('${r.id}')">編輯</button>
+        <button class="btn btn-danger btn-sm ml-1" onclick="deleteDailyRecord('${r.id}')">刪除</button>
+      </td>
+    </tr>`).join('');
 }
 
-// ─── REVENUE CHART ─────────────────────────────────────────────────────────
-let revenueChart;
-function initRevenueChart() {
-  const ctx = document.getElementById('revenueChart').getContext('2d');
-  const data = revenueData.all;
-  const grad = ctx.createLinearGradient(0,0,0,260);
-  grad.addColorStop(0,'rgba(112,134,251,0.3)');
-  grad.addColorStop(1,'rgba(112,134,251,0)');
-  revenueChart = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: weekdays,
-      datasets: [{
-        label: '營業額 (NT$)', data,
-        borderColor: '#7086fb', backgroundColor: grad,
-        borderWidth: 2.5, pointRadius: 4, pointBackgroundColor: '#7086fb',
-        fill: true, tension: 0.4
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          backgroundColor: '#1e2035', borderColor: 'rgba(255,255,255,.1)', borderWidth: 1,
-          titleColor: '#94a3b8', bodyColor: '#e2e8f0',
-          callbacks: { label: c => ` NT$ ${c.raw.toLocaleString()}` }
-        }
-      },
-      scales: {
-        x: { grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#64748b', font:{size:11} } },
-        y: {
-          grid: { color: 'rgba(255,255,255,.06)' }, ticks: { color: '#64748b', font:{size:11},
-          callback: v => 'NT$ '+v.toLocaleString() }
-        }
-      }
-    }
-  });
+function editRecord(id){
+  const r = loadDaily().find(r=>String(r.id)===String(id));
+  if(!r) return;
+  document.getElementById('e-date').value   = r.date;
+  document.getElementById('e-branch').value = r.branch;
+  document.getElementById('e-con').value    = r.con;
+  document.getElementById('e-new').value    = r.new_c||0;
+  document.getElementById('e-ret').value    = r.ret_c||0;
+  document.getElementById('e-rev').value    = r.revenue||0;
+  document.getElementById('e-date').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
-function updateRevenueChart() {
-  const key = document.getElementById('revFilter').value;
-  revenueChart.data.datasets[0].data = revenueData[key];
-  revenueChart.update('active');
+// ──────────────────────────────────────────────────────────────
+// AD MODAL
+// ──────────────────────────────────────────────────────────────
+function openAdModal(){
+  const today = new Date().toISOString().slice(0,7);
+  document.getElementById('ad-month').value    = today;
+  document.getElementById('ad-fb-spend').value = '';
+  document.getElementById('ad-fb-con-in').value= '';
+  document.getElementById('ad-gg-spend').value = '';
+  document.getElementById('ad-gg-con-in').value= '';
+  document.getElementById('ad-rev-in').value   = '';
+  loadAdModalForMonth(today);
+  document.getElementById('ad-modal').classList.add('open');
+  document.getElementById('ad-month').addEventListener('change', function(){
+    loadAdModalForMonth(this.value);
+  },{once:false});
 }
 
-function switchRevView(type, btn) {
-  document.querySelectorAll('#revenueChart ~ .tab-btn, .tab-btn').forEach(b=>{});
-  btn.closest('.flex').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  revenueChartType = type;
-  revenueChart.config.type = type;
-  if (type === 'bar') {
-    revenueChart.data.datasets[0].backgroundColor = '#7086fb';
-    revenueChart.data.datasets[0].fill = false;
+function loadAdModalForMonth(month){
+  const ads = loadAds();
+  const existing = ads.find(a=>a.month===month);
+  if(existing){
+    document.getElementById('ad-fb-spend').value  = existing.fb.spend||'';
+    document.getElementById('ad-fb-con-in').value = existing.fb.con||'';
+    document.getElementById('ad-gg-spend').value  = existing.gg.spend||'';
+    document.getElementById('ad-gg-con-in').value = existing.gg.con||'';
+    document.getElementById('ad-rev-in').value    = existing.rev_override||'';
+    document.getElementById('ad-delete-btn').style.display='inline-block';
   } else {
-    const ctx = document.getElementById('revenueChart').getContext('2d');
-    const grad = ctx.createLinearGradient(0,0,0,260);
-    grad.addColorStop(0,'rgba(112,134,251,0.3)');
-    grad.addColorStop(1,'rgba(112,134,251,0)');
-    revenueChart.data.datasets[0].backgroundColor = grad;
-    revenueChart.data.datasets[0].fill = true;
+    document.getElementById('ad-delete-btn').style.display='none';
   }
-  revenueChart.destroy();
-  const ctx2 = document.getElementById('revenueChart').getContext('2d');
-  revenueChart = new Chart(ctx2, {
-    type,
-    data: {
-      labels: weekdays,
-      datasets: [{
-        label: '營業額 (NT$)',
-        data: revenueData[document.getElementById('revFilter').value],
-        borderColor: '#7086fb',
-        backgroundColor: type==='bar' ? '#7086fb' : (() => {
-          const g = ctx2.createLinearGradient(0,0,0,260);
-          g.addColorStop(0,'rgba(112,134,251,0.3)'); g.addColorStop(1,'rgba(112,134,251,0)'); return g;
-        })(),
-        borderWidth: 2.5, pointRadius: type==='bar'?0:4,
-        pointBackgroundColor: '#7086fb', fill: type==='line', tension: 0.4,
-        borderRadius: type==='bar'?6:0,
-      }]
-    },
-    options: revenueChart.options
-  });
 }
 
-// ─── CHANNEL CHART ─────────────────────────────────────────────────────────
-let channelChart;
-function initChannelChart() {
-  const ctx = document.getElementById('channelChart').getContext('2d');
-  channelChart = new Chart(ctx, buildChannelConfig());
-}
-
-function buildChannelConfig() {
-  const labels = channels.map(c=>c.name);
-  const data   = channels.map(c=>c.value);
-  const colors = channels.map(c=>c.color);
-  const type   = channelChartType;
-  return {
-    type,
-    data: {
-      labels,
-      datasets: [{
-        label: '來源人數',
-        data, backgroundColor: colors,
-        borderColor: 'transparent',
-        borderWidth: 0,
-        borderRadius: type==='bar'?6:0,
-        hoverOffset: type==='pie'?10:0,
-      }]
-    },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: type!=='bar',
-          labels: { color:'#94a3b8', font:{size:12}, padding:16,
-            usePointStyle:true, pointStyleWidth:8 }
-        },
-        tooltip: {
-          backgroundColor: '#1e2035', borderColor: 'rgba(255,255,255,.1)', borderWidth: 1,
-          titleColor: '#94a3b8', bodyColor: '#e2e8f0',
-          callbacks: {
-            label: c => {
-              if (type==='pie') {
-                const total = c.dataset.data.reduce((a,b)=>a+b,0);
-                return ` ${c.label}: ${c.raw} (${((c.raw/total)*100).toFixed(1)}%)`;
-              }
-              return ` ${c.raw} 人`;
-            }
-          }
-        }
-      },
-      scales: type==='bar' ? {
-        x: { grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#64748b',font:{size:12}} },
-        y: { grid:{color:'rgba(255,255,255,.06)'}, ticks:{color:'#64748b',font:{size:11}} }
-      } : {}
-    }
-  };
-}
-
-function refreshChannelChart() {
-  channelChart.destroy();
-  channelChart = new Chart(document.getElementById('channelChart').getContext('2d'), buildChannelConfig());
-}
-
-function switchChView(type, btn) {
-  btn.closest('.flex').querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  channelChartType = type;
-  refreshChannelChart();
-}
-
-// ─── CHANNEL MANAGEMENT ────────────────────────────────────────────────────
-function renderChannelList() {
-  const el = document.getElementById('channelList');
-  el.innerHTML = channels.map((c,i) => `
-    <div class="channel-tag">
-      <span class="channel-dot" style="background:${c.color}"></span>
-      <span class="flex-1 font-500">${c.name}</span>
-      <input type="number" class="input-styled w-20 text-center text-xs py-1 px-2"
-        value="${c.value}" min="0"
-        onchange="updateChannelValue(${i},this.value)" />
-      <span class="text-slate-500 text-xs">人</span>
-      ${i >= 3 ? `<button class="btn-danger" onclick="removeChannel(${i})">刪除</button>` : ''}
-    </div>`).join('');
-}
-
-function updateChannelValue(i, val) {
-  channels[i].value = parseInt(val) || 0;
-  saveChannels(); refreshChannelChart();
-}
-
-function removeChannel(i) {
-  channels.splice(i, 1);
-  saveChannels(); renderChannelList(); refreshChannelChart();
-}
-
-function addChannel() {
-  const nameEl = document.getElementById('newChannelName');
-  const dataEl = document.getElementById('newChannelData');
-  const name   = nameEl.value.trim();
-  const value  = parseInt(dataEl.value) || 0;
-  if (!name) { nameEl.focus(); return; }
-  if (channels.find(c=>c.name.toLowerCase()===name.toLowerCase())) {
-    nameEl.value=''; nameEl.placeholder='⚠ 已存在此渠道'; return;
-  }
-  channels.push({ name, value, color: PALETTE[channels.length % PALETTE.length] });
-  saveChannels(); renderChannelList(); refreshChannelChart();
-  nameEl.value=''; dataEl.value='';
-  nameEl.placeholder='渠道名稱 (e.g. Instagram)';
-}
-
-// ─── MODAL ─────────────────────────────────────────────────────────────────
-function openModal()  {
-  renderChannelList();
-  document.getElementById('adminModal').classList.add('open');
-}
-function closeModal() { document.getElementById('adminModal').classList.remove('open'); }
-function closeModalOutside(e) { if (e.target.id==='adminModal') closeModal(); }
-
-document.addEventListener('keydown', e => { if (e.key==='Escape') closeModal(); });
-
-// ─── Enter key in modal ─────────────────────────────────────────────────────
-document.getElementById('newChannelName').addEventListener('keydown', e => {
-  if (e.key==='Enter') addChannel();
+document.getElementById('ad-month').addEventListener('change', function(){
+  loadAdModalForMonth(this.value);
 });
-document.getElementById('newChannelData').addEventListener('keydown', e => {
-  if (e.key==='Enter') addChannel();
+
+function saveAdData(){
+  const month   = document.getElementById('ad-month').value;
+  const fbSpend = parseFloat(document.getElementById('ad-fb-spend').value)||0;
+  const fbCon   = parseInt(document.getElementById('ad-fb-con-in').value)||0;
+  const ggSpend = parseFloat(document.getElementById('ad-gg-spend').value)||0;
+  const ggCon   = parseInt(document.getElementById('ad-gg-con-in').value)||0;
+  const revOv   = parseFloat(document.getElementById('ad-rev-in').value)||null;
+  if(!month){ alert('請選擇月份'); return; }
+  const ads = loadAds();
+  const idx = ads.findIndex(a=>a.month===month);
+  const rec = {month, fb:{spend:fbSpend,con:fbCon}, gg:{spend:ggSpend,con:ggCon}, rev_override:revOv};
+  if(idx>=0) ads[idx]=rec; else ads.push(rec);
+  saveAds(ads);
+  renderAds();
+  const msg=document.getElementById('ad-msg');
+  msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
+}
+
+function deleteAdMonth(){
+  const month = document.getElementById('ad-month').value;
+  if(!confirm(`確定刪除 ${month} 的廣告數據？`)) return;
+  saveAds(loadAds().filter(a=>a.month!==month));
+  renderAds(); closeAdModal();
+}
+
+function closeAdModal(){ document.getElementById('ad-modal').classList.remove('open'); }
+function closeAdModalOutside(e){ if(e.target.id==='ad-modal') closeAdModal(); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdModal(); });
+
+// ──────────────────────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────────────────────
+function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+
+function startClock(){
+  const el=document.getElementById('live-clock');
+  const tick=()=>el.textContent=new Date().toLocaleTimeString('zh-TW',{hour12:false});
+  tick(); setInterval(tick,1000);
+}
+
+// ──────────────────────────────────────────────────────────────
+// BOOT
+// ──────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded',()=>{
+  seedIfEmpty();
+  startClock();
+  populateMonthSelects();
+  // set today in entry form
+  document.getElementById('e-date').value = new Date().toISOString().slice(0,10);
+  renderDashboard();
 });
 </script>
 </body>
