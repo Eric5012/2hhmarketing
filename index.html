@@ -101,9 +101,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <!-- PAGE TABS -->
 <div class="px-4 sm:px-8 pt-5 pb-0">
   <div class="flex gap-1 bg-white/5 rounded-xl p-1 w-fit">
-    <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">📊 儀表板</button>
-    <button class="tab-nav-btn" onclick="showTab('seoul',this)">🏥 首爾醫美</button>
-    <button class="tab-nav-btn" onclick="showTab('entry',this)">✏️ 資料輸入</button>
+    <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">廣告總覽</button>
+    <button class="tab-nav-btn" onclick="showTab('seoul',this)">首爾醫美</button>
+    <button class="tab-nav-btn" onclick="showTab('entry',this)">資料輸入</button>
   </div>
 </div>
 
@@ -122,9 +122,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <select class="sel text-xs" id="db-month-filter" onchange="renderDashboard()"></select>
       <select class="sel text-xs" id="db-branch-filter" onchange="renderDashboard()">
         <option value="all">全部分店</option>
-        <option value="seoul">🇰🇷 首爾</option>
-        <option value="hsinchu">🏙️ 新竹</option>
-        <option value="taichung">🏔️ 台中</option>
+        <option value="seoul">首爾</option>
+        <option value="hsinchu">新竹</option>
+        <option value="taichung">台中</option>
       </select>
     </div>
   </div>
@@ -137,17 +137,17 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <div class="text-slate-400 text-xs mt-1">本月累計 <span id="kpi-total-con" class="text-white font-semibold">—</span> 筆</div>
     </div>
     <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">🇰🇷 首爾</div>
+      <div class="text-slate-300 text-xs mb-1">首爾</div>
       <div class="text-2xl font-bold text-white" id="kpi-seoul-con">—</div>
       <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-seoul-pct" class="font-semibold" style="color:#7086fb">—</span></div>
     </div>
     <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">🏙️ 新竹</div>
+      <div class="text-slate-300 text-xs mb-1">新竹</div>
       <div class="text-2xl font-bold text-white" id="kpi-hsinchu-con">—</div>
       <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-hsinchu-pct" class="font-semibold" style="color:#34d399">—</span></div>
     </div>
     <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">🏔️ 台中</div>
+      <div class="text-slate-300 text-xs mb-1">台中</div>
       <div class="text-2xl font-bold text-white" id="kpi-taichung-con">—</div>
       <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-taichung-pct" class="font-semibold" style="color:#a78bfa">—</span></div>
     </div>
@@ -289,9 +289,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <div>
         <label class="text-xs text-slate-400 block mb-1">分店</label>
         <select id="e-branch" class="sel w-full">
-          <option value="seoul">🇰🇷 首爾 Seoul</option>
-          <option value="hsinchu">🏙️ 新竹 Hsinchu</option>
-          <option value="taichung">🏔️ 台中 Taichung</option>
+          <option value="seoul">首爾 Seoul</option>
+          <option value="hsinchu">新竹 Hsinchu</option>
+          <option value="taichung">台中 Taichung</option>
         </select>
       </div>
       <div>
@@ -350,7 +350,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="modal-box" style="width:min(95vw,540px)">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-white font-bold text-base">🏥 首爾醫美 廣告數據</h3>
+        <h3 class="text-white font-bold text-base">首爾醫美 廣告數據</h3>
         <p class="text-slate-400 text-xs mt-0.5" id="bm-subtitle">月份廣告數據</p>
       </div>
       <button onclick="closeBrandModal()" class="text-slate-500 hover:text-white text-xl leading-none">✕</button>
@@ -470,7 +470,7 @@ const fmt  = n => n==null||isNaN(n) ? '—' : Math.round(n).toLocaleString('zh-T
 const fmtR = n => n==null||isNaN(n) ? '—' : 'NT$ '+Math.round(n).toLocaleString('zh-TW');
 const pct  = (a,b) => b===0 ? '—' : (a/b*100).toFixed(1)+'%';
 
-const BRANCH_LABELS = {seoul:'🇰🇷 首爾', hsinchu:'🏙️ 新竹', taichung:'🏔️ 台中'};
+const BRANCH_LABELS = {seoul:'首爾', hsinchu:'新竹', taichung:'台中'};
 const BRANCH_COLORS = {seoul:'#7086fb', hsinchu:'#34d399', taichung:'#a78bfa'};
 
 function getMonths(){
