@@ -79,6 +79,17 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .pt .r-est-h td{background:rgba(79,96,245,.22);color:#a5b4fc;font-weight:700}
 .pt .r-est td{background:rgba(79,96,245,.07);color:#a5b4fc}
 .pt .r-oth td{background:rgba(255,255,255,.02);color:#94a3b8}
+.pt .pt-inp{color:#e2e8f0}
+.pt .pt-auto{color:rgba(160,180,220,.38);font-style:italic;border-left:1px dashed rgba(255,255,255,.09)!important}
+.pt .r-newrev td{background:rgba(251,191,36,.08);color:#fde68a}
+.pt .r-contrib td{background:rgba(52,211,153,.09);color:#6ee7b7;font-style:italic}
+.pt .r-cpa td{background:rgba(251,146,60,.07);color:#fdba74;font-style:italic}
+.pt .r-conv td{background:rgba(167,139,250,.08);color:#c4b5fd;font-style:italic}
+.pt .r-pm td{background:rgba(99,102,241,.08);color:#a5b4fc}
+.pt .r-est-target td{background:rgba(250,204,21,.17);color:#fde047;font-weight:700}
+.pt .pt-sub-inp{background:rgba(45,40,140,.7)!important;color:#c4b5fd;font-size:10px;text-align:center;font-weight:600}
+.pt .pt-sub-auto{background:rgba(20,20,60,.7)!important;color:#64748b;font-size:10px;text-align:center;font-style:italic}
+.pt .pt-hd-yr{background:rgba(45,38,160,.9)!important;color:#e0e7ff;font-size:13px;font-weight:800;letter-spacing:.05em;text-align:center}
 </style>
 </head>
 <body>
@@ -100,7 +111,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <div class="px-4 sm:px-8 pt-5 pb-0">
   <div class="flex gap-1 bg-white/5 rounded-xl p-1 w-fit">
     <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">📊 儀表板</button>
-    <button class="tab-nav-btn" onclick="showTab('ads',this)">📣 廣告分析</button>
+    <button class="tab-nav-btn" onclick="showTab('seoul',this)">🏥 首爾醫美</button>
+    <button class="tab-nav-btn" onclick="showTab('hh',this)">💇 HH醫髮</button>
     <button class="tab-nav-btn" onclick="showTab('entry',this)">✏️ 資料輸入</button>
   </div>
 </div>
@@ -218,45 +230,69 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 </div>
 
 <!-- ═══════════════════════════════════════
-     TAB 2: ADS
+     TAB 2: 首爾醫美 ADS
 ══════════════════════════════════════════ -->
-<div id="tab-ads" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
-
+<div id="tab-seoul" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-bold text-white">廣告成效分析</h1>
-      <p class="text-slate-400 text-sm">點擊月份欄位即可輸入數據 · Google 稅後自動計算</p>
+      <h1 class="text-xl font-bold text-white">🏥 首爾醫美 廣告成效分析</h1>
+      <p class="text-slate-400 text-sm">點擊月份欄位輸入數據 · 斜體欄位自動計算</p>
     </div>
     <div class="flex gap-2 flex-wrap items-center">
-      <select id="ads-year" class="sel font-bold" style="font-size:14px" onchange="renderAds()"></select>
-      <div class="flex items-center gap-2 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-        <span>Google 稅率</span>
-        <input id="tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="5" min="0" max="50" onchange="renderAds()"/>
-        <span>%</span>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="openAdModal(null)">＋ 新增 / 編輯月份</button>
+      <select id="seoul-year" class="sel font-bold" style="font-size:14px" onchange="renderBrandAds('seoul')"></select>
+      <button class="btn btn-primary btn-sm" onclick="openBrandModal('seoul',null)">＋ 新增 / 編輯月份</button>
     </div>
   </div>
-
-  <!-- pivot table card -->
   <div class="card" style="padding:0;overflow:hidden">
     <div class="overflow-x-auto">
-      <table class="pt" id="ads-pivot" style="min-width:800px">
-        <thead id="ads-pt-head"></thead>
-        <tbody id="ads-pt-body"></tbody>
+      <table class="pt" id="seoul-pivot" style="min-width:900px">
+        <thead id="seoul-pt-head"></thead>
+        <tbody id="seoul-pt-body"></tbody>
       </table>
     </div>
   </div>
-
-  <!-- charts row -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <div class="card flex flex-col gap-2">
-      <div class="section-title mb-0">月度廣告花費趨勢 (稅後)</div>
-      <div style="height:220px;position:relative"><canvas id="ad-spend-chart"></canvas></div>
+      <div class="section-title mb-0">月度廣告花費趨勢</div>
+      <div style="height:220px;position:relative"><canvas id="seoul-spend-chart"></canvas></div>
     </div>
     <div class="card flex flex-col gap-2">
       <div class="section-title mb-0">月度 CPL 比較</div>
-      <div style="height:220px;position:relative"><canvas id="cpl-chart"></canvas></div>
+      <div style="height:220px;position:relative"><canvas id="seoul-cpl-chart"></canvas></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     TAB 3: HH醫髮 ADS
+══════════════════════════════════════════ -->
+<div id="tab-hh" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div>
+      <h1 class="text-xl font-bold text-white">💇 HH醫髮 廣告成效分析</h1>
+      <p class="text-slate-400 text-sm">點擊月份欄位輸入數據 · 斜體欄位自動計算</p>
+    </div>
+    <div class="flex gap-2 flex-wrap items-center">
+      <select id="hh-year" class="sel font-bold" style="font-size:14px" onchange="renderBrandAds('hh')"></select>
+      <button class="btn btn-primary btn-sm" onclick="openBrandModal('hh',null)">＋ 新增 / 編輯月份</button>
+    </div>
+  </div>
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="overflow-x-auto">
+      <table class="pt" id="hh-pivot" style="min-width:900px">
+        <thead id="hh-pt-head"></thead>
+        <tbody id="hh-pt-body"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="card flex flex-col gap-2">
+      <div class="section-title mb-0">月度廣告花費趨勢</div>
+      <div style="height:220px;position:relative"><canvas id="hh-spend-chart"></canvas></div>
+    </div>
+    <div class="card flex flex-col gap-2">
+      <div class="section-title mb-0">月度 CPL 比較</div>
+      <div style="height:220px;position:relative"><canvas id="hh-cpl-chart"></canvas></div>
     </div>
   </div>
 </div>
@@ -338,97 +374,99 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 </div>
 
-<!-- AD INPUT MODAL -->
-<div id="ad-modal" class="modal-overlay" onclick="closeAdModalOutside(event)">
-  <div class="modal-box" style="width:min(95vw,540px)">
+<!-- BRAND INPUT MODAL -->
+<div id="brand-modal" class="modal-overlay" onclick="closeBrandModalOutside(event)">
+  <div class="modal-box" style="width:min(95vw,600px)">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-white font-bold text-base">廣告數據輸入</h3>
-        <p class="text-slate-400 text-xs mt-0.5" id="ad-modal-subtitle">月份廣告數據</p>
+        <h3 class="text-white font-bold text-base" id="bm-title">廣告數據輸入</h3>
+        <p class="text-slate-400 text-xs mt-0.5" id="bm-subtitle">月份廣告數據</p>
       </div>
-      <button onclick="closeAdModal()" class="text-slate-500 hover:text-white text-xl leading-none">✕</button>
+      <button onclick="closeBrandModal()" class="text-slate-500 hover:text-white text-xl leading-none">✕</button>
     </div>
+    <input type="hidden" id="bm-brand"/>
 
     <div class="mb-4">
       <label class="text-xs text-slate-400 block mb-1">月份</label>
-      <input type="month" id="ad-month" class="inp"/>
+      <input type="month" id="bm-month" class="inp" onchange="fillBrandModal()"/>
     </div>
 
     <div class="space-y-3">
       <!-- Google -->
       <div class="rounded-xl p-4" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22)">
-        <div class="text-xs font-bold text-emerald-400 mb-3 flex items-center gap-2 uppercase tracking-wider">
-          <span class="pill pill-gg">Google</span> Google Ads
+        <div class="text-xs font-bold text-emerald-400 mb-3 uppercase tracking-wider">Google Ads</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-gg-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">新客業績 NT$</label><input type="number" id="bm-gg-newrev" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-gg-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-gg-con" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">估值目標 NT$</label><input type="number" id="bm-gg-est" class="inp" placeholder="0" min="0"/></div>
         </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">花費 NT$</label>
-            <input type="number" id="ad-gg-spend" class="inp" placeholder="0" min="0"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">CON 數</label>
-            <input type="number" id="ad-gg-con-in" class="inp" placeholder="0" min="0"/>
-          </div>
-        </div>
-        <p class="text-xs text-slate-500 mt-2">稅後自動依稅率計算 · CPL 自動帶出</p>
       </div>
 
       <!-- FB -->
       <div class="rounded-xl p-4" style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.22)">
-        <div class="text-xs font-bold text-blue-400 mb-3 flex items-center gap-2 uppercase tracking-wider">
-          <span class="pill pill-fb">FB</span> Facebook Ads
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">花費 NT$</label>
-            <input type="number" id="ad-fb-spend" class="inp" placeholder="0" min="0"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">CON 數</label>
-            <input type="number" id="ad-fb-con-in" class="inp" placeholder="0" min="0"/>
-          </div>
+        <div class="text-xs font-bold text-blue-400 mb-3 uppercase tracking-wider">Facebook Ads</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-fb-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">新客業績 NT$</label><input type="number" id="bm-fb-newrev" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-fb-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-fb-con" class="inp" placeholder="0" min="0"/></div>
         </div>
       </div>
 
-      <!-- 其他 -->
+      <!-- Q -->
+      <div class="rounded-xl p-4" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2)">
+        <div class="text-xs font-bold text-violet-400 mb-3 uppercase tracking-wider">Q 活動</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-q-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-q-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-q-con" class="inp" placeholder="0" min="0"/></div>
+        </div>
+      </div>
+
+      <!-- H -->
+      <div class="rounded-xl p-4" style="background:rgba(251,146,60,.06);border:1px solid rgba(251,146,60,.2)">
+        <div class="text-xs font-bold text-orange-400 mb-3 uppercase tracking-wider">H 活動</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-h-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-h-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-h-con" class="inp" placeholder="0" min="0"/></div>
+        </div>
+      </div>
+
+      <!-- Extra -->
       <div class="rounded-xl p-4" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
-        <div class="text-xs font-bold text-slate-300 mb-3 uppercase tracking-wider">其他費用</div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">SEO NT$</label>
-            <input type="number" id="ad-seo" class="inp" placeholder="0" min="0"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">預扣金 NT$</label>
-            <input type="number" id="ad-prepaid" class="inp" placeholder="0" min="0"/>
-          </div>
+        <div class="text-xs font-bold text-slate-300 mb-3 uppercase tracking-wider">其他活動</div>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-ex-spend" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-ex-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-ex-con" class="inp" placeholder="0" min="0"/></div>
         </div>
       </div>
 
-      <!-- 業績 & 估值 -->
-      <div class="rounded-xl p-4" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2)">
-        <div class="text-xs font-bold text-amber-400 mb-3 uppercase tracking-wider">業績 / 估值</div>
+      <!-- 私訊 -->
+      <div class="rounded-xl p-4" style="background:rgba(99,102,241,.06);border:1px solid rgba(99,102,241,.2)">
+        <div class="text-xs font-bold text-indigo-400 mb-3 uppercase tracking-wider">私訊</div>
         <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">實際業績 NT$ <span class="text-slate-600">(選填)</span></label>
-            <input type="number" id="ad-rev-in" class="inp" placeholder="留空=每日記錄加總" min="0"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">估值業績 NT$</label>
-            <input type="number" id="ad-est-rev" class="inp" placeholder="0" min="0"/>
-          </div>
-          <div>
-            <label class="text-xs text-slate-400 block mb-1">估值 CON</label>
-            <input type="number" id="ad-est-con" class="inp" placeholder="0" min="0"/>
-          </div>
+          <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-pm-inq" class="inp" placeholder="0" min="0"/></div>
+          <div><label class="text-xs text-slate-400 block mb-1">Con 數</label><input type="number" id="bm-pm-con" class="inp" placeholder="0" min="0"/></div>
+        </div>
+      </div>
+
+      <!-- 估值目標 -->
+      <div class="rounded-xl p-4" style="background:rgba(250,204,21,.07);border:1px solid rgba(250,204,21,.25)">
+        <div class="text-xs font-bold text-yellow-400 mb-3 uppercase tracking-wider">估值目標</div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">目標業績 NT$</label><input type="number" id="bm-est-target" class="inp" placeholder="0" min="0"/></div>
         </div>
       </div>
     </div>
 
     <div class="mt-5 flex gap-2 items-center">
-      <button class="btn btn-primary" onclick="saveAdData()">儲存</button>
-      <button class="btn btn-danger btn-sm" id="ad-delete-btn" onclick="deleteAdMonth()" style="display:none">刪除此月</button>
-      <span id="ad-msg" class="text-xs text-emerald-400 hidden">✓ 已儲存！</span>
+      <button class="btn btn-primary" onclick="saveBrandData()">儲存</button>
+      <button class="btn btn-danger btn-sm" id="bm-delete-btn" onclick="deleteBrandMonth()" style="display:none">刪除此月</button>
+      <span id="bm-msg" class="text-xs text-emerald-400 hidden">✓ 已儲存！</span>
     </div>
   </div>
 </div>
@@ -438,12 +476,13 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 // STORAGE
 // ──────────────────────────────────────────────────────────────
 const STORAGE_DAILY = 'dash_daily_v2';
-const STORAGE_ADS   = 'dash_ads_v4'; // v4: pivot layout, Google+FB+其他+估值
+const STORAGE_SEOUL = 'dash_seoul_v1';
+const STORAGE_HH    = 'dash_hh_v1';
 
 function loadDaily(){ return JSON.parse(localStorage.getItem(STORAGE_DAILY)||'[]'); }
 function saveDaily(d){ localStorage.setItem(STORAGE_DAILY, JSON.stringify(d)); }
-function loadAds()  { return JSON.parse(localStorage.getItem(STORAGE_ADS)||'[]'); }
-function saveAds(d) { localStorage.setItem(STORAGE_ADS, JSON.stringify(d)); }
+function loadBrandAds(brand){ return JSON.parse(localStorage.getItem(brand==='seoul'?STORAGE_SEOUL:STORAGE_HH)||'[]'); }
+function saveBrandAds(brand,d){ localStorage.setItem(brand==='seoul'?STORAGE_SEOUL:STORAGE_HH, JSON.stringify(d)); }
 
 // ──────────────────────────────────────────────────────────────
 // SEED DATA (daily only — ads start empty)
@@ -484,11 +523,9 @@ const BRANCH_COLORS = {seoul:'#7086fb', hsinchu:'#34d399', taichung:'#a78bfa'};
 
 function getMonths(){
   const daily = loadDaily();
-  const ads   = loadAds();
-  const months = new Set([
-    ...daily.map(r=>r.date.slice(0,7)),
-    ...ads.map(a=>a.month)
-  ]);
+  const months = new Set(daily.map(r=>r.date.slice(0,7)));
+  loadBrandAds('seoul').forEach(a=>months.add(a.month));
+  loadBrandAds('hh').forEach(a=>months.add(a.month));
   return Array.from(months).sort().reverse();
 }
 
@@ -504,8 +541,6 @@ function populateMonthSelects(){
   });
 }
 
-function taxRate(){ return 1 + (parseFloat(document.getElementById('tax-rate')?.value||5)/100); }
-
 // ──────────────────────────────────────────────────────────────
 // TAB SWITCHING
 // ──────────────────────────────────────────────────────────────
@@ -515,7 +550,8 @@ function showTab(tab, btn){
   document.getElementById('tab-'+tab).classList.remove('hidden');
   btn.classList.add('active');
   if(tab==='dashboard') renderDashboard();
-  if(tab==='ads') renderAds();
+  if(tab==='seoul') renderBrandAds('seoul');
+  if(tab==='hh') renderBrandAds('hh');
   if(tab==='entry') { populateMonthSelects(); renderEntryList(); }
 }
 
@@ -626,156 +662,183 @@ function switchRevType(type, btn){
 }
 
 // ──────────────────────────────────────────────────────────────
-// ADS RENDER  (pivot: months = columns, metrics = rows)
+// BRAND ADS RENDER (pivot: months = columns, metrics = rows)
 // ──────────────────────────────────────────────────────────────
-let adSpendChart=null, cplChart=null;
+const _brandCharts = {};  // { 'seoul-spend': Chart, ... }
 
-function monthRevFromDaily(month){
-  return loadDaily().filter(r=>r.date.slice(0,7)===month).reduce((s,r)=>s+r.revenue,0);
+function _destroyBrandCharts(brand){
+  [`${brand}-spend`,`${brand}-cpl`].forEach(k=>{ if(_brandCharts[k]){ _brandCharts[k].destroy(); delete _brandCharts[k]; } });
 }
 
-function populateAdsYears(){
-  const ads   = loadAds();
+function _emptyBrandRec(){
+  return {
+    google:{ spend:0, new_rev:0, inq:0, con:0, est:0 },
+    fb:    { spend:0, new_rev:0, inq:0, con:0 },
+    q:     { spend:0, inq:0, con:0 },
+    h:     { spend:0, inq:0, con:0 },
+    extra: { spend:0, inq:0, con:0 },
+    pm:    { inq:0, con:0 },
+    est_target: 0
+  };
+}
+
+function _mergeBrandRec(stored){
+  const def = _emptyBrandRec();
+  if(!stored) return def;
+  return {
+    google: {...def.google,...(stored.google||{})},
+    fb:     {...def.fb,...(stored.fb||{})},
+    q:      {...def.q,...(stored.q||{})},
+    h:      {...def.h,...(stored.h||{})},
+    extra:  {...def.extra,...(stored.extra||{})},
+    pm:     {...def.pm,...(stored.pm||{})},
+    est_target: stored.est_target||0
+  };
+}
+
+function populateBrandYears(brand){
+  const data  = loadBrandAds(brand);
   const years = new Set([String(new Date().getFullYear())]);
-  ads.forEach(a=>years.add(a.month.slice(0,4)));
+  data.forEach(a=>years.add(a.month.slice(0,4)));
   const sorted = Array.from(years).sort().reverse();
-  const el = document.getElementById('ads-year');
+  const el = document.getElementById(`${brand}-year`);
   if(!el) return;
   const cur = el.value;
   el.innerHTML = sorted.map(y=>`<option value="${y}">${y} 年</option>`).join('');
   if(cur && sorted.includes(cur)) el.value=cur;
 }
 
-function renderAds(){
-  populateAdsYears();
-  const yearEl = document.getElementById('ads-year');
+function renderBrandAds(brand){
+  populateBrandYears(brand);
+  const yearEl = document.getElementById(`${brand}-year`);
   const year   = yearEl ? yearEl.value : String(new Date().getFullYear());
-  const tr     = taxRate();
 
-  // Build month keys for all 12 months of the selected year
   const mkeys = Array.from({length:12},(_,i)=>`${year}-${String(i+1).padStart(2,'0')}`);
   const mNums = mkeys.map(k=>parseInt(k.slice(5)));
 
-  // Build lookup map from storage
   const adsMap = {};
-  loadAds().forEach(a=>{ adsMap[a.month]=a; });
+  loadBrandAds(brand).forEach(a=>{ adsMap[a.month]=a; });
+  const has  = k => !!adsMap[k];
+  const get  = k => _mergeBrandRec(adsMap[k]);
 
-  const hasData = k => !!adsMap[k];
+  const N  = v => (v!=null&&!isNaN(v)&&v!==0) ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const Pct= v => (v!=null&&!isNaN(v)&&v!==0) ? (v*100).toFixed(1)+'%' : '—';
+  const D2 = v => (v!=null&&!isNaN(v)&&v!==0) ? v.toFixed(2) : '—';
 
-  // Default empty record shape
-  const emptyRec = () => ({gg:{spend:0,con:0},fb:{spend:0,con:0},other:{seo:0,prepaid:0},rev_override:null,est_revenue:0,est_con:0});
-  const get = k => {const r=adsMap[k]; return r?{...emptyRec(),...r,other:{...{seo:0,prepaid:0},...(r.other||{})}}:emptyRec();};
-
-  // ── cell helpers ──────────────────────────────────
-  const N  = (v,d=0) => v!=null&&!isNaN(v)&&v!==0 ? Math.round(v).toLocaleString('zh-TW') : (d?d:'');
-  const P  = v => v!=null&&!isNaN(v)&&v!==0 ? v.toFixed(2)+'%' : '';
-  const nd = (k,fn,pctFn) => mkeys.map(m=>{
-    if(!hasData(m)) return `<td class="pt-num"></td>`;
-    const a=get(m), v=fn(a,m);
-    return `<td class="pt-num">${pctFn?P(v):N(v)}</td>`;
-  }).join('');
-
-  // ── BUILD HEADER ──────────────────────────────────
-  const headHTML = `<tr>
-    <th colspan="2" style="background:rgba(45,38,160,.9);color:#e0e7ff;font-size:13px;font-weight:800;letter-spacing:.05em;text-align:center">${year}</th>
-    ${mNums.map(n=>`<th class="pt-hd-month" onclick="openAdModal('${year}-${String(n).padStart(2,'0')}')" title="${n}月 · 點擊輸入數據">${n}</th>`).join('')}
+  // Header: row1 = year label + month names (colspan 2 each)
+  // row2   = 輸入 / 計算 sub-labels per month
+  const colCount = 2 + 12*2;
+  const headHTML = `
+  <tr>
+    <th colspan="2" class="pt-hd-yr">${year}</th>
+    ${mNums.map(n=>`<th colspan="2" class="pt-hd-month" onclick="openBrandModal('${brand}','${year}-${String(n).padStart(2,'0')}')" title="${n}月 · 點擊輸入">${n}月</th>`).join('')}
+  </tr>
+  <tr>
+    <th></th><th></th>
+    ${mkeys.map(()=>`<th class="pt-sub-inp">輸入</th><th class="pt-sub-auto">計算</th>`).join('')}
   </tr>`;
 
-  // ── BUILD BODY ────────────────────────────────────
   const rows = [];
-  const R = (cls,grpLabel,grpSpan,lbl,fn,isPct) => {
-    const gcell = grpLabel!=null ? `<td class="pt-grp" rowspan="${grpSpan}">${grpLabel}</td>` : '';
-    const cells = mkeys.map(m=>{
-      if(!hasData(m)) return `<td class="pt-num"></td>`;
-      const a=get(m), v=fn(a,m);
-      return `<td class="pt-num">${isPct?P(v):N(v)}</td>`;
+  const SEP = () => rows.push(`<tr class="r-sep"><td colspan="${colCount}"></td></tr>`);
+
+  // row helper: grp=group label (or null), grpSpan, lbl=row label, inpFn=raw input value, calcFn=calc value
+  const R = (cls, grp, grpSpan, lbl, inpFn, calcFn) => {
+    const gcell = grp!=null ? `<td class="pt-grp" rowspan="${grpSpan}">${grp}</td>` : '';
+    const cells = mkeys.map(m => {
+      if(!has(m)) return `<td class="pt-num pt-inp"></td><td class="pt-num pt-auto"></td>`;
+      const a=get(m);
+      const iv=inpFn?inpFn(a):null;
+      const cv=calcFn?calcFn(a):null;
+      return `<td class="pt-num pt-inp">${iv!=null&&!isNaN(iv)&&iv!==0?Math.round(iv).toLocaleString('zh-TW'):'—'}</td>`+
+             `<td class="pt-num pt-auto">${cv!=null&&!isNaN(cv)?cv:'—'}</td>`;
     }).join('');
     rows.push(`<tr class="${cls}">${gcell}<td class="pt-lbl">${lbl}</td>${cells}</tr>`);
   };
-  const SEP = () => rows.push(`<tr class="r-sep"><td colspan="${14}"></td></tr>`);
 
-  // Google (4 rows)
-  R('',       'Google',4,'花費',     a=>a.gg.spend);
-  R('r-taxed',null,   0,'稅後',     a=>a.gg.spend*tr);
-  R('r-con',  null,   0,'Con',      a=>a.gg.con||null);
-  R('r-cpl',  null,   0,'CPL',      a=>a.gg.con>0?a.gg.spend*tr/a.gg.con:null);
+  // Pure-input row (calc col blank)
+  const RI = (cls, grp, grpSpan, lbl, inpFn) => R(cls, grp, grpSpan, lbl, inpFn, null);
+  // Pure-calc row (input col blank)
+  const RC = (cls, grp, grpSpan, lbl, calcFn) => R(cls, grp, grpSpan, lbl, null, calcFn);
+
+  // ── Google (9 rows) ───────────────────────────────
+  const GG_ROWS = 9;
+  R('',         'Google', GG_ROWS, '廣告費',   a=>a.google.spend,   null);
+  R('r-newrev', null, 0,           '新客業績', a=>a.google.new_rev, null);
+  RC('r-contrib',null, 0,          '貢獻度',   a=>a.google.spend>0?D2(a.google.new_rev/a.google.spend):null);
+  R('',         null, 0,           '詢問',     a=>a.google.inq,     null);
+  RC('r-cpa',   null, 0,           'CPA',      a=>a.google.inq>0?N(a.google.spend/a.google.inq):null);
+  R('r-con',    null, 0,           'Con',      a=>a.google.con,     null);
+  RC('r-cpl',   null, 0,           'CPL',      a=>a.google.con>0?N(a.google.spend/a.google.con):null);
+  RC('r-conv',  null, 0,           '轉換率',   a=>a.google.inq>0?Pct(a.google.con/a.google.inq):null);
+  R('r-est',    null, 0,           '估值目標', a=>a.google.est,     null);
   SEP();
 
-  // FB (3 rows — no 稅後 row, matching the spreadsheet)
-  R('',       'FB',   3,'花費',     a=>a.fb.spend);
-  R('r-con',  null,   0,'Con',      a=>a.fb.con||null);
-  R('r-cpl',  null,   0,'CPL',      a=>a.fb.con>0?a.fb.spend/a.fb.con:null);
+  // ── FB (8 rows) ───────────────────────────────────
+  const FB_ROWS = 8;
+  R('',         'FB', FB_ROWS, '廣告費',   a=>a.fb.spend,   null);
+  R('r-newrev', null, 0,       '新客業績', a=>a.fb.new_rev, null);
+  RC('r-contrib',null,0,       '貢獻度',   a=>a.fb.spend>0?D2(a.fb.new_rev/a.fb.spend):null);
+  R('',         null, 0,       '詢問',     a=>a.fb.inq,     null);
+  RC('r-cpa',   null, 0,       'CPA',      a=>a.fb.inq>0?N(a.fb.spend/a.fb.inq):null);
+  R('r-con',    null, 0,       'Con',      a=>a.fb.con,     null);
+  RC('r-cpl',   null, 0,       'CPL',      a=>a.fb.con>0?N(a.fb.spend/a.fb.con):null);
+  RC('r-conv',  null, 0,       '轉換率',   a=>a.fb.inq>0?Pct(a.fb.con/a.fb.inq):null);
   SEP();
 
-  // 其他 (2 rows)
-  R('r-oth',  '其他', 2,'SEO',      a=>a.other.seo||null);
-  R('r-oth',  null,   0,'預扣金',   a=>a.other.prepaid||null);
+  // ── Q (6 rows) ────────────────────────────────────
+  const Q_ROWS = 6;
+  R('',         'Q', Q_ROWS, '廣告費', a=>a.q.spend, null);
+  R('',         null, 0,     '詢問',   a=>a.q.inq,   null);
+  RC('r-cpa',   null, 0,     'CPA',    a=>a.q.inq>0?N(a.q.spend/a.q.inq):null);
+  R('r-con',    null, 0,     'Con',    a=>a.q.con,   null);
+  RC('r-cpl',   null, 0,     'CPL',    a=>a.q.con>0?N(a.q.spend/a.q.con):null);
+  RC('r-conv',  null, 0,     '轉換率', a=>a.q.inq>0?Pct(a.q.con/a.q.inq):null);
   SEP();
 
-  // Summary rows — span first 2 cols with colspan=2
-  const sumRow = (cls,lbl,fn,isPct) => {
+  // ── H (6 rows) ────────────────────────────────────
+  R('',         'H', Q_ROWS, '廣告費', a=>a.h.spend, null);
+  R('',         null, 0,     '詢問',   a=>a.h.inq,   null);
+  RC('r-cpa',   null, 0,     'CPA',    a=>a.h.inq>0?N(a.h.spend/a.h.inq):null);
+  R('r-con',    null, 0,     'Con',    a=>a.h.con,   null);
+  RC('r-cpl',   null, 0,     'CPL',    a=>a.h.con>0?N(a.h.spend/a.h.con):null);
+  RC('r-conv',  null, 0,     '轉換率', a=>a.h.inq>0?Pct(a.h.con/a.h.inq):null);
+  SEP();
+
+  // ── 其他 (6 rows) ─────────────────────────────────
+  R('r-oth',    '其他', Q_ROWS, '廣告費', a=>a.extra.spend, null);
+  R('r-oth',    null, 0,        '詢問',   a=>a.extra.inq,   null);
+  RC('r-cpa',   null, 0,        'CPA',    a=>a.extra.inq>0?N(a.extra.spend/a.extra.inq):null);
+  R('r-con',    null, 0,        'Con',    a=>a.extra.con,   null);
+  RC('r-cpl',   null, 0,        'CPL',    a=>a.extra.con>0?N(a.extra.spend/a.extra.con):null);
+  RC('r-conv',  null, 0,        '轉換率', a=>a.extra.inq>0?Pct(a.extra.con/a.extra.inq):null);
+  SEP();
+
+  // ── 私訊 (2 rows) ─────────────────────────────────
+  RI('r-pm', '私訊', 2, '詢問', a=>a.pm.inq);
+  RI('r-pm', null,   0, 'Con',  a=>a.pm.con);
+  SEP();
+
+  // ── 估值目標 (1 row) ──────────────────────────────
+  {
     const cells = mkeys.map(m=>{
-      if(!hasData(m)) return `<td class="pt-num"></td>`;
-      const a=get(m), v=fn(a,m);
-      return `<td class="pt-num">${isPct?P(v):N(v)}</td>`;
+      if(!has(m)) return `<td class="pt-num pt-inp" colspan="2"></td>`;
+      const v=get(m).est_target;
+      return `<td class="pt-num pt-inp" colspan="2" style="text-align:center">${v>0?Math.round(v).toLocaleString('zh-TW'):'—'}</td>`;
     }).join('');
-    rows.push(`<tr class="${cls}"><td class="pt-lbl" colspan="2" style="padding-left:14px;font-weight:700">${lbl}</td>${cells}</tr>`);
-  };
+    rows.push(`<tr class="r-est-target"><td class="pt-lbl" colspan="2" style="font-weight:700">估值目標</td>${cells}</tr>`);
+  }
 
-  sumRow('r-total','總計', (a)=>{
-    const v=a.gg.spend*tr + a.fb.spend + a.other.seo + a.other.prepaid;
-    return v>0?v:null;
-  });
-  sumRow('r-pct',  '占比', (a,m)=>{
-    const spend=a.gg.spend*tr+a.fb.spend+a.other.seo+a.other.prepaid;
-    const rev  =a.rev_override||monthRevFromDaily(m);
-    return (rev>0&&spend>0)?spend/rev*100:null;
-  }, true);
-  sumRow('r-rev',  '業績', (a,m)=>{
-    const v=a.rev_override||monthRevFromDaily(m);
-    return v>0?v:null;
-  });
-  sumRow('r-con-s','CON',  (a)=>{
-    const v=a.gg.con+a.fb.con; return v>0?v:null;
-  });
-  sumRow('r-cpl-s','Cpl',  (a,m)=>{
-    const spend=a.gg.spend*tr+a.fb.spend+a.other.seo+a.other.prepaid;
-    const con=a.gg.con+a.fb.con;
-    return con>0?spend/con:null;
-  });
-  sumRow('r-perc', 'PerC', (a,m)=>{
-    const rev=a.rev_override||monthRevFromDaily(m);
-    const con=a.gg.con+a.fb.con;
-    return (rev>0&&con>0)?rev/con:null;
-  });
-  SEP();
-
-  // 估值 (2 rows)
-  const estRow = (cls,grp,grpSpan,lbl,fn) => {
-    const gcell = grp!=null ? `<td class="pt-grp" rowspan="${grpSpan}" style="background:rgba(79,96,245,.3)!important">${grp}</td>` : '';
-    const cells = mkeys.map(m=>{
-      if(!hasData(m)) return `<td class="pt-num"></td>`;
-      const a=get(m), v=fn(a,m);
-      return `<td class="pt-num">${N(v)}</td>`;
-    }).join('');
-    rows.push(`<tr class="${cls}">${gcell}<td class="pt-lbl">${lbl}</td>${cells}</tr>`);
-  };
-  estRow('r-est','估值',2,'業績', a=>a.est_revenue||null);
-  estRow('r-est',null,  0,'CON',  a=>a.est_con||null);
-
-  document.getElementById('ads-pt-head').innerHTML = headHTML;
-  document.getElementById('ads-pt-body').innerHTML = rows.join('');
+  document.getElementById(`${brand}-pt-head`).innerHTML = headHTML;
+  document.getElementById(`${brand}-pt-body`).innerHTML = rows.join('');
 
   // ── CHARTS ───────────────────────────────────────
-  const validMonths = mkeys.filter(m=>hasData(m));
-  const mlabels  = validMonths.map(m=>parseInt(m.slice(5))+'月');
-  const ggSpends = validMonths.map(m=>Math.round(get(m).gg.spend*tr));
-  const fbSpends = validMonths.map(m=>get(m).fb.spend);
-  const ggCPLs   = validMonths.map(m=>{const a=get(m);return a.gg.con>0?Math.round(a.gg.spend*tr/a.gg.con):0;});
-  const fbCPLs   = validMonths.map(m=>{const a=get(m);return a.fb.con>0?Math.round(a.fb.spend/a.fb.con):0;});
-
-  if(adSpendChart){ adSpendChart.destroy(); adSpendChart=null; }
-  if(cplChart){ cplChart.destroy(); cplChart=null; }
+  _destroyBrandCharts(brand);
+  const validM   = mkeys.filter(m=>has(m));
+  const mlabels  = validM.map(m=>parseInt(m.slice(5))+'月');
+  const ggSpends = validM.map(m=>get(m).google.spend);
+  const fbSpends = validM.map(m=>get(m).fb.spend);
+  const ggCPLs   = validM.map(m=>{const a=get(m);return a.google.con>0?Math.round(a.google.spend/a.google.con):0;});
+  const fbCPLs   = validM.map(m=>{const a=get(m);return a.fb.con>0?Math.round(a.fb.spend/a.fb.con):0;});
 
   const baseOpts = {
     responsive:true, maintainAspectRatio:false,
@@ -791,16 +854,16 @@ function renderAds(){
     }
   };
 
-  adSpendChart = new Chart(document.getElementById('ad-spend-chart').getContext('2d'),{
+  _brandCharts[`${brand}-spend`] = new Chart(document.getElementById(`${brand}-spend-chart`).getContext('2d'),{
     type:'bar',
     data:{labels:mlabels,datasets:[
-      {label:'Google(稅後)',data:ggSpends,backgroundColor:'rgba(52,211,153,.75)',borderRadius:5},
-      {label:'FB 花費',    data:fbSpends,backgroundColor:'rgba(96,165,250,.75)',borderRadius:5}
+      {label:'Google',data:ggSpends,backgroundColor:'rgba(52,211,153,.75)',borderRadius:5},
+      {label:'FB',    data:fbSpends,backgroundColor:'rgba(96,165,250,.75)',borderRadius:5}
     ]},
     options:baseOpts
   });
 
-  cplChart = new Chart(document.getElementById('cpl-chart').getContext('2d'),{
+  _brandCharts[`${brand}-cpl`] = new Chart(document.getElementById(`${brand}-cpl-chart`).getContext('2d'),{
     type:'line',
     data:{labels:mlabels,datasets:[
       {label:'Google CPL',data:ggCPLs,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2},
@@ -876,87 +939,92 @@ function editRecord(id){
 }
 
 // ──────────────────────────────────────────────────────────────
-// AD MODAL
+// BRAND MODAL
 // ──────────────────────────────────────────────────────────────
-const AD_FIELDS = ['ad-gg-spend','ad-gg-con-in','ad-fb-spend','ad-fb-con-in',
-                   'ad-seo','ad-prepaid','ad-rev-in','ad-est-rev','ad-est-con'];
+const BM_FIELDS = ['bm-gg-spend','bm-gg-newrev','bm-gg-inq','bm-gg-con','bm-gg-est',
+                   'bm-fb-spend','bm-fb-newrev','bm-fb-inq','bm-fb-con',
+                   'bm-q-spend','bm-q-inq','bm-q-con',
+                   'bm-h-spend','bm-h-inq','bm-h-con',
+                   'bm-ex-spend','bm-ex-inq','bm-ex-con',
+                   'bm-pm-inq','bm-pm-con','bm-est-target'];
 
-function openAdModal(month){
+function openBrandModal(brand, month){
   const target = month || new Date().toISOString().slice(0,7);
-  AD_FIELDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
-  document.getElementById('ad-month').value = target;
-  document.getElementById('ad-modal-subtitle').textContent =
+  document.getElementById('bm-brand').value = brand;
+  document.getElementById('bm-month').value = target;
+  const brandLabel = brand==='seoul'?'🏥 首爾醫美':'💇 HH醫髮';
+  document.getElementById('bm-title').textContent = brandLabel+' 廣告數據';
+  document.getElementById('bm-subtitle').textContent =
     target ? target.slice(0,4)+'年 '+parseInt(target.slice(5))+'月' : '月份廣告數據';
-  _fillAdModal(target);
-  document.getElementById('ad-modal').classList.add('open');
+  BM_FIELDS.forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  fillBrandModal();
+  document.getElementById('brand-modal').classList.add('open');
 }
 
-function _fillAdModal(month){
-  const a = loadAds().find(x=>x.month===month);
-  if(a){
-    const oth = a.other||{};
-    document.getElementById('ad-gg-spend').value  = a.gg?.spend||'';
-    document.getElementById('ad-gg-con-in').value = a.gg?.con||'';
-    document.getElementById('ad-fb-spend').value  = a.fb?.spend||'';
-    document.getElementById('ad-fb-con-in').value = a.fb?.con||'';
-    document.getElementById('ad-seo').value        = oth.seo||'';
-    document.getElementById('ad-prepaid').value    = oth.prepaid||'';
-    document.getElementById('ad-rev-in').value     = a.rev_override||'';
-    document.getElementById('ad-est-rev').value    = a.est_revenue||'';
-    document.getElementById('ad-est-con').value    = a.est_con||'';
-    document.getElementById('ad-delete-btn').style.display='inline-block';
+function fillBrandModal(){
+  const brand = document.getElementById('bm-brand').value;
+  const month = document.getElementById('bm-month').value;
+  if(!brand||!month) return;
+  document.getElementById('bm-subtitle').textContent =
+    month ? month.slice(0,4)+'年 '+parseInt(month.slice(5))+'月' : '月份廣告數據';
+  const stored = loadBrandAds(brand).find(x=>x.month===month);
+  if(stored){
+    const a = _mergeBrandRec(stored);
+    const sv = (id,v)=>{ const el=document.getElementById(id); if(el) el.value=v||''; };
+    sv('bm-gg-spend',  a.google.spend);  sv('bm-gg-newrev', a.google.new_rev);
+    sv('bm-gg-inq',    a.google.inq);    sv('bm-gg-con',    a.google.con);
+    sv('bm-gg-est',    a.google.est);
+    sv('bm-fb-spend',  a.fb.spend);      sv('bm-fb-newrev', a.fb.new_rev);
+    sv('bm-fb-inq',    a.fb.inq);        sv('bm-fb-con',    a.fb.con);
+    sv('bm-q-spend',   a.q.spend);       sv('bm-q-inq',     a.q.inq);    sv('bm-q-con',    a.q.con);
+    sv('bm-h-spend',   a.h.spend);       sv('bm-h-inq',     a.h.inq);    sv('bm-h-con',    a.h.con);
+    sv('bm-ex-spend',  a.extra.spend);   sv('bm-ex-inq',    a.extra.inq);sv('bm-ex-con',   a.extra.con);
+    sv('bm-pm-inq',    a.pm.inq);        sv('bm-pm-con',    a.pm.con);
+    sv('bm-est-target',a.est_target);
+    document.getElementById('bm-delete-btn').style.display='inline-block';
   } else {
-    document.getElementById('ad-delete-btn').style.display='none';
+    document.getElementById('bm-delete-btn').style.display='none';
   }
 }
 
-document.getElementById('ad-month').addEventListener('change', function(){
-  _fillAdModal(this.value);
-  document.getElementById('ad-modal-subtitle').textContent =
-    this.value ? this.value.slice(0,4)+'年 '+parseInt(this.value.slice(5))+'月' : '月份廣告數據';
-});
-
-function saveAdData(){
-  const month    = document.getElementById('ad-month').value;
+function saveBrandData(){
+  const brand = document.getElementById('bm-brand').value;
+  const month = document.getElementById('bm-month').value;
   if(!month){ alert('請選擇月份'); return; }
-  const ggSpend  = parseFloat(document.getElementById('ad-gg-spend').value)||0;
-  const ggCon    = parseInt(document.getElementById('ad-gg-con-in').value)||0;
-  const fbSpend  = parseFloat(document.getElementById('ad-fb-spend').value)||0;
-  const fbCon    = parseInt(document.getElementById('ad-fb-con-in').value)||0;
-  const seo      = parseFloat(document.getElementById('ad-seo').value)||0;
-  const prepaid  = parseFloat(document.getElementById('ad-prepaid').value)||0;
-  const revOv    = parseFloat(document.getElementById('ad-rev-in').value)||null;
-  const estRev   = parseFloat(document.getElementById('ad-est-rev').value)||0;
-  const estCon   = parseInt(document.getElementById('ad-est-con').value)||0;
-
-  const ads = loadAds();
-  const idx = ads.findIndex(a=>a.month===month);
-  const rec = {month,
-    gg:{spend:ggSpend,con:ggCon},
-    fb:{spend:fbSpend,con:fbCon},
-    other:{seo,prepaid},
-    rev_override:revOv,
-    est_revenue:estRev, est_con:estCon
+  const gv = id => parseFloat(document.getElementById(id)?.value)||0;
+  const iv = id => parseInt(document.getElementById(id)?.value)||0;
+  const rec = {
+    month,
+    google:{ spend:gv('bm-gg-spend'), new_rev:gv('bm-gg-newrev'), inq:iv('bm-gg-inq'), con:iv('bm-gg-con'), est:gv('bm-gg-est') },
+    fb:    { spend:gv('bm-fb-spend'), new_rev:gv('bm-fb-newrev'), inq:iv('bm-fb-inq'), con:iv('bm-fb-con') },
+    q:     { spend:gv('bm-q-spend'),  inq:iv('bm-q-inq'),  con:iv('bm-q-con') },
+    h:     { spend:gv('bm-h-spend'),  inq:iv('bm-h-inq'),  con:iv('bm-h-con') },
+    extra: { spend:gv('bm-ex-spend'), inq:iv('bm-ex-inq'), con:iv('bm-ex-con') },
+    pm:    { inq:iv('bm-pm-inq'), con:iv('bm-pm-con') },
+    est_target: gv('bm-est-target')
   };
-  if(idx>=0) ads[idx]=rec; else ads.push(rec);
-  saveAds(ads);
-  populateAdsYears();
-  renderAds();
-  const msg=document.getElementById('ad-msg');
+  const data = loadBrandAds(brand);
+  const idx  = data.findIndex(a=>a.month===month);
+  if(idx>=0) data[idx]=rec; else data.push(rec);
+  saveBrandAds(brand, data);
+  populateBrandYears(brand);
+  renderBrandAds(brand);
+  const msg=document.getElementById('bm-msg');
   msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
-  document.getElementById('ad-delete-btn').style.display='inline-block';
+  document.getElementById('bm-delete-btn').style.display='inline-block';
 }
 
-function deleteAdMonth(){
-  const month = document.getElementById('ad-month').value;
+function deleteBrandMonth(){
+  const brand = document.getElementById('bm-brand').value;
+  const month = document.getElementById('bm-month').value;
   if(!confirm(`確定刪除 ${month} 的廣告數據？`)) return;
-  saveAds(loadAds().filter(a=>a.month!==month));
-  populateAdsYears(); renderAds(); closeAdModal();
+  saveBrandAds(brand, loadBrandAds(brand).filter(a=>a.month!==month));
+  populateBrandYears(brand); renderBrandAds(brand); closeBrandModal();
 }
 
-function closeAdModal(){ document.getElementById('ad-modal').classList.remove('open'); }
-function closeAdModalOutside(e){ if(e.target.id==='ad-modal') closeAdModal(); }
-document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeAdModal(); });
+function closeBrandModal(){ document.getElementById('brand-modal').classList.remove('open'); }
+function closeBrandModalOutside(e){ if(e.target.id==='brand-modal') closeBrandModal(); }
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeBrandModal(); });
 
 // ──────────────────────────────────────────────────────────────
 // HELPERS
@@ -976,7 +1044,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   seedIfEmpty();
   startClock();
   populateMonthSelects();
-  populateAdsYears();
+  populateBrandYears('seoul');
+  populateBrandYears('hh');
   document.getElementById('e-date').value = new Date().toISOString().slice(0,10);
   renderDashboard();
 });
