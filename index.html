@@ -202,104 +202,65 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
       <h1 class="text-xl font-bold text-white">廣告成效分析</h1>
-      <p class="text-slate-400 text-sm">FB &amp; Google 月度廣告數據</p>
+      <p class="text-slate-400 text-sm">FB &amp; Google 月度廣告數據 · 以月份為單位</p>
     </div>
-    <div class="flex gap-2 flex-wrap">
-      <button class="btn btn-primary btn-sm" onclick="openAdModal()">✏️ 輸入廣告數據</button>
-      <div class="flex items-center gap-2 text-xs text-slate-400">
+    <div class="flex gap-2 flex-wrap items-center">
+      <div class="flex items-center gap-2 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
         <span>稅率</span>
-        <input id="tax-rate" type="number" class="inp text-xs" style="width:60px" value="5" min="0" max="50" onchange="renderAds()"/>
+        <input id="tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="5" min="0" max="50" onchange="renderAds()"/>
         <span>%</span>
       </div>
+      <button class="btn btn-primary btn-sm" onclick="openAdModal(null)">＋ 新增月份數據</button>
     </div>
   </div>
 
-  <!-- ad summary cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <div class="card" style="border-color:rgba(96,165,250,.3);background:rgba(24,119,242,.1)">
-      <div class="text-xs mb-1 flex items-center gap-1"><span class="pill pill-fb">FB</span><span class="text-slate-300">總花費(稅後)</span></div>
-      <div class="text-xl font-bold text-blue-400" id="ad-fb-total">NT$ —</div>
-      <div class="text-xs text-slate-400 mt-1">CON: <span id="ad-fb-con" class="text-white">—</span> / CPL: <span id="ad-fb-cpl" class="text-white">—</span></div>
-    </div>
-    <div class="card" style="border-color:rgba(52,211,153,.3);background:rgba(52,211,153,.08)">
-      <div class="text-xs mb-1 flex items-center gap-1"><span class="pill pill-gg">Google</span><span class="text-slate-300">總花費(稅後)</span></div>
-      <div class="text-xl font-bold text-emerald-400" id="ad-gg-total">NT$ —</div>
-      <div class="text-xs text-slate-400 mt-1">CON: <span id="ad-gg-con" class="text-white">—</span> / CPL: <span id="ad-gg-cpl" class="text-white">—</span></div>
-    </div>
-    <div class="card" style="border-color:rgba(167,139,250,.3);background:rgba(167,139,250,.08)">
-      <div class="text-xs mb-1"><span class="pill pill-all">合計</span><span class="text-slate-300 ml-1">廣告總花費(稅後)</span></div>
-      <div class="text-xl font-bold text-violet-400" id="ad-all-total">NT$ —</div>
-      <div class="text-xs text-slate-400 mt-1">FB佔 <span id="ad-fb-pct" class="text-white">—</span> / Google佔 <span id="ad-gg-pct" class="text-white">—</span></div>
-    </div>
-    <div class="card">
-      <div class="text-xs text-slate-300 mb-1">整體 CPL / Per CON</div>
-      <div class="text-xl font-bold text-white" id="ad-total-cpl">— / —</div>
-      <div class="text-xs text-slate-400 mt-1">總 CON: <span id="ad-total-con" class="text-white">—</span></div>
-    </div>
-  </div>
-
-  <!-- monthly table FB -->
+  <!-- unified table -->
   <div class="card">
-    <div class="section-title">FB 廣告月度明細</div>
-    <p class="section-sub">Facebook Ads Monthly Breakdown</p>
+    <div class="flex items-center justify-between mb-1">
+      <div class="section-title mb-0">月度廣告明細表</div>
+      <div class="text-xs text-slate-500">點擊列可編輯該月數據</div>
+    </div>
+    <p class="section-sub">Google 一組 · FB 一組 · 最右方總計</p>
     <div class="overflow-x-auto">
-      <table class="tbl">
+      <table class="tbl" id="ads-main-table">
         <thead>
           <tr>
-            <th>月份</th>
-            <th class="num">廣告花費</th>
-            <th class="num">稅後花費</th>
-            <th class="num">CON 數</th>
-            <th class="num">CPL</th>
-            <th class="num">佔總花費%</th>
+            <th rowspan="2" style="vertical-align:bottom;border-right:1px solid rgba(255,255,255,.12)">月份</th>
+            <!-- Google group -->
+            <th colspan="4" class="text-center" style="border-bottom:2px solid rgba(52,211,153,.5);color:#34d399;background:rgba(52,211,153,.05)">
+              <span class="pill pill-gg">Google</span>
+            </th>
+            <!-- FB group -->
+            <th colspan="4" class="text-center" style="border-bottom:2px solid rgba(96,165,250,.5);color:#60a5fa;background:rgba(96,165,250,.05)">
+              <span class="pill pill-fb">FB</span>
+            </th>
+            <!-- Summary group -->
+            <th colspan="6" class="text-center" style="border-bottom:2px solid rgba(167,139,250,.5);color:#a78bfa;background:rgba(167,139,250,.05)">
+              總計 Summary
+            </th>
+            <th rowspan="2" style="vertical-align:bottom;text-align:center;width:60px">操作</th>
           </tr>
-        </thead>
-        <tbody id="fb-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- monthly table Google -->
-  <div class="card">
-    <div class="section-title">Google 廣告月度明細</div>
-    <p class="section-sub">Google Ads Monthly Breakdown</p>
-    <div class="overflow-x-auto">
-      <table class="tbl">
-        <thead>
           <tr>
-            <th>月份</th>
-            <th class="num">廣告花費</th>
-            <th class="num">稅後花費</th>
-            <th class="num">CON 數</th>
-            <th class="num">CPL</th>
-            <th class="num">佔總花費%</th>
+            <!-- Google sub-headers -->
+            <th class="num" style="background:rgba(52,211,153,.04)">花費</th>
+            <th class="num" style="background:rgba(52,211,153,.04)">稅後花費</th>
+            <th class="num" style="background:rgba(52,211,153,.04)">CON</th>
+            <th class="num" style="background:rgba(52,211,153,.04);border-right:1px solid rgba(255,255,255,.08)">CPL</th>
+            <!-- FB sub-headers -->
+            <th class="num" style="background:rgba(96,165,250,.04)">花費</th>
+            <th class="num" style="background:rgba(96,165,250,.04)">稅後花費</th>
+            <th class="num" style="background:rgba(96,165,250,.04)">CON</th>
+            <th class="num" style="background:rgba(96,165,250,.04);border-right:1px solid rgba(255,255,255,.08)">CPL</th>
+            <!-- Summary sub-headers -->
+            <th class="num" style="background:rgba(167,139,250,.04)">總花費(稅後)</th>
+            <th class="num" style="background:rgba(167,139,250,.04)">佔比%</th>
+            <th class="num" style="background:rgba(167,139,250,.04)">業績</th>
+            <th class="num" style="background:rgba(167,139,250,.04)">總CON</th>
+            <th class="num" style="background:rgba(167,139,250,.04)">總CPL</th>
+            <th class="num" style="background:rgba(167,139,250,.04)">Per CON</th>
           </tr>
         </thead>
-        <tbody id="gg-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- combined summary table -->
-  <div class="card">
-    <div class="section-title">FB + Google 月度合計</div>
-    <p class="section-sub">Combined Monthly Summary with Revenue Metrics</p>
-    <div class="overflow-x-auto">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>月份</th>
-            <th class="num">廣告總花費(稅後)</th>
-            <th class="num">FB佔%</th>
-            <th class="num">Google佔%</th>
-            <th class="num">廣告總CON</th>
-            <th class="num">CPL</th>
-            <th class="num">營業總業績</th>
-            <th class="num">Per CON</th>
-            <th class="num">ROI</th>
-          </tr>
-        </thead>
-        <tbody id="combined-tbody"></tbody>
+        <tbody id="ads-tbody"></tbody>
       </table>
     </div>
   </div>
@@ -307,7 +268,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- charts row -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
     <div class="card flex flex-col gap-2">
-      <div class="section-title mb-0">月度廣告花費趨勢</div>
+      <div class="section-title mb-0">月度廣告花費趨勢 (稅後)</div>
       <div style="height:220px;position:relative"><canvas id="ad-spend-chart"></canvas></div>
     </div>
     <div class="card flex flex-col gap-2">
@@ -399,39 +360,56 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="modal-box">
     <div class="flex items-center justify-between mb-5">
       <div><h3 class="text-white font-bold text-base">輸入廣告數據</h3><p class="text-slate-400 text-xs mt-0.5">Ad Spend Data Entry</p></div>
-      <button onclick="closeAdModal()" class="text-slate-500 hover:text-white">✕</button>
+      <button onclick="closeAdModal()" class="text-slate-500 hover:text-white text-lg leading-none">✕</button>
     </div>
     <div class="space-y-3">
-      <div class="grid grid-cols-2 gap-3">
-        <div>
-          <label class="text-xs text-slate-400 block mb-1">月份</label>
-          <input type="month" id="ad-month" class="inp"/>
-        </div>
-        <div class="flex items-end"><span class="text-slate-400 text-xs">選擇月份後輸入各平台數據</span></div>
+      <div>
+        <label class="text-xs text-slate-400 block mb-1">月份</label>
+        <input type="month" id="ad-month" class="inp"/>
       </div>
-      <div class="rounded-xl p-3 space-y-2" style="background:rgba(24,119,242,.1);border:1px solid rgba(96,165,250,.2)">
-        <div class="text-xs font-semibold text-blue-400 mb-2 flex items-center gap-1"><span class="pill pill-fb">FB</span> Facebook Ads</div>
-        <div class="grid grid-cols-2 gap-2">
-          <div><label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label><input type="number" id="ad-fb-spend" class="inp" placeholder="0" min="0"/></div>
-          <div><label class="text-xs text-slate-400 block mb-1">CON 數</label><input type="number" id="ad-fb-con-in" class="inp" placeholder="0" min="0"/></div>
+      <!-- Google -->
+      <div class="rounded-xl p-4 space-y-2" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.25)">
+        <div class="text-sm font-semibold text-emerald-400 mb-3 flex items-center gap-2">
+          <span class="pill pill-gg">Google</span> Google Ads
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label>
+            <input type="number" id="ad-gg-spend" class="inp" placeholder="0" min="0"/>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">CON 數</label>
+            <input type="number" id="ad-gg-con-in" class="inp" placeholder="0" min="0"/>
+          </div>
         </div>
       </div>
-      <div class="rounded-xl p-3 space-y-2" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2)">
-        <div class="text-xs font-semibold text-emerald-400 mb-2 flex items-center gap-1"><span class="pill pill-gg">Google</span> Google Ads</div>
-        <div class="grid grid-cols-2 gap-2">
-          <div><label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label><input type="number" id="ad-gg-spend" class="inp" placeholder="0" min="0"/></div>
-          <div><label class="text-xs text-slate-400 block mb-1">CON 數</label><input type="number" id="ad-gg-con-in" class="inp" placeholder="0" min="0"/></div>
+      <!-- FB -->
+      <div class="rounded-xl p-4 space-y-2" style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.25)">
+        <div class="text-sm font-semibold text-blue-400 mb-3 flex items-center gap-2">
+          <span class="pill pill-fb">FB</span> Facebook Ads
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">廣告花費 NT$</label>
+            <input type="number" id="ad-fb-spend" class="inp" placeholder="0" min="0"/>
+          </div>
+          <div>
+            <label class="text-xs text-slate-400 block mb-1">CON 數</label>
+            <input type="number" id="ad-fb-con-in" class="inp" placeholder="0" min="0"/>
+          </div>
         </div>
       </div>
-      <div class="rounded-xl p-3 space-y-2" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
-        <div class="text-xs font-semibold text-slate-300 mb-2">該月營業額 NT$</div>
-        <input type="number" id="ad-rev-in" class="inp" placeholder="留空則自動從每日記錄計算" min="0"/>
+      <!-- Revenue -->
+      <div class="rounded-xl p-4" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.12)">
+        <label class="text-xs text-slate-300 font-semibold block mb-1">該月業績 NT$</label>
+        <p class="text-xs text-slate-500 mb-2">留空則自動加總每日業績記錄</p>
+        <input type="number" id="ad-rev-in" class="inp" placeholder="手動填入業績（選填）" min="0"/>
       </div>
     </div>
-    <div class="mt-5 flex gap-2">
+    <div class="mt-5 flex gap-2 items-center">
       <button class="btn btn-primary" onclick="saveAdData()">儲存</button>
-      <button class="btn btn-danger btn-sm" onclick="deleteAdMonth()" style="display:none" id="ad-delete-btn">刪除此月數據</button>
-      <span id="ad-msg" class="text-xs text-emerald-400 self-center hidden">✓ 已儲存！</span>
+      <button class="btn btn-danger btn-sm" id="ad-delete-btn" onclick="deleteAdMonth()" style="display:none">刪除此月</button>
+      <span id="ad-msg" class="text-xs text-emerald-400 hidden">✓ 已儲存！</span>
     </div>
   </div>
 </div>
@@ -441,7 +419,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 // STORAGE
 // ──────────────────────────────────────────────────────────────
 const STORAGE_DAILY = 'dash_daily_v2';
-const STORAGE_ADS   = 'dash_ads_v2';
+const STORAGE_ADS   = 'dash_ads_v3'; // v3: no seed data, Google+FB unified table
 
 function loadDaily(){ return JSON.parse(localStorage.getItem(STORAGE_DAILY)||'[]'); }
 function saveDaily(d){ localStorage.setItem(STORAGE_DAILY, JSON.stringify(d)); }
@@ -449,7 +427,7 @@ function loadAds()  { return JSON.parse(localStorage.getItem(STORAGE_ADS)||'[]')
 function saveAds(d) { localStorage.setItem(STORAGE_ADS, JSON.stringify(d)); }
 
 // ──────────────────────────────────────────────────────────────
-// SEED DATA (first run)
+// SEED DATA (daily only — ads start empty)
 // ──────────────────────────────────────────────────────────────
 function seedIfEmpty(){
   if(loadDaily().length > 0) return;
@@ -460,32 +438,19 @@ function seedIfEmpty(){
     for(let b of branches){
       const d = new Date(today);
       d.setDate(d.getDate() - w);
-      const con   = Math.floor(Math.random()*40+50);
-      const nw    = Math.floor(con * (0.45+Math.random()*0.2));
-      const ret   = con - nw;
-      const rev   = con * (Math.floor(Math.random()*800+1800));
+      const con = Math.floor(Math.random()*40+50);
+      const nw  = Math.floor(con * (0.45+Math.random()*0.2));
+      const ret = con - nw;
+      const rev = con * (Math.floor(Math.random()*800+1800));
       records.push({
         id: Date.now()+Math.random(),
         date: d.toISOString().slice(0,10),
-        branch: b,
-        con, new_c: nw, ret_c: ret, revenue: rev
+        branch: b, con, new_c: nw, ret_c: ret, revenue: rev
       });
     }
   }
   saveDaily(records);
-
-  const ads = [];
-  for(let m=0;m<4;m++){
-    const d = new Date(today.getFullYear(), today.getMonth()-m, 1);
-    const month = d.toISOString().slice(0,7);
-    ads.push({
-      month,
-      fb:{ spend: Math.floor(Math.random()*10000+12000), con: Math.floor(Math.random()*40+60) },
-      gg:{ spend: Math.floor(Math.random()*8000+10000),  con: Math.floor(Math.random()*30+80) },
-      rev_override: null
-    });
-  }
-  saveAds(ads);
+  // ads intentionally NOT seeded — user fills manually
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -646,171 +611,133 @@ function switchRevType(type, btn){
 // ──────────────────────────────────────────────────────────────
 let adSpendChart=null, cplChart=null;
 
-function renderAds(){
-  const ads   = loadAds().slice().sort((a,b)=>a.month.localeCompare(b.month));
-  const daily = loadDaily();
-  const tr    = taxRate();
+function monthRevFromDaily(month){
+  return loadDaily().filter(r=>r.date.slice(0,7)===month).reduce((s,r)=>s+r.revenue,0);
+}
 
-  // per-month revenue from daily records (fallback)
-  function monthRev(month){
-    const ad = ads.find(a=>a.month===month);
-    if(ad && ad.rev_override) return ad.rev_override;
-    return daily.filter(r=>r.date.slice(0,7)===month).reduce((s,r)=>s+r.revenue,0);
+function renderAds(){
+  const ads  = loadAds().slice().sort((a,b)=>a.month.localeCompare(b.month));
+  const tr   = taxRate();
+  const EMPTY_MSG = '<tr><td colspan="15" class="text-center text-slate-500 py-10">尚無廣告數據 · 點擊右上角「＋ 新增月份數據」開始輸入</td></tr>';
+
+  if(!ads.length){
+    document.getElementById('ads-tbody').innerHTML = EMPTY_MSG;
+    if(adSpendChart){ adSpendChart.destroy(); adSpendChart=null; }
+    if(cplChart){ cplChart.destroy(); cplChart=null; }
+    return;
   }
 
-  // totals
-  const fbTotalSpend  = ads.reduce((s,a)=>s+a.fb.spend,0);
-  const ggTotalSpend  = ads.reduce((s,a)=>s+a.gg.spend,0);
-  const fbTotalAfter  = fbTotalSpend*tr;
-  const ggTotalAfter  = ggTotalSpend*tr;
-  const allAfter      = fbTotalAfter+ggTotalAfter;
-  const fbTotalCon    = ads.reduce((s,a)=>s+a.fb.con,0);
-  const ggTotalCon    = ads.reduce((s,a)=>s+a.gg.con,0);
-  const allCon        = fbTotalCon+ggTotalCon;
+  // grand totals accumulators
+  let gtGgSpend=0, gtGgAfter=0, gtGgCon=0;
+  let gtFbSpend=0, gtFbAfter=0, gtFbCon=0;
+  let gtRev=0;
 
-  setText('ad-fb-total', fmtR(fbTotalAfter));
-  setText('ad-fb-con',   fmt(fbTotalCon));
-  setText('ad-fb-cpl',   fbTotalCon>0?fmtR(fbTotalAfter/fbTotalCon):'—');
-  setText('ad-gg-total', fmtR(ggTotalAfter));
-  setText('ad-gg-con',   fmt(ggTotalCon));
-  setText('ad-gg-cpl',   ggTotalCon>0?fmtR(ggTotalAfter/ggTotalCon):'—');
-  setText('ad-all-total',fmtR(allAfter));
-  setText('ad-fb-pct',   pct(fbTotalAfter,allAfter));
-  setText('ad-gg-pct',   pct(ggTotalAfter,allAfter));
-  setText('ad-total-con',fmt(allCon));
+  const rows = ads.map(a=>{
+    const ggAfter = a.gg.spend * tr;
+    const fbAfter = a.fb.spend * tr;
+    const ggCpl   = a.gg.con>0 ? ggAfter/a.gg.con : null;
+    const fbCpl   = a.fb.con>0 ? fbAfter/a.fb.con : null;
+    const totalAfter = ggAfter + fbAfter;
+    const totalCon   = a.gg.con + a.fb.con;
+    const totalCpl   = totalCon>0 ? totalAfter/totalCon : null;
+    const rev        = a.rev_override || monthRevFromDaily(a.month);
+    // 佔比% = 廣告總花費(稅後) ÷ 業績
+    const spendPct   = rev>0 ? (totalAfter/rev*100).toFixed(1)+'%' : '—';
+    const percon     = totalCon>0 && rev>0 ? rev/totalCon : null;
 
-  const totalCPL    = allCon>0?allAfter/allCon:null;
-  const totalRevAll = ads.reduce((s,a)=>s+monthRev(a.month),0);
-  const percon      = allCon>0?totalRevAll/allCon:null;
-  setText('ad-total-cpl', (totalCPL?fmtR(totalCPL):'—') + ' / ' + (percon?fmtR(percon):'—'));
+    gtGgSpend+=a.gg.spend; gtGgAfter+=ggAfter; gtGgCon+=a.gg.con;
+    gtFbSpend+=a.fb.spend; gtFbAfter+=fbAfter; gtFbCon+=a.fb.con;
+    gtRev+=rev;
 
-  // FB table
-  const allMonthSpend = ads.map(a=>(a.fb.spend+a.gg.spend)*tr);
-  const totalAllAfterEach = allMonthSpend.reduce((s,v)=>s+v,0);
-
-  document.getElementById('fb-tbody').innerHTML = ads.length===0
-    ? '<tr><td colspan="6" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
-    : ads.map(a=>{
-      const after = a.fb.spend*tr;
-      const cpl   = a.fb.con>0?after/a.fb.con:null;
-      const totalM= (a.fb.spend+a.gg.spend)*tr;
-      return `<tr>
-        <td><span class="font-semibold text-white">${a.month}</span></td>
-        <td class="num">${fmtR(a.fb.spend)}</td>
-        <td class="num text-blue-400 font-semibold">${fmtR(after)}</td>
-        <td class="num">${fmt(a.fb.con)}</td>
-        <td class="num">${cpl?fmtR(cpl):'—'}</td>
-        <td class="num">${pct(after,totalM)}</td>
-      </tr>`;
-    }).join('') + `<tr class="total-row">
-      <td>合計</td><td class="num">${fmtR(fbTotalSpend)}</td>
-      <td class="num">${fmtR(fbTotalAfter)}</td>
-      <td class="num">${fmt(fbTotalCon)}</td>
-      <td class="num">${fbTotalCon>0?fmtR(fbTotalAfter/fbTotalCon):'—'}</td>
-      <td class="num">${pct(fbTotalAfter,allAfter)}</td>
+    return `<tr class="cursor-pointer hover:bg-white/5" onclick="openAdModal('${a.month}')">
+      <td style="border-right:1px solid rgba(255,255,255,.08)"><span class="font-semibold text-white">${a.month}</span></td>
+      <!-- Google -->
+      <td class="num" style="background:rgba(52,211,153,.03)">${fmtR(a.gg.spend)}</td>
+      <td class="num font-semibold" style="color:#34d399;background:rgba(52,211,153,.03)">${fmtR(ggAfter)}</td>
+      <td class="num" style="background:rgba(52,211,153,.03)">${fmt(a.gg.con)}</td>
+      <td class="num" style="background:rgba(52,211,153,.03);border-right:1px solid rgba(255,255,255,.08)">${ggCpl?fmtR(ggCpl):'—'}</td>
+      <!-- FB -->
+      <td class="num" style="background:rgba(96,165,250,.03)">${fmtR(a.fb.spend)}</td>
+      <td class="num font-semibold" style="color:#60a5fa;background:rgba(96,165,250,.03)">${fmtR(fbAfter)}</td>
+      <td class="num" style="background:rgba(96,165,250,.03)">${fmt(a.fb.con)}</td>
+      <td class="num" style="background:rgba(96,165,250,.03);border-right:1px solid rgba(255,255,255,.08)">${fbCpl?fmtR(fbCpl):'—'}</td>
+      <!-- Summary -->
+      <td class="num font-semibold" style="color:#a78bfa;background:rgba(167,139,250,.04)">${fmtR(totalAfter)}</td>
+      <td class="num" style="background:rgba(167,139,250,.04)">${spendPct}</td>
+      <td class="num" style="background:rgba(167,139,250,.04)">${rev>0?fmtR(rev):'—'}</td>
+      <td class="num" style="background:rgba(167,139,250,.04)">${fmt(totalCon)}</td>
+      <td class="num" style="background:rgba(167,139,250,.04)">${totalCpl?fmtR(totalCpl):'—'}</td>
+      <td class="num" style="background:rgba(167,139,250,.04)">${percon?fmtR(percon):'—'}</td>
+      <!-- edit btn -->
+      <td class="text-center"><button class="btn btn-primary btn-sm" style="padding:3px 10px;font-size:11px" onclick="event.stopPropagation();openAdModal('${a.month}')">編輯</button></td>
     </tr>`;
+  });
 
-  // Google table
-  document.getElementById('gg-tbody').innerHTML = ads.length===0
-    ? '<tr><td colspan="6" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
-    : ads.map(a=>{
-      const after = a.gg.spend*tr;
-      const cpl   = a.gg.con>0?after/a.gg.con:null;
-      const totalM= (a.fb.spend+a.gg.spend)*tr;
-      return `<tr>
-        <td><span class="font-semibold text-white">${a.month}</span></td>
-        <td class="num">${fmtR(a.gg.spend)}</td>
-        <td class="num text-emerald-400 font-semibold">${fmtR(after)}</td>
-        <td class="num">${fmt(a.gg.con)}</td>
-        <td class="num">${cpl?fmtR(cpl):'—'}</td>
-        <td class="num">${pct(after,totalM)}</td>
-      </tr>`;
-    }).join('') + `<tr class="total-row">
-      <td>合計</td><td class="num">${fmtR(ggTotalSpend)}</td>
-      <td class="num">${fmtR(ggTotalAfter)}</td>
-      <td class="num">${fmt(ggTotalCon)}</td>
-      <td class="num">${ggTotalCon>0?fmtR(ggTotalAfter/ggTotalCon):'—'}</td>
-      <td class="num">${pct(ggTotalAfter,allAfter)}</td>
-    </tr>`;
+  // grand total row
+  const gtAllAfter  = gtGgAfter+gtFbAfter;
+  const gtAllCon    = gtGgCon+gtFbCon;
+  const gtSpendPct  = gtRev>0 ? (gtAllAfter/gtRev*100).toFixed(1)+'%' : '—';
+  const gtCpl       = gtAllCon>0 ? gtAllAfter/gtAllCon : null;
+  const gtPercon    = gtAllCon>0 && gtRev>0 ? gtRev/gtAllCon : null;
 
-  // Combined table
-  document.getElementById('combined-tbody').innerHTML = ads.length===0
-    ? '<tr><td colspan="9" class="text-center text-slate-500 py-6">尚無廣告數據</td></tr>'
-    : ads.map(a=>{
-      const fbA   = a.fb.spend*tr, ggA=a.gg.spend*tr, allA=fbA+ggA;
-      const con   = a.fb.con+a.gg.con;
-      const cpl   = con>0?allA/con:null;
-      const rev   = monthRev(a.month);
-      const pc    = con>0?rev/con:null;
-      const roi   = allA>0?rev/allA:null;
-      return `<tr>
-        <td><span class="font-semibold text-white">${a.month}</span></td>
-        <td class="num text-violet-400 font-semibold">${fmtR(allA)}</td>
-        <td class="num"><span class="pill pill-fb">${pct(fbA,allA)}</span></td>
-        <td class="num"><span class="pill pill-gg">${pct(ggA,allA)}</span></td>
-        <td class="num">${fmt(con)}</td>
-        <td class="num">${cpl?fmtR(cpl):'—'}</td>
-        <td class="num">${rev>0?fmtR(rev):'—'}</td>
-        <td class="num">${pc?fmtR(pc):'—'}</td>
-        <td class="num">${roi?roi.toFixed(2)+'x':'—'}</td>
-      </tr>`;
-    }).join('') + (()=>{
-      const totalAllA = allAfter;
-      const allC = allCon;
-      const cplT = allC>0?totalAllA/allC:null;
-      const revT = ads.reduce((s,a)=>s+monthRev(a.month),0);
-      const pcT  = allC>0?revT/allC:null;
-      const roiT = totalAllA>0?revT/totalAllA:null;
-      return `<tr class="total-row">
-        <td>合計</td>
-        <td class="num">${fmtR(totalAllA)}</td>
-        <td class="num">${pct(fbTotalAfter,totalAllA)}</td>
-        <td class="num">${pct(ggTotalAfter,totalAllA)}</td>
-        <td class="num">${fmt(allC)}</td>
-        <td class="num">${cplT?fmtR(cplT):'—'}</td>
-        <td class="num">${revT>0?fmtR(revT):'—'}</td>
-        <td class="num">${pcT?fmtR(pcT):'—'}</td>
-        <td class="num">${roiT?roiT.toFixed(2)+'x':'—'}</td>
-      </tr>`;
-    })();
+  rows.push(`<tr class="total-row">
+    <td style="border-right:1px solid rgba(255,255,255,.12)">累計合計</td>
+    <td class="num">${fmtR(gtGgSpend)}</td>
+    <td class="num">${fmtR(gtGgAfter)}</td>
+    <td class="num">${fmt(gtGgCon)}</td>
+    <td class="num" style="border-right:1px solid rgba(255,255,255,.12)">${gtGgCon>0?fmtR(gtGgAfter/gtGgCon):'—'}</td>
+    <td class="num">${fmtR(gtFbSpend)}</td>
+    <td class="num">${fmtR(gtFbAfter)}</td>
+    <td class="num">${fmt(gtFbCon)}</td>
+    <td class="num" style="border-right:1px solid rgba(255,255,255,.12)">${gtFbCon>0?fmtR(gtFbAfter/gtFbCon):'—'}</td>
+    <td class="num">${fmtR(gtAllAfter)}</td>
+    <td class="num">${gtSpendPct}</td>
+    <td class="num">${gtRev>0?fmtR(gtRev):'—'}</td>
+    <td class="num">${fmt(gtAllCon)}</td>
+    <td class="num">${gtCpl?fmtR(gtCpl):'—'}</td>
+    <td class="num">${gtPercon?fmtR(gtPercon):'—'}</td>
+    <td></td>
+  </tr>`);
+
+  document.getElementById('ads-tbody').innerHTML = rows.join('');
 
   // charts
-  const months = ads.map(a=>a.month.slice(5)+' 月');
-  const fbSpends = ads.map(a=>Math.round(a.fb.spend*tr));
+  const months   = ads.map(a=>a.month.slice(5)+' 月');
   const ggSpends = ads.map(a=>Math.round(a.gg.spend*tr));
-  const fbCPLs = ads.map(a=>a.fb.con>0?Math.round(a.fb.spend*tr/a.fb.con):0);
-  const ggCPLs = ads.map(a=>a.gg.con>0?Math.round(a.gg.spend*tr/a.gg.con):0);
+  const fbSpends = ads.map(a=>Math.round(a.fb.spend*tr));
+  const ggCPLs   = ads.map(a=>a.gg.con>0?Math.round(a.gg.spend*tr/a.gg.con):0);
+  const fbCPLs   = ads.map(a=>a.fb.con>0?Math.round(a.fb.spend*tr/a.fb.con):0);
 
   if(adSpendChart){ adSpendChart.destroy(); adSpendChart=null; }
   if(cplChart){ cplChart.destroy(); cplChart=null; }
 
-  const chartOpts = (yLabel) => ({
-    responsive:true,maintainAspectRatio:false,
-    plugins:{legend:{labels:{color:'#94a3b8',font:{size:11}}},
+  const baseOpts = {
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyleWidth:8} },
       tooltip:{backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,titleColor:'#94a3b8',bodyColor:'#e2e8f0',
         callbacks:{label:c=>` ${c.dataset.label}: NT$ ${c.raw.toLocaleString()}`}}},
     scales:{
       x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:11}}},
       y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}
     }
-  });
+  };
 
   adSpendChart = new Chart(document.getElementById('ad-spend-chart').getContext('2d'),{
     type:'bar',
     data:{labels:months,datasets:[
-      {label:'FB(稅後)',data:fbSpends,backgroundColor:'rgba(96,165,250,.7)',borderRadius:4},
-      {label:'Google(稅後)',data:ggSpends,backgroundColor:'rgba(52,211,153,.7)',borderRadius:4}
+      {label:'Google(稅後)',data:ggSpends,backgroundColor:'rgba(52,211,153,.75)',borderRadius:5},
+      {label:'FB(稅後)',    data:fbSpends,backgroundColor:'rgba(96,165,250,.75)',borderRadius:5}
     ]},
-    options:{...chartOpts(),plugins:{...chartOpts().plugins},scales:{...chartOpts().scales}}
+    options: baseOpts
   });
 
   cplChart = new Chart(document.getElementById('cpl-chart').getContext('2d'),{
     type:'line',
     data:{labels:months,datasets:[
-      {label:'FB CPL',data:fbCPLs,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2},
-      {label:'Google CPL',data:ggCPLs,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2}
+      {label:'Google CPL',data:ggCPLs,borderColor:'#34d399',backgroundColor:'rgba(52,211,153,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2},
+      {label:'FB CPL',    data:fbCPLs,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,.1)',fill:true,tension:.4,pointRadius:4,borderWidth:2}
     ]},
-    options:{...chartOpts(),plugins:{...chartOpts().plugins},scales:{...chartOpts().scales}}
+    options: baseOpts
   });
 }
 
@@ -882,29 +809,24 @@ function editRecord(id){
 // ──────────────────────────────────────────────────────────────
 // AD MODAL
 // ──────────────────────────────────────────────────────────────
-function openAdModal(){
-  const today = new Date().toISOString().slice(0,7);
-  document.getElementById('ad-month').value    = today;
-  document.getElementById('ad-fb-spend').value = '';
-  document.getElementById('ad-fb-con-in').value= '';
-  document.getElementById('ad-gg-spend').value = '';
-  document.getElementById('ad-gg-con-in').value= '';
-  document.getElementById('ad-rev-in').value   = '';
-  loadAdModalForMonth(today);
+function openAdModal(month){
+  const target = month || new Date().toISOString().slice(0,7);
+  // clear fields first
+  ['ad-fb-spend','ad-fb-con-in','ad-gg-spend','ad-gg-con-in','ad-rev-in'].forEach(id=>{
+    document.getElementById(id).value='';
+  });
+  document.getElementById('ad-month').value = target;
+  _fillAdModal(target);
   document.getElementById('ad-modal').classList.add('open');
-  document.getElementById('ad-month').addEventListener('change', function(){
-    loadAdModalForMonth(this.value);
-  },{once:false});
 }
 
-function loadAdModalForMonth(month){
-  const ads = loadAds();
-  const existing = ads.find(a=>a.month===month);
+function _fillAdModal(month){
+  const existing = loadAds().find(a=>a.month===month);
   if(existing){
-    document.getElementById('ad-fb-spend').value  = existing.fb.spend||'';
-    document.getElementById('ad-fb-con-in').value = existing.fb.con||'';
     document.getElementById('ad-gg-spend').value  = existing.gg.spend||'';
     document.getElementById('ad-gg-con-in').value = existing.gg.con||'';
+    document.getElementById('ad-fb-spend').value  = existing.fb.spend||'';
+    document.getElementById('ad-fb-con-in').value = existing.fb.con||'';
     document.getElementById('ad-rev-in').value    = existing.rev_override||'';
     document.getElementById('ad-delete-btn').style.display='inline-block';
   } else {
@@ -912,26 +834,25 @@ function loadAdModalForMonth(month){
   }
 }
 
-document.getElementById('ad-month').addEventListener('change', function(){
-  loadAdModalForMonth(this.value);
-});
+document.getElementById('ad-month').addEventListener('change', function(){ _fillAdModal(this.value); });
 
 function saveAdData(){
   const month   = document.getElementById('ad-month').value;
-  const fbSpend = parseFloat(document.getElementById('ad-fb-spend').value)||0;
-  const fbCon   = parseInt(document.getElementById('ad-fb-con-in').value)||0;
   const ggSpend = parseFloat(document.getElementById('ad-gg-spend').value)||0;
   const ggCon   = parseInt(document.getElementById('ad-gg-con-in').value)||0;
+  const fbSpend = parseFloat(document.getElementById('ad-fb-spend').value)||0;
+  const fbCon   = parseInt(document.getElementById('ad-fb-con-in').value)||0;
   const revOv   = parseFloat(document.getElementById('ad-rev-in').value)||null;
   if(!month){ alert('請選擇月份'); return; }
   const ads = loadAds();
   const idx = ads.findIndex(a=>a.month===month);
-  const rec = {month, fb:{spend:fbSpend,con:fbCon}, gg:{spend:ggSpend,con:ggCon}, rev_override:revOv};
+  const rec = {month, gg:{spend:ggSpend,con:ggCon}, fb:{spend:fbSpend,con:fbCon}, rev_override:revOv};
   if(idx>=0) ads[idx]=rec; else ads.push(rec);
   saveAds(ads);
   renderAds();
   const msg=document.getElementById('ad-msg');
   msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
+  document.getElementById('ad-delete-btn').style.display='inline-block';
 }
 
 function deleteAdMonth(){
