@@ -721,109 +721,91 @@ function renderBrandAds(brand){
   const has  = k => !!adsMap[k];
   const get  = k => _mergeBrandRec(adsMap[k]);
 
-  const N  = v => (v!=null&&!isNaN(v)&&v!==0) ? Math.round(v).toLocaleString('zh-TW') : '—';
-  const Pct= v => (v!=null&&!isNaN(v)&&v!==0) ? (v*100).toFixed(1)+'%' : '—';
-  const D2 = v => (v!=null&&!isNaN(v)&&v!==0) ? v.toFixed(2) : '—';
+  const N   = v => (v!=null&&!isNaN(v)&&v!==0) ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const Pct = v => (v!=null&&!isNaN(v)&&v!==0) ? (v*100).toFixed(1)+'%' : '—';
+  const D2  = v => (v!=null&&!isNaN(v)&&v!==0) ? v.toFixed(2) : '—';
+  const colCount = 2 + 12;
 
-  // Header: row1 = year label + month names (colspan 2 each)
-  // row2   = 輸入 / 計算 sub-labels per month
-  const colCount = 2 + 12*2;
-  const headHTML = `
-  <tr>
+  // Single column per month — click to edit
+  const headHTML = `<tr>
     <th colspan="2" class="pt-hd-yr">${year}</th>
-    ${mNums.map(n=>`<th colspan="2" class="pt-hd-month" onclick="openBrandModal('${brand}','${year}-${String(n).padStart(2,'0')}')" title="${n}月 · 點擊輸入">${n}月</th>`).join('')}
-  </tr>
-  <tr>
-    <th></th><th></th>
-    ${mkeys.map(()=>`<th class="pt-sub-inp">輸入</th><th class="pt-sub-auto">計算</th>`).join('')}
+    ${mNums.map(n=>`<th class="pt-hd-month" onclick="openBrandModal('${brand}','${year}-${String(n).padStart(2,'0')}')" title="${n}月 · 點擊輸入">${n}月</th>`).join('')}
   </tr>`;
 
   const rows = [];
   const SEP = () => rows.push(`<tr class="r-sep"><td colspan="${colCount}"></td></tr>`);
 
-  // row helper: grp=group label (or null), grpSpan, lbl=row label, inpFn=raw input value, calcFn=calc value
-  const R = (cls, grp, grpSpan, lbl, inpFn, calcFn) => {
+  // R: normal row with value function
+  const R = (cls, grp, grpSpan, lbl, fn) => {
     const gcell = grp!=null ? `<td class="pt-grp" rowspan="${grpSpan}">${grp}</td>` : '';
     const cells = mkeys.map(m => {
-      if(!has(m)) return `<td class="pt-num pt-inp"></td><td class="pt-num pt-auto"></td>`;
-      const a=get(m);
-      const iv=inpFn?inpFn(a):null;
-      const cv=calcFn?calcFn(a):null;
-      return `<td class="pt-num pt-inp">${iv!=null&&!isNaN(iv)&&iv!==0?Math.round(iv).toLocaleString('zh-TW'):'—'}</td>`+
-             `<td class="pt-num pt-auto">${cv!=null&&!isNaN(cv)?cv:'—'}</td>`;
+      if(!has(m)) return `<td class="pt-num"></td>`;
+      return `<td class="pt-num">${fn(get(m))}</td>`;
     }).join('');
     rows.push(`<tr class="${cls}">${gcell}<td class="pt-lbl">${lbl}</td>${cells}</tr>`);
   };
 
-  // Pure-input row (calc col blank)
-  const RI = (cls, grp, grpSpan, lbl, inpFn) => R(cls, grp, grpSpan, lbl, inpFn, null);
-  // Pure-calc row (input col blank)
-  const RC = (cls, grp, grpSpan, lbl, calcFn) => R(cls, grp, grpSpan, lbl, null, calcFn);
-
   // ── Google (9 rows) ───────────────────────────────
-  const GG_ROWS = 9;
-  R('',         'Google', GG_ROWS, '廣告費',   a=>a.google.spend,   null);
-  R('r-newrev', null, 0,           '新客業績', a=>a.google.new_rev, null);
-  RC('r-contrib',null, 0,          '貢獻度',   a=>a.google.spend>0?D2(a.google.new_rev/a.google.spend):null);
-  R('',         null, 0,           '詢問',     a=>a.google.inq,     null);
-  RC('r-cpa',   null, 0,           'CPA',      a=>a.google.inq>0?N(a.google.spend/a.google.inq):null);
-  R('r-con',    null, 0,           'Con',      a=>a.google.con,     null);
-  RC('r-cpl',   null, 0,           'CPL',      a=>a.google.con>0?N(a.google.spend/a.google.con):null);
-  RC('r-conv',  null, 0,           '轉換率',   a=>a.google.inq>0?Pct(a.google.con/a.google.inq):null);
-  R('r-est',    null, 0,           '估值目標', a=>a.google.est,     null);
+  R('',          'Google', 9, '廣告費',   a=>N(a.google.spend));
+  R('r-newrev',  null, 0,    '新客業績', a=>N(a.google.new_rev));
+  R('r-contrib', null, 0,    '貢獻度',   a=>a.google.spend>0?D2(a.google.new_rev/a.google.spend):'—');
+  R('',          null, 0,    '詢問',     a=>N(a.google.inq));
+  R('r-cpa',     null, 0,    'CPA',      a=>a.google.inq>0?N(a.google.spend/a.google.inq):'—');
+  R('r-con',     null, 0,    'Con',      a=>N(a.google.con));
+  R('r-cpl',     null, 0,    'CPL',      a=>a.google.con>0?N(a.google.spend/a.google.con):'—');
+  R('r-conv',    null, 0,    '轉換率',   a=>a.google.inq>0?Pct(a.google.con/a.google.inq):'—');
+  R('r-est',     null, 0,    '估值目標', a=>N(a.google.est));
   SEP();
 
   // ── FB (8 rows) ───────────────────────────────────
-  const FB_ROWS = 8;
-  R('',         'FB', FB_ROWS, '廣告費',   a=>a.fb.spend,   null);
-  R('r-newrev', null, 0,       '新客業績', a=>a.fb.new_rev, null);
-  RC('r-contrib',null,0,       '貢獻度',   a=>a.fb.spend>0?D2(a.fb.new_rev/a.fb.spend):null);
-  R('',         null, 0,       '詢問',     a=>a.fb.inq,     null);
-  RC('r-cpa',   null, 0,       'CPA',      a=>a.fb.inq>0?N(a.fb.spend/a.fb.inq):null);
-  R('r-con',    null, 0,       'Con',      a=>a.fb.con,     null);
-  RC('r-cpl',   null, 0,       'CPL',      a=>a.fb.con>0?N(a.fb.spend/a.fb.con):null);
-  RC('r-conv',  null, 0,       '轉換率',   a=>a.fb.inq>0?Pct(a.fb.con/a.fb.inq):null);
+  R('',          'FB', 8, '廣告費',   a=>N(a.fb.spend));
+  R('r-newrev',  null, 0, '新客業績', a=>N(a.fb.new_rev));
+  R('r-contrib', null, 0, '貢獻度',   a=>a.fb.spend>0?D2(a.fb.new_rev/a.fb.spend):'—');
+  R('',          null, 0, '詢問',     a=>N(a.fb.inq));
+  R('r-cpa',     null, 0, 'CPA',      a=>a.fb.inq>0?N(a.fb.spend/a.fb.inq):'—');
+  R('r-con',     null, 0, 'Con',      a=>N(a.fb.con));
+  R('r-cpl',     null, 0, 'CPL',      a=>a.fb.con>0?N(a.fb.spend/a.fb.con):'—');
+  R('r-conv',    null, 0, '轉換率',   a=>a.fb.inq>0?Pct(a.fb.con/a.fb.inq):'—');
   SEP();
 
   // ── Q (6 rows) ────────────────────────────────────
-  const Q_ROWS = 6;
-  R('',         'Q', Q_ROWS, '廣告費', a=>a.q.spend, null);
-  R('',         null, 0,     '詢問',   a=>a.q.inq,   null);
-  RC('r-cpa',   null, 0,     'CPA',    a=>a.q.inq>0?N(a.q.spend/a.q.inq):null);
-  R('r-con',    null, 0,     'Con',    a=>a.q.con,   null);
-  RC('r-cpl',   null, 0,     'CPL',    a=>a.q.con>0?N(a.q.spend/a.q.con):null);
-  RC('r-conv',  null, 0,     '轉換率', a=>a.q.inq>0?Pct(a.q.con/a.q.inq):null);
+  R('',          'Q', 6, '廣告費', a=>N(a.q.spend));
+  R('',          null, 0,'詢問',   a=>N(a.q.inq));
+  R('r-cpa',     null, 0,'CPA',    a=>a.q.inq>0?N(a.q.spend/a.q.inq):'—');
+  R('r-con',     null, 0,'Con',    a=>N(a.q.con));
+  R('r-cpl',     null, 0,'CPL',    a=>a.q.con>0?N(a.q.spend/a.q.con):'—');
+  R('r-conv',    null, 0,'轉換率', a=>a.q.inq>0?Pct(a.q.con/a.q.inq):'—');
   SEP();
 
   // ── H (6 rows) ────────────────────────────────────
-  R('',         'H', Q_ROWS, '廣告費', a=>a.h.spend, null);
-  R('',         null, 0,     '詢問',   a=>a.h.inq,   null);
-  RC('r-cpa',   null, 0,     'CPA',    a=>a.h.inq>0?N(a.h.spend/a.h.inq):null);
-  R('r-con',    null, 0,     'Con',    a=>a.h.con,   null);
-  RC('r-cpl',   null, 0,     'CPL',    a=>a.h.con>0?N(a.h.spend/a.h.con):null);
-  RC('r-conv',  null, 0,     '轉換率', a=>a.h.inq>0?Pct(a.h.con/a.h.inq):null);
+  R('',          'H', 6, '廣告費', a=>N(a.h.spend));
+  R('',          null, 0,'詢問',   a=>N(a.h.inq));
+  R('r-cpa',     null, 0,'CPA',    a=>a.h.inq>0?N(a.h.spend/a.h.inq):'—');
+  R('r-con',     null, 0,'Con',    a=>N(a.h.con));
+  R('r-cpl',     null, 0,'CPL',    a=>a.h.con>0?N(a.h.spend/a.h.con):'—');
+  R('r-conv',    null, 0,'轉換率', a=>a.h.inq>0?Pct(a.h.con/a.h.inq):'—');
   SEP();
 
   // ── 其他 (6 rows) ─────────────────────────────────
-  R('r-oth',    '其他', Q_ROWS, '廣告費', a=>a.extra.spend, null);
-  R('r-oth',    null, 0,        '詢問',   a=>a.extra.inq,   null);
-  RC('r-cpa',   null, 0,        'CPA',    a=>a.extra.inq>0?N(a.extra.spend/a.extra.inq):null);
-  R('r-con',    null, 0,        'Con',    a=>a.extra.con,   null);
-  RC('r-cpl',   null, 0,        'CPL',    a=>a.extra.con>0?N(a.extra.spend/a.extra.con):null);
-  RC('r-conv',  null, 0,        '轉換率', a=>a.extra.inq>0?Pct(a.extra.con/a.extra.inq):null);
+  R('r-oth',     '其他', 6,'廣告費', a=>N(a.extra.spend));
+  R('r-oth',     null, 0, '詢問',   a=>N(a.extra.inq));
+  R('r-cpa',     null, 0, 'CPA',    a=>a.extra.inq>0?N(a.extra.spend/a.extra.inq):'—');
+  R('r-con',     null, 0, 'Con',    a=>N(a.extra.con));
+  R('r-cpl',     null, 0, 'CPL',    a=>a.extra.con>0?N(a.extra.spend/a.extra.con):'—');
+  R('r-conv',    null, 0, '轉換率', a=>a.extra.inq>0?Pct(a.extra.con/a.extra.inq):'—');
   SEP();
 
   // ── 私訊 (2 rows) ─────────────────────────────────
-  RI('r-pm', '私訊', 2, '詢問', a=>a.pm.inq);
-  RI('r-pm', null,   0, 'Con',  a=>a.pm.con);
+  R('r-pm', '私訊', 2,'詢問', a=>N(a.pm.inq));
+  R('r-pm', null,   0,'Con',  a=>N(a.pm.con));
   SEP();
 
   // ── 估值目標 (1 row) ──────────────────────────────
   {
     const cells = mkeys.map(m=>{
-      if(!has(m)) return `<td class="pt-num pt-inp" colspan="2"></td>`;
+      if(!has(m)) return `<td class="pt-num"></td>`;
       const v=get(m).est_target;
-      return `<td class="pt-num pt-inp" colspan="2" style="text-align:center">${v>0?Math.round(v).toLocaleString('zh-TW'):'—'}</td>`;
+      return `<td class="pt-num">${v>0?Math.round(v).toLocaleString('zh-TW'):'—'}</td>`;
     }).join('');
     rows.push(`<tr class="r-est-target"><td class="pt-lbl" colspan="2" style="font-weight:700">估值目標</td>${cells}</tr>`);
   }
