@@ -72,8 +72,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .pt .r-sep td{height:3px;padding:0;background:rgba(79,96,245,.25);border:none}
 .pt .r-total td{background:rgba(255,255,255,.08);color:#fff;font-weight:700}
 .pt .r-pct td{color:#fff;font-weight:600}
-.pt .r-rev td{color:#fff;font-weight:600}
-.pt .r-con-s td{color:#fff;font-weight:600}
+.pt .r-rev td{background:rgba(251,191,36,.12);color:#fff;font-weight:600}
+.pt .r-con-s td{background:rgba(79,96,245,.18);color:#fff;font-weight:600}
 .pt .r-cpl-s td{color:#fff;font-weight:600}
 .pt .r-perc td{color:#fff;font-weight:600}
 .pt .r-est-h td{color:#fff;font-weight:700}
@@ -375,13 +375,11 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         </div>
       </div>
 
-      <!-- 業績 & 估值 -->
+      <!-- 業績 -->
       <div class="rounded-xl p-4" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2)">
-        <div class="text-xs font-bold text-amber-400 mb-3 uppercase tracking-wider">業績 / 估值</div>
-        <div class="grid grid-cols-2 gap-3">
-          <div><label class="text-xs text-slate-400 block mb-1">實際業績 NT$ <span class="text-slate-600">(選填)</span></label><input type="number" id="bm-rev-in" class="inp" placeholder="留空=每日記錄加總" min="0"/></div>
-          <div><label class="text-xs text-slate-400 block mb-1">估值業績 NT$</label><input type="number" id="bm-est-rev" class="inp" placeholder="0" min="0"/></div>
-          <div><label class="text-xs text-slate-400 block mb-1">估值 CON</label><input type="number" id="bm-est-con" class="inp" placeholder="0" min="0"/></div>
+        <div class="text-xs font-bold text-amber-400 mb-3 uppercase tracking-wider">業績</div>
+        <div class="grid grid-cols-1 gap-3">
+          <div><label class="text-xs text-slate-400 block mb-1">實際業績 NT$ <span class="text-slate-600">(選填，留空則從每日記錄加總)</span></label><input type="number" id="bm-rev-in" class="inp" placeholder="留空=每日記錄加總" min="0"/></div>
         </div>
       </div>
     </div>
@@ -640,48 +638,52 @@ function renderSeoulAds(){
   };
   const SEP = () => rows.push(`<tr class="r-sep"><td colspan="${colCount}"></td></tr>`);
 
-  // Google
+  // Google (CPL red if > 2500)
   R('',        'Google',4,'花費',  a=>a.gg.spend);
   R('r-taxed', null,    0,'稅後',  a=>a.gg.spend*tr);
   R('r-con',   null,    0,'Con',   a=>a.gg.con||null);
-  R('r-cpl',   null,    0,'CPL',   a=>a.gg.con>0?a.gg.spend*tr/a.gg.con:null);
+  {
+    const cells = mkeys.map(m=>{
+      if(!hasData(m)) return `<td class="pt-num"></td>`;
+      const a=get(m), v=a.gg.con>0?a.gg.spend*tr/a.gg.con:null;
+      const red = v!=null && v>2500;
+      return `<td class="pt-num"${red?' style="color:#f87171;font-weight:600"':''}>${v!=null?N(v):''}</td>`;
+    }).join('');
+    rows.push(`<tr class="r-cpl"><td class="pt-lbl">CPL</td>${cells}</tr>`);
+  }
   SEP();
 
-  // FB
+  // FB (CPL red if > 3500)
   R('',       'FB',3,'花費', a=>a.fb.spend);
   R('r-con',  null,0,'Con',  a=>a.fb.con||null);
-  R('r-cpl',  null,0,'CPL',  a=>a.fb.con>0?a.fb.spend/a.fb.con:null);
+  {
+    const cells = mkeys.map(m=>{
+      if(!hasData(m)) return `<td class="pt-num"></td>`;
+      const a=get(m), v=a.fb.con>0?a.fb.spend/a.fb.con:null;
+      const red = v!=null && v>3500;
+      return `<td class="pt-num"${red?' style="color:#f87171;font-weight:600"':''}>${v!=null?N(v):''}</td>`;
+    }).join('');
+    rows.push(`<tr class="r-cpl"><td class="pt-lbl">CPL</td>${cells}</tr>`);
+  }
   SEP();
 
   // Summary (colspan 2)
-  const sumRow = (cls,lbl,fn,isPct) => {
+  const sumRow = (cls,lbl,fn,isPct,redFn) => {
     const cells = mkeys.map(m=>{
       if(!hasData(m)) return `<td class="pt-num"></td>`;
       const a=get(m), v=fn(a,m);
-      return `<td class="pt-num">${isPct?P(v):N(v)}</td>`;
+      const red = redFn && v!=null && redFn(v);
+      const txt = isPct?P(v):N(v);
+      return `<td class="pt-num"${red?' style="color:#f87171;font-weight:600"':''}>${txt}</td>`;
     }).join('');
     rows.push(`<tr class="${cls}"><td class="pt-lbl" colspan="2" style="padding-left:14px;font-weight:700">${lbl}</td>${cells}</tr>`);
   };
   sumRow('r-total','總計', a=>{ const v=a.gg.spend*tr+a.fb.spend; return v>0?v:null; });
-  sumRow('r-pct',  '占比', (a,m)=>{ const sp=a.gg.spend*tr+a.fb.spend; const rv=a.rev_override||monthRevFromDaily(m); return (rv>0&&sp>0)?sp/rv*100:null; }, true);
-  sumRow('r-rev',  '業績', (a,m)=>{ const v=a.rev_override||monthRevFromDaily(m); return v>0?v:null; });
+  sumRow('r-pct',  '占比', (a,m)=>{ const sp=a.gg.spend*tr+a.fb.spend; const rv=a.rev_override||monthRevFromDaily(m); return (rv>0&&sp>0)?sp/rv*100:null; }, true, v=>v>5);
+  sumRow('r-rev',  '業績', (a,m)=>{ const v=a.rev_override||monthRevFromDaily(m); return v>0?v:null; }, false, null);
   sumRow('r-con-s','CON',  a=>{ const v=a.gg.con+a.fb.con; return v>0?v:null; });
   sumRow('r-cpl-s','Cpl',  a=>{ const sp=a.gg.spend*tr+a.fb.spend; const c=a.gg.con+a.fb.con; return c>0?sp/c:null; });
   sumRow('r-perc', 'PerC', (a,m)=>{ const rv=a.rev_override||monthRevFromDaily(m); const c=a.gg.con+a.fb.con; return (rv>0&&c>0)?rv/c:null; });
-  SEP();
-
-  // 估值
-  const estRow = (cls,grp,grpSpan,lbl,fn) => {
-    const gcell = grp!=null ? `<td class="pt-grp" rowspan="${grpSpan}" style="background:rgba(79,96,245,.3)!important">${grp}</td>` : '';
-    const cells = mkeys.map(m=>{
-      if(!hasData(m)) return `<td class="pt-num"></td>`;
-      const a=get(m), v=fn(a);
-      return `<td class="pt-num">${N(v)}</td>`;
-    }).join('');
-    rows.push(`<tr class="${cls}">${gcell}<td class="pt-lbl">${lbl}</td>${cells}</tr>`);
-  };
-  estRow('r-est','估值',2,'業績', a=>a.est_revenue||null);
-  estRow('r-est', null, 0,'CON',  a=>a.est_con||null);
 
   document.getElementById('seoul-pt-head').innerHTML = headHTML;
   document.getElementById('seoul-pt-body').innerHTML = rows.join('');
@@ -798,8 +800,7 @@ function editRecord(id){
 // ──────────────────────────────────────────────────────────────
 // BRAND MODAL (首爾醫美)
 // ──────────────────────────────────────────────────────────────
-const BM_FIELDS = ['bm-gg-spend','bm-gg-con','bm-fb-spend','bm-fb-con',
-                   'bm-rev-in','bm-est-rev','bm-est-con'];
+const BM_FIELDS = ['bm-gg-spend','bm-gg-con','bm-fb-spend','bm-fb-con','bm-rev-in'];
 
 function openBrandModal(month){
   const target = month || new Date().toISOString().slice(0,7);
@@ -824,8 +825,6 @@ function fillBrandModal(){
     document.getElementById('bm-fb-spend').value = a.fb?.spend||'';
     document.getElementById('bm-fb-con').value   = a.fb?.con||'';
     document.getElementById('bm-rev-in').value   = a.rev_override||'';
-    document.getElementById('bm-est-rev').value  = a.est_revenue||'';
-    document.getElementById('bm-est-con').value  = a.est_con||'';
     document.getElementById('bm-delete-btn').style.display='inline-block';
   } else {
     document.getElementById('bm-delete-btn').style.display='none';
@@ -844,9 +843,7 @@ function saveBrandData(){
     gg:   { spend:gv('bm-gg-spend'), con:iv('bm-gg-con') },
     fb:   { spend:gv('bm-fb-spend'), con:iv('bm-fb-con') },
     other:{ seo:0, prepaid:0 },
-    rev_override: gv('bm-rev-in')||null,
-    est_revenue:  gv('bm-est-rev'),
-    est_con:      iv('bm-est-con')
+    rev_override: gv('bm-rev-in')||null
   };
   const data = loadSeoulAds();
   const idx  = data.findIndex(a=>a.month===month);
