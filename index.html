@@ -232,7 +232,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <select id="seoul-year" class="sel font-bold" style="font-size:14px" onchange="renderSeoulAds()"></select>
       <div class="flex items-center gap-2 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
         <span>Google 稅率</span>
-        <input id="seoul-tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="5" min="0" max="50" onchange="renderSeoulAds()"/>
+        <input id="seoul-tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="0" min="0" max="50" onchange="renderSeoulAds()"/>
         <span>%</span>
       </div>
       <button class="btn btn-primary btn-sm" onclick="openBrandModal(null)">＋ 新增 / 編輯月份</button>
@@ -620,7 +620,7 @@ function monthRevFromDaily(month){
   return loadDaily().filter(r=>r.date.slice(0,7)===month).reduce((s,r)=>s+r.revenue,0);
 }
 
-function seoulTaxRate(){ return 1 + (parseFloat(document.getElementById('seoul-tax-rate')?.value||5)/100); }
+function seoulTaxRate(){ return 1 + (parseFloat(document.getElementById('seoul-tax-rate')?.value||0)/100); }
 
 function populateSeoulYears(){
   const ads   = loadSeoulAds();
