@@ -81,6 +81,25 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .pt .r-oth td{color:#fff}
 .pt .r-est-target td{background:rgba(255,255,255,.08);color:#fff;font-weight:700}
 .pt .pt-hd-yr{background:rgba(45,38,160,.9)!important;color:#fff;font-size:13px;font-weight:800;letter-spacing:.05em;text-align:center}
+/* ── Inline editable table ── */
+.et{width:100%;border-collapse:collapse;font-size:12px}
+.et th,.et td{border:1px solid rgba(255,255,255,.07);padding:0;white-space:nowrap}
+.et th{background:rgba(45,40,140,.85);color:#fff;font-weight:600;font-size:11px;letter-spacing:.03em;padding:6px 10px;text-align:center}
+.et td{color:#fff;vertical-align:middle}
+.et .et-date{background:rgba(45,38,160,.6);font-weight:700;font-size:12px;text-align:center;padding:6px 10px;vertical-align:middle}
+.et .et-brand{background:rgba(55,48,163,.5);font-weight:700;text-align:center;padding:6px 10px;vertical-align:middle}
+.et .et-type{padding:5px 10px;color:#94a3b8;font-size:11px;font-weight:600;text-align:left;min-width:46px}
+.et .et-diff .et-type{color:#64748b}
+.et .et-est td{background:rgba(255,255,255,.03)}
+.et .et-prev td{background:rgba(251,191,36,.05)}
+.et .et-diff td{background:rgba(255,255,255,.04)}
+.et .et-sep td{height:4px;padding:0;background:rgba(79,96,245,.3);border:none}
+.et-inp{background:transparent;border:none;color:#fff;text-align:right;width:100%;padding:5px 8px;outline:none;font-size:12px;font-variant-numeric:tabular-nums;font-family:inherit;min-width:64px}
+.et-inp:focus{background:rgba(79,96,245,.25);border-radius:0}
+.et-inp::placeholder{color:rgba(255,255,255,.15)}
+.et-diff-val{display:block;text-align:right;padding:5px 8px;min-width:64px;font-variant-numeric:tabular-nums}
+.et-adpct-inp{background:transparent;border:none;color:#7086fb;text-align:center;width:100%;padding:5px 6px;outline:none;font-size:12px;font-weight:700;font-family:inherit}
+.et-adpct-inp:focus{background:rgba(79,96,245,.25)}
 </style>
 </head>
 <body>
@@ -115,23 +134,16 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- daily compare table -->
   <div class="card" style="padding:0;overflow:hidden">
     <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-      <div class="flex items-center gap-3">
-        <span class="font-bold text-white text-sm">每日成效對比</span>
-        <span id="dcmp-label" class="text-xs text-slate-400"></span>
-      </div>
-      <div class="flex gap-2">
-        <button class="btn btn-danger btn-sm" id="dcmp-del-btn" onclick="deleteDcmpRecord()" style="display:none">刪除此筆</button>
-        <button class="btn btn-sm" style="background:rgba(255,255,255,.1);color:#e2e8f0" onclick="openDcmpModal(dcmpSelectedDate)">編輯</button>
-        <button class="btn btn-primary btn-sm" onclick="openDcmpModal(null)">＋ 新增</button>
+      <span class="font-bold text-white text-sm">每日成效對比</span>
+      <div class="flex gap-2 items-center">
+        <input type="date" id="dcmp-add-date" class="inp" style="width:148px;padding:5px 8px;font-size:12px"/>
+        <button class="btn btn-primary btn-sm" onclick="addDcmpRow()">＋ 新增日期</button>
       </div>
     </div>
-    <!-- date list -->
-    <div id="dcmp-datelist" class="flex flex-wrap gap-2 px-4 py-3 border-b border-white/08" style="border-color:rgba(255,255,255,.06)"></div>
-    <!-- detail view -->
     <div class="overflow-x-auto">
-      <table id="dcmp-table" class="pt" style="min-width:640px">
-        <thead id="dcmp-thead"></thead>
-        <tbody id="dcmp-tbody"></tbody>
+      <table class="et" id="dcmp-et" style="min-width:700px">
+        <thead id="dcmp-et-head"></thead>
+        <tbody id="dcmp-et-body"></tbody>
       </table>
     </div>
   </div>
@@ -365,90 +377,6 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         </thead>
         <tbody id="entry-tbody"></tbody>
       </table>
-    </div>
-  </div>
-</div>
-
-<!-- DAILY COMPARE MODAL -->
-<div id="dcmp-modal" class="modal-overlay" onclick="if(event.target.id==='dcmp-modal')closeDcmpModal()">
-  <div class="modal-box" style="width:min(95vw,560px)">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-white font-bold text-base">每日成效對比 輸入</h3>
-      <button onclick="closeDcmpModal()" class="text-slate-500 hover:text-white text-xl leading-none">✕</button>
-    </div>
-    <div class="mb-4">
-      <label class="text-xs text-slate-400 block mb-1">日期</label>
-      <input type="date" id="dcmp-date" class="inp"/>
-    </div>
-    <!-- SEOUL -->
-    <div class="rounded-xl p-4 mb-3" style="background:rgba(79,96,245,.07);border:1px solid rgba(79,96,245,.22)">
-      <div class="text-xs font-bold text-indigo-400 mb-3 uppercase tracking-wider">SEOUL</div>
-      <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 mb-1 px-1"><span>Google</span><span>FB</span><span>總CON</span><span>業績(萬)</span></div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">實際</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-s-a-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-a-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-a-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-a-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">估值</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-s-e-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-e-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-e-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-e-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">同期</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-s-p-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-p-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-p-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-s-p-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div><label class="text-xs text-slate-400 block mb-1">廣告%數</label><input type="number" id="d-s-adpct" class="inp" placeholder="5.58" step="0.01"/></div>
-    </div>
-    <!-- HH -->
-    <div class="rounded-xl p-4 mb-3" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2)">
-      <div class="text-xs font-bold text-violet-400 mb-3 uppercase tracking-wider">HH</div>
-      <div class="grid grid-cols-2 gap-2 text-xs text-slate-400 mb-1 px-1"><span>Google</span><span>FB</span><span>總CON</span><span>業績(萬)</span></div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">實際</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-h-a-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-a-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-a-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-a-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">估值</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-h-e-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-e-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-e-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-e-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div class="mb-2">
-        <div class="text-xs text-slate-500 mb-1">同期</div>
-        <div class="grid grid-cols-4 gap-2">
-          <input type="number" id="d-h-p-gg" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-p-fb" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-p-con" class="inp" placeholder="0"/>
-          <input type="number" id="d-h-p-rev" class="inp" placeholder="0"/>
-        </div>
-      </div>
-      <div><label class="text-xs text-slate-400 block mb-1">廣告%數</label><input type="number" id="d-h-adpct" class="inp" placeholder="6.10" step="0.01"/></div>
-    </div>
-    <div class="mt-4 flex gap-2 items-center">
-      <button class="btn btn-primary" onclick="saveDcmp()">儲存</button>
-      <span id="dcmp-msg" class="text-xs text-emerald-400 hidden">✓ 已儲存！</span>
     </div>
   </div>
 </div>
@@ -895,195 +823,176 @@ function renderSeoulAds(){
 }
 
 // ──────────────────────────────────────────────────────────────
-// DAILY COMPARE TABLE
+// DAILY COMPARE TABLE (inline editable)
 // ──────────────────────────────────────────────────────────────
 const STORAGE_DCMP = 'dash_dcmp_v2';
-let dcmpSelectedDate = null;
 
 function loadDcmpAll(){ return JSON.parse(localStorage.getItem(STORAGE_DCMP)||'[]'); }
 function saveDcmpAll(arr){ localStorage.setItem(STORAGE_DCMP, JSON.stringify(arr)); }
 
-function openDcmpModal(date){
-  const all = loadDcmpAll();
-  const today = new Date().toISOString().slice(0,10);
-  const targetDate = date || today;
-  const d = all.find(r=>r.date===targetDate);
-  document.getElementById('dcmp-date').value = targetDate;
-  const fill = (id, v) => { const el=document.getElementById(id); if(el) el.value = v||''; };
-  // clear all first
-  ['d-s-a-gg','d-s-a-fb','d-s-a-con','d-s-a-rev','d-s-e-gg','d-s-e-fb','d-s-e-con','d-s-e-rev',
-   'd-s-p-gg','d-s-p-fb','d-s-p-con','d-s-p-rev','d-s-adpct',
-   'd-h-a-gg','d-h-a-fb','d-h-a-con','d-h-a-rev','d-h-e-gg','d-h-e-fb','d-h-e-con','d-h-e-rev',
-   'd-h-p-gg','d-h-p-fb','d-h-p-con','d-h-p-rev','d-h-adpct'].forEach(id=>fill(id,''));
-  if(d){
-    fill('d-s-a-gg',d.seoul?.actual?.gg);   fill('d-s-a-fb',d.seoul?.actual?.fb);
-    fill('d-s-a-con',d.seoul?.actual?.con); fill('d-s-a-rev',d.seoul?.actual?.rev);
-    fill('d-s-e-gg',d.seoul?.est?.gg);      fill('d-s-e-fb',d.seoul?.est?.fb);
-    fill('d-s-e-con',d.seoul?.est?.con);    fill('d-s-e-rev',d.seoul?.est?.rev);
-    fill('d-s-p-gg',d.seoul?.prev?.gg);     fill('d-s-p-fb',d.seoul?.prev?.fb);
-    fill('d-s-p-con',d.seoul?.prev?.con);   fill('d-s-p-rev',d.seoul?.prev?.rev);
-    fill('d-s-adpct',d.seoul?.adpct);
-    fill('d-h-a-gg',d.hh?.actual?.gg);     fill('d-h-a-fb',d.hh?.actual?.fb);
-    fill('d-h-a-con',d.hh?.actual?.con);   fill('d-h-a-rev',d.hh?.actual?.rev);
-    fill('d-h-e-gg',d.hh?.est?.gg);        fill('d-h-e-fb',d.hh?.est?.fb);
-    fill('d-h-e-con',d.hh?.est?.con);      fill('d-h-e-rev',d.hh?.est?.rev);
-    fill('d-h-p-gg',d.hh?.prev?.gg);       fill('d-h-p-fb',d.hh?.prev?.fb);
-    fill('d-h-p-con',d.hh?.prev?.con);     fill('d-h-p-rev',d.hh?.prev?.rev);
-    fill('d-h-adpct',d.hh?.adpct);
-  }
-  document.getElementById('dcmp-modal').classList.add('open');
-}
-function closeDcmpModal(){ document.getElementById('dcmp-modal').classList.remove('open'); }
+function emptyDcmpRec(date){ return {date, seoul:{actual:{gg:0,fb:0,con:0,rev:0},est:{gg:0,fb:0,con:0,rev:0},prev:{gg:0,fb:0,con:0,rev:0},adpct:0}, hh:{actual:{gg:0,fb:0,con:0,rev:0},est:{gg:0,fb:0,con:0,rev:0},prev:{gg:0,fb:0,con:0,rev:0},adpct:0}}; }
 
-function saveDcmp(){
-  const gv = id => parseFloat(document.getElementById(id)?.value)||0;
-  const iv = id => parseInt(document.getElementById(id)?.value)||0;
-  const date = document.getElementById('dcmp-date').value;
+function addDcmpRow(){
+  const dateEl = document.getElementById('dcmp-add-date');
+  const date = dateEl.value || new Date().toISOString().slice(0,10);
   if(!date){ alert('請選擇日期'); return; }
-  const rec = {
-    date,
-    seoul: {
-      actual: {gg:iv('d-s-a-gg'), fb:iv('d-s-a-fb'), con:iv('d-s-a-con'), rev:gv('d-s-a-rev')},
-      est:    {gg:iv('d-s-e-gg'), fb:iv('d-s-e-fb'), con:iv('d-s-e-con'), rev:gv('d-s-e-rev')},
-      prev:   {gg:iv('d-s-p-gg'), fb:iv('d-s-p-fb'), con:iv('d-s-p-con'), rev:gv('d-s-p-rev')},
-      adpct:  gv('d-s-adpct')
-    },
-    hh: {
-      actual: {gg:iv('d-h-a-gg'), fb:iv('d-h-a-fb'), con:iv('d-h-a-con'), rev:gv('d-h-a-rev')},
-      est:    {gg:iv('d-h-e-gg'), fb:iv('d-h-e-fb'), con:iv('d-h-e-con'), rev:gv('d-h-e-rev')},
-      prev:   {gg:iv('d-h-p-gg'), fb:iv('d-h-p-fb'), con:iv('d-h-p-con'), rev:gv('d-h-p-rev')},
-      adpct:  gv('d-h-adpct')
-    }
-  };
   const all = loadDcmpAll();
-  const idx = all.findIndex(r=>r.date===date);
-  if(idx>=0) all[idx]=rec; else all.push(rec);
+  if(all.find(r=>r.date===date)){ alert('此日期已存在，可直接在表格中修改'); return; }
+  all.push(emptyDcmpRec(date));
   all.sort((a,b)=>b.date.localeCompare(a.date));
   saveDcmpAll(all);
-  dcmpSelectedDate = date;
   renderDcmp();
-  const msg=document.getElementById('dcmp-msg');
-  msg.classList.remove('hidden'); setTimeout(()=>msg.classList.add('hidden'),2000);
+  // scroll to new row
+  setTimeout(()=>{ const el=document.getElementById('dcmp-row-'+date); if(el) el.scrollIntoView({behavior:'smooth',block:'center'}); }, 100);
 }
 
-function deleteDcmpRecord(){
-  if(!dcmpSelectedDate) return;
-  if(!confirm(`確定刪除 ${dcmpSelectedDate} 的資料？`)) return;
-  saveDcmpAll(loadDcmpAll().filter(r=>r.date!==dcmpSelectedDate));
+function deleteDcmpRow(date){
+  if(!confirm(`確定刪除 ${date} 的資料？`)) return;
+  saveDcmpAll(loadDcmpAll().filter(r=>r.date!==date));
+  renderDcmp();
+}
+
+function onDcmpChange(el){
+  const {date, brand, type, field} = el.dataset;
   const all = loadDcmpAll();
-  dcmpSelectedDate = all.length ? all[0].date : null;
-  renderDcmp();
+  let rec = all.find(r=>r.date===date);
+  if(!rec){ rec=emptyDcmpRec(date); all.push(rec); }
+  const val = parseFloat(el.value)||0;
+  if(type==='adpct'){ rec[brand].adpct=val; }
+  else { if(!rec[brand][type]) rec[brand][type]={}; rec[brand][type][field]=val; }
+  all.sort((a,b)=>b.date.localeCompare(a.date));
+  saveDcmpAll(all);
+  // update 落差 cells live
+  refreshDiffRow(date, brand, rec[brand]);
 }
 
-function selectDcmpDate(date){
-  dcmpSelectedDate = date;
-  renderDcmp();
+function refreshDiffRow(date, brand, bdata){
+  const fields=['gg','fb','con','rev'];
+  fields.forEach(f=>{
+    const el=document.getElementById(`diff-${date}-${brand}-${f}`);
+    if(!el) return;
+    const v=(bdata.actual[f]||0)-(bdata.prev[f]||0);
+    el.textContent = v===0?'0':(v>0?'+':'')+Math.round(v).toLocaleString('zh-TW');
+    el.style.color = v<0?'#f87171':v>0?'#34d399':'#94a3b8';
+    el.style.fontWeight = v!==0?'700':'400';
+  });
+  // also refresh 總業績 cells
+  const all = loadDcmpAll();
+  const rec = all.find(r=>r.date===date);
+  if(!rec) return;
+  const updateTotal = (sfx, va, vb)=>{
+    const el=document.getElementById(`tot-${date}-${sfx}`);
+    if(el) el.textContent = (va+vb)>0?Math.round(va+vb).toLocaleString('zh-TW'):'—';
+  };
+  updateTotal('actual-rev', rec.seoul.actual.rev||0, rec.hh.actual.rev||0);
+  updateTotal('est-rev',    rec.seoul.est.rev||0,    rec.hh.est.rev||0);
+  updateTotal('prev-rev',   rec.seoul.prev.rev||0,   rec.hh.prev.rev||0);
+}
+
+function inp(date, brand, type, field, val){
+  const v = val||'';
+  return `<input type="number" class="et-inp" placeholder="—" value="${v||''}"
+    data-date="${date}" data-brand="${brand}" data-type="${type}" data-field="${field}"
+    onchange="onDcmpChange(this)" oninput="onDcmpChange(this)"/>`;
 }
 
 function renderDcmp(){
   const all = loadDcmpAll();
-  const datelistEl = document.getElementById('dcmp-datelist');
-  const thead = document.getElementById('dcmp-thead');
-  const tbody = document.getElementById('dcmp-tbody');
-  const delBtn = document.getElementById('dcmp-del-btn');
+  const thead = document.getElementById('dcmp-et-head');
+  const tbody = document.getElementById('dcmp-et-body');
   if(!thead||!tbody) return;
 
-  // sync selected date
-  if(!dcmpSelectedDate && all.length) dcmpSelectedDate = all[0].date;
-  if(all.length && !all.find(r=>r.date===dcmpSelectedDate)) dcmpSelectedDate = all[0].date;
+  // Set default date to today
+  const dateEl = document.getElementById('dcmp-add-date');
+  if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
 
-  // date chips
-  if(datelistEl){
-    if(!all.length){
-      datelistEl.innerHTML = '<span class="text-xs text-slate-500">尚無記錄</span>';
-    } else {
-      datelistEl.innerHTML = all.map(r=>{
-        const active = r.date===dcmpSelectedDate;
-        const label = r.date.slice(5).replace('-','/');
-        return `<button onclick="selectDcmpDate('${r.date}')" style="padding:4px 12px;border-radius:999px;font-size:12px;font-weight:600;border:none;cursor:pointer;transition:background .15s;${active?'background:rgba(79,96,245,.6);color:#fff':'background:rgba(255,255,255,.08);color:#94a3b8'}">${label}</button>`;
-      }).join('');
-    }
-  }
+  thead.innerHTML = `<tr>
+    <th rowspan="2" style="min-width:80px">日期</th>
+    <th rowspan="2" style="min-width:50px">品牌</th>
+    <th rowspan="2" style="min-width:44px"></th>
+    <th>Google</th><th>FB</th><th>總CON</th><th>業績</th>
+    <th rowspan="2" style="color:#7086fb;min-width:62px">廣告%數</th>
+    <th rowspan="2" style="min-width:44px">刪除</th>
+  </tr>
+  <tr style="background:rgba(30,26,100,.6)">
+    <th style="font-size:10px;color:#a5b4fc">數值</th>
+    <th style="font-size:10px;color:#a5b4fc">數值</th>
+    <th style="font-size:10px;color:#a5b4fc">數值</th>
+    <th style="font-size:10px;color:#a5b4fc">業績</th>
+  </tr>`;
 
-  const d = all.find(r=>r.date===dcmpSelectedDate);
-  if(delBtn) delBtn.style.display = d ? 'inline-block' : 'none';
-
-  if(!d){
-    thead.innerHTML='';
-    tbody.innerHTML=`<tr><td colspan="7" class="text-center text-slate-500 py-6 text-sm">尚無資料，請點擊「＋ 新增」</td></tr>`;
-    document.getElementById('dcmp-label').textContent='';
+  if(!all.length){
+    tbody.innerHTML=`<tr><td colspan="9" class="text-center text-slate-500 py-8">尚無資料，請選擇日期後點擊「＋ 新增日期」</td></tr>`;
     return;
   }
 
-  const dateObj = new Date(d.date+'T00:00:00');
-  const monthNum = dateObj.getMonth()+1;
-  const dayNum   = dateObj.getDate();
-  document.getElementById('dcmp-label').textContent = `${dateObj.getFullYear()}年 ${monthNum}月 ${dayNum}日`;
+  const rows=[];
+  all.forEach(rec=>{
+    const {date, seoul, hh} = rec;
+    const d = new Date(date+'T00:00:00');
+    const dateLabel = `${d.getMonth()+1}/${d.getDate()}`;
+    const ROWSPAN = 9; // 4 rows SEOUL + sep + 4 rows HH
 
-  thead.innerHTML = `<tr>
-    <th style="text-align:center">${monthNum}月</th>
-    <th style="text-align:center">${dayNum}</th>
-    <th style="text-align:center">Google</th>
-    <th style="text-align:center">FB</th>
-    <th style="text-align:center">總CON</th>
-    <th style="text-align:center">業績</th>
-    <th style="text-align:center">廣告%數</th>
-  </tr>`;
+    const brandRows = (brand, bdata, color, isFirst)=>{
+      const a=bdata.actual, e=bdata.est||{}, p=bdata.prev||{};
+      const grp = `<td class="et-brand" style="color:${color}" rowspan="4">${brand}</td>`;
+      const dateCell = isFirst ? `<td class="et-date" rowspan="${ROWSPAN}" id="dcmp-row-${date}">${dateLabel}<br/><span style="font-size:10px;color:#64748b;font-weight:400">${date.slice(0,4)}</span></td>` : '';
+      const delCell  = isFirst ? `<td rowspan="${ROWSPAN}" style="text-align:center;vertical-align:middle"><button class="btn btn-danger btn-sm" onclick="deleteDcmpRow('${date}')">✕</button></td>` : '';
 
-  const N = v => v!=null&&v!==0 ? Math.round(v).toLocaleString('zh-TW') : '—';
-  const F = v => v!=null&&v!==0 ? v.toFixed(2)+'%' : '—';
-  const diff = (a,b) => {
-    const v=a-b; if(v===0) return '<td class="pt-num">0</td>';
-    const red=v<0;
-    return `<td class="pt-num" style="color:${red?'#f87171':'#34d399'};font-weight:700">${v>0?'+':''}${Math.round(v).toLocaleString('zh-TW')}</td>`;
-  };
+      rows.push(`<tr>${dateCell}${grp}<td class="et-type">實際</td>
+        <td>${inp(date,brand,'actual','gg',a.gg)}</td>
+        <td>${inp(date,brand,'actual','fb',a.fb)}</td>
+        <td>${inp(date,brand,'actual','con',a.con)}</td>
+        <td>${inp(date,brand,'actual','rev',a.rev)}</td>
+        <td rowspan="4" style="text-align:center;vertical-align:middle"><input type="number" step="0.01" class="et-adpct-inp" placeholder="0.00" value="${bdata.adpct||''}" data-date="${date}" data-brand="${brand}" data-type="adpct" data-field="adpct" onchange="onDcmpChange(this)"/>%</td>
+        ${delCell}
+      </tr>`);
+      rows.push(`<tr class="et-est"><td class="et-type">估值</td>
+        <td>${inp(date,brand,'est','gg',e.gg)}</td>
+        <td>${inp(date,brand,'est','fb',e.fb)}</td>
+        <td>${inp(date,brand,'est','con',e.con)}</td>
+        <td>${inp(date,brand,'est','rev',e.rev)}</td>
+      </tr>`);
+      rows.push(`<tr class="et-prev"><td class="et-type">同期</td>
+        <td>${inp(date,brand,'prev','gg',p.gg)}</td>
+        <td>${inp(date,brand,'prev','fb',p.fb)}</td>
+        <td>${inp(date,brand,'prev','con',p.con)}</td>
+        <td>${inp(date,brand,'prev','rev',p.rev)}</td>
+      </tr>`);
+      const dv = (f)=>{
+        const v=(a[f]||0)-(p[f]||0);
+        const c=v<0?'#f87171':v>0?'#34d399':'#94a3b8';
+        const fw=v!==0?'700':'400';
+        return `<span id="diff-${date}-${brand}-${f}" style="color:${c};font-weight:${fw};display:block;text-align:right;padding:5px 8px">${v===0?'0':(v>0?'+':'')+Math.round(v).toLocaleString('zh-TW')}</span>`;
+      };
+      rows.push(`<tr class="et-diff"><td class="et-type" style="color:#64748b">落差</td>
+        <td>${dv('gg')}</td><td>${dv('fb')}</td><td>${dv('con')}</td><td>${dv('rev')}</td>
+      </tr>`);
+    };
 
-  const rows = [];
-  const brandSection = (label, color, data) => {
-    const a=data.actual, e=data.est, p=data.prev;
-    rows.push(`<tr style="background:rgba(255,255,255,.02)">
-      <td class="pt-grp" rowspan="4" style="text-align:center;vertical-align:middle;font-size:13px;font-weight:700">${label}</td>
-      <td class="pt-lbl" style="color:#94a3b8">實際</td>
-      <td class="pt-num">${N(a.gg)}</td><td class="pt-num">${N(a.fb)}</td>
-      <td class="pt-num">${N(a.con)}</td><td class="pt-num">${N(a.rev)}</td>
-      <td class="pt-num" rowspan="4" style="font-weight:700;font-size:13px;color:${color};text-align:center;vertical-align:middle">${F(data.adpct)}</td>
+    brandRows('SEOUL', seoul, '#7086fb', true);
+    rows.push(`<tr class="et-sep"><td colspan="9"></td></tr>`);
+    brandRows('HH', hh, '#a78bfa', false);
+
+    // 總業績 row
+    const totA = (seoul.actual?.rev||0)+(hh.actual?.rev||0);
+    const totE = (seoul.est?.rev||0)+(hh.est?.rev||0);
+    const totP = (seoul.prev?.rev||0)+(hh.prev?.rev||0);
+    const N = v => v>0?Math.round(v).toLocaleString('zh-TW'):'—';
+    rows.push(`<tr style="background:rgba(251,191,36,.1)">
+      <td colspan="2" class="et-brand" style="color:#fcd34d;text-align:center">總業績</td>
+      <td style="text-align:center;padding:5px 8px;font-size:11px;color:#94a3b8">實際<br/>估值<br/>同期</td>
+      <td colspan="3"></td>
+      <td style="text-align:right;padding:6px 8px;vertical-align:middle">
+        <div id="tot-${date}-actual-rev" style="color:#fcd34d;font-weight:700;font-size:13px">${N(totA)}</div>
+        <div id="tot-${date}-est-rev" style="color:#94a3b8;font-size:11px">${N(totE)}</div>
+        <div id="tot-${date}-prev-rev" style="color:#a5b4fc;font-size:11px">同期 ${N(totP)}</div>
+      </td>
+      <td colspan="2"></td>
     </tr>`);
-    rows.push(`<tr style="background:rgba(255,255,255,.02)">
-      <td class="pt-lbl" style="color:#94a3b8">估值</td>
-      <td class="pt-num">${N(e.gg)}</td><td class="pt-num">${N(e.fb)}</td>
-      <td class="pt-num">${N(e.con)}</td><td class="pt-num">${N(e.rev)}</td>
-    </tr>`);
-    rows.push(`<tr style="background:rgba(251,191,36,.06)">
-      <td class="pt-lbl" style="color:#94a3b8">同期</td>
-      <td class="pt-num">${N(p.gg)}</td><td class="pt-num">${N(p.fb)}</td>
-      <td class="pt-num">${N(p.con)}</td><td class="pt-num">${N(p.rev)}</td>
-    </tr>`);
-    rows.push(`<tr style="background:rgba(255,255,255,.04)">
-      <td class="pt-lbl" style="color:#94a3b8;font-weight:600">落差</td>
-      ${diff(a.gg,p.gg)}${diff(a.fb,p.fb)}${diff(a.con,p.con)}${diff(a.rev,p.rev)}
-    </tr>`);
-  };
 
-  brandSection('SEOUL', '#7086fb', d.seoul);
-  rows.push(`<tr class="r-sep"><td colspan="7"></td></tr>`);
-  brandSection('HH', '#a78bfa', d.hh);
-  rows.push(`<tr class="r-sep"><td colspan="7"></td></tr>`);
-
-  const sa=d.seoul.actual.rev, ha=d.hh.actual.rev;
-  const se=d.seoul.est.rev,    he=d.hh.est.rev;
-  const sp=d.seoul.prev.rev,   hp=d.hh.prev.rev;
-  rows.push(`<tr style="background:rgba(251,191,36,.1)">
-    <td class="pt-grp" rowspan="2" style="text-align:center;vertical-align:middle;font-weight:700">總業績</td>
-    <td class="pt-lbl" style="color:#fcd34d;font-weight:600">實際</td>
-    <td class="pt-num" colspan="3">${N(sa+ha)}</td>
-    <td class="pt-num" style="font-weight:700;color:#fcd34d">同期 ${N(sp+hp)}</td>
-    <td class="pt-num"></td>
-  </tr>`);
-  rows.push(`<tr style="background:rgba(251,191,36,.06)">
-    <td class="pt-lbl" style="color:#94a3b8">估值</td>
-    <td class="pt-num" colspan="3">${N(se+he)}</td>
-    <td class="pt-num"></td><td class="pt-num"></td>
-  </tr>`);
+    rows.push(`<tr><td colspan="9" style="height:8px;background:rgba(79,96,245,.15);border:none;padding:0"></td></tr>`);
+  });
 
   tbody.innerHTML = rows.join('');
 }
