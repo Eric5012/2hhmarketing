@@ -9,117 +9,127 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
 <style>
 *{box-sizing:border-box}
-body{font-family:'Inter',sans-serif;background:#0d0f1e;color:#e2e8f0;min-height:100vh}
-.card{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:20px}
+body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:100vh}
+.card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .card-hover{transition:transform .2s,box-shadow .2s}
-.card-hover:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.35)}
-.inp{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#e2e8f0;padding:7px 11px;font-size:13px;outline:none;width:100%;transition:border-color .2s}
-.inp::placeholder{color:rgba(255,255,255,.3)}
-.inp:focus{border-color:#7086fb}
-.inp option{background:#1a1d30}
-.sel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#e2e8f0;padding:7px 11px;font-size:13px;outline:none;transition:border-color .2s;cursor:pointer}
-.sel:focus{border-color:#7086fb}
-.sel option{background:#1a1d30}
+.card-hover:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.10)}
+.inp{background:#fff;border:1px solid #cbd5e1;border-radius:8px;color:#1e293b;padding:7px 11px;font-size:13px;outline:none;width:100%;transition:border-color .2s}
+.inp::placeholder{color:#94a3b8}
+.inp:focus{border-color:#4f60f5;box-shadow:0 0 0 3px rgba(79,96,245,.12)}
+.inp option{background:#fff;color:#1e293b}
+.sel{background:#fff;border:1px solid #cbd5e1;border-radius:8px;color:#1e293b;padding:7px 11px;font-size:13px;outline:none;transition:border-color .2s;cursor:pointer}
+.sel:focus{border-color:#4f60f5}
+.sel option{background:#fff;color:#1e293b}
 .btn{border:none;border-radius:8px;padding:8px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity .2s,transform .1s}
 .btn:active{transform:scale(.97)}
-.btn-primary{background:linear-gradient(135deg,#4f60f5,#7086fb);color:#fff}
+.btn-primary{background:linear-gradient(135deg,#4f60f5,#7086fb);color:#fff;box-shadow:0 2px 8px rgba(79,96,245,.3)}
 .btn-primary:hover{opacity:.88}
-.btn-danger{background:rgba(248,113,113,.15);color:#f87171;border:1px solid rgba(248,113,113,.3)}
-.btn-danger:hover{background:rgba(248,113,113,.3)}
+.btn-danger{background:#fef2f2;color:#ef4444;border:1px solid #fecaca}
+.btn-danger:hover{background:#fee2e2}
 .btn-sm{padding:5px 12px;font-size:12px}
-.badge-up{display:inline-flex;align-items:center;background:rgba(52,211,153,.15);color:#34d399;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.badge-dn{display:inline-flex;align-items:center;background:rgba(248,113,113,.15);color:#f87171;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.badge-neu{display:inline-flex;align-items:center;background:rgba(148,163,184,.15);color:#94a3b8;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.tab-nav-btn{padding:9px 20px;border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:background .2s,color .2s;background:transparent;color:#64748b}
-.tab-nav-btn.active{background:rgba(79,96,245,.25);color:#7086fb;font-weight:600}
-.tab-nav-btn:hover:not(.active){background:rgba(255,255,255,.05);color:#e2e8f0}
-.section-title{font-size:15px;font-weight:600;color:#fff;margin-bottom:4px}
-.section-sub{font-size:12px;color:#64748b;margin-bottom:16px}
+.badge-up{display:inline-flex;align-items:center;background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-dn{display:inline-flex;align-items:center;background:#fef2f2;color:#ef4444;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.badge-neu{display:inline-flex;align-items:center;background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
+.tab-nav-btn{padding:8px 20px;border-radius:999px;font-size:14px;font-weight:500;cursor:pointer;border:none;transition:background .2s,color .2s;background:transparent;color:#64748b}
+.tab-nav-btn.active{background:#fff;color:#4f60f5;font-weight:700;box-shadow:0 1px 6px rgba(0,0,0,.10)}
+.tab-nav-btn:hover:not(.active){background:rgba(79,96,245,.06);color:#4f60f5}
+.section-title{font-size:15px;font-weight:600;color:#1e293b;margin-bottom:4px}
+.section-sub{font-size:12px;color:#94a3b8;margin-bottom:16px}
 .tbl{width:100%;border-collapse:collapse;font-size:13px}
-.tbl th{text-align:left;padding:10px 12px;color:#64748b;font-weight:500;font-size:11px;border-bottom:1px solid rgba(255,255,255,.08);white-space:nowrap}
-.tbl td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);color:#cbd5e1;vertical-align:middle}
-.tbl tr:hover td{background:rgba(255,255,255,.03)}
+.tbl th{text-align:left;padding:10px 12px;color:#94a3b8;font-weight:500;font-size:11px;border-bottom:1px solid #f1f5f9;white-space:nowrap;text-transform:uppercase;letter-spacing:.04em}
+.tbl td{padding:9px 12px;border-bottom:1px solid #f8fafc;color:#334155;vertical-align:middle}
+.tbl tr:hover td{background:#f8fafc}
 .tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
 .tbl th.num{text-align:right}
-.tbl tr.total-row td{background:rgba(79,96,245,.12);color:#fff;font-weight:600;border-top:1px solid rgba(79,96,245,.4)}
-.modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.tbl tr.total-row td{background:#f0f4ff;color:#4f60f5;font-weight:600;border-top:1px solid #c7d2fe}
+.modal-overlay{position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.45);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 .modal-overlay.open{opacity:1;pointer-events:all}
-.modal-box{background:#13162a;border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:28px;width:min(95vw,480px);transform:scale(.95);transition:transform .25s;max-height:90vh;overflow-y:auto}
+.modal-box{background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:28px;width:min(95vw,480px);transform:scale(.95);transition:transform .25s;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.15)}
 .modal-overlay.open .modal-box{transform:scale(1)}
 ::-webkit-scrollbar{width:5px;height:5px}
-::-webkit-scrollbar-thumb{background:rgba(255,255,255,.15);border-radius:3px}
+::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .fade-up{animation:fadeUp .35s ease forwards}
 .sparkline-wrap{height:40px}
 .pill{display:inline-block;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600}
-.pill-fb{background:rgba(24,119,242,.2);color:#60a5fa}
-.pill-gg{background:rgba(52,211,153,.2);color:#34d399}
-.pill-all{background:rgba(167,139,250,.2);color:#a78bfa}
+.pill-fb{background:#dbeafe;color:#2563eb}
+.pill-gg{background:#dcfce7;color:#16a34a}
+.pill-all{background:#ede9fe;color:#7c3aed}
 input[type=number]::-webkit-inner-spin-button{opacity:.4}
+/* ── filter chips ── */
+.chip-group{display:flex;gap:6px;flex-wrap:wrap}
+.chip{padding:6px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s}
+.chip.active{background:#4f60f5;color:#fff;border-color:#4f60f5;font-weight:600}
+.chip:hover:not(.active){border-color:#4f60f5;color:#4f60f5}
+/* ── KPI tile ── */
+.kpi-tile{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.kpi-tile .kpi-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em}
+.kpi-tile .kpi-val{font-size:28px;font-weight:800;color:#1e293b;line-height:1.1}
+.kpi-tile .kpi-sub{font-size:12px;color:#94a3b8}
 /* ── Pivot table ── */
 .pt{width:100%;border-collapse:collapse;font-size:12px}
-.pt th,.pt td{border:1px solid rgba(255,255,255,.07);padding:7px 10px;white-space:nowrap}
-.pt th{background:rgba(45,40,140,.85);color:#fff;font-weight:600;font-size:11px;letter-spacing:.03em}
-.pt td{color:#fff}
+.pt th,.pt td{border:1px solid #e2e8f0;padding:7px 10px;white-space:nowrap}
+.pt th{background:#f8fafc;color:#475569;font-weight:600;font-size:11px;letter-spacing:.03em}
+.pt td{color:#1e293b}
 .pt .pt-num{text-align:right;font-variant-numeric:tabular-nums}
-.pt .pt-lbl{font-weight:500;color:#fff;padding-left:18px}
-.pt .pt-grp{font-weight:700;color:#fff;background:rgba(55,48,163,.5)!important;text-align:center;vertical-align:middle}
-.pt .pt-hd-month{background:rgba(45,40,140,.9)!important;color:#fff;cursor:pointer;text-align:center;transition:background .15s}
-.pt .pt-hd-month:hover{background:rgba(79,96,245,.85)!important;color:#fff}
-.pt .r-taxed td{color:#fff}
-.pt .r-con td{background:rgba(79,96,245,.18);color:#fff}
-.pt .r-cpl td{color:#fff}
-.pt .r-sep td{height:3px;padding:0;background:rgba(79,96,245,.25);border:none}
-.pt .r-total td{background:rgba(255,255,255,.08);color:#fff;font-weight:700}
-.pt .r-pct td{color:#fff;font-weight:600}
-.pt .r-rev td{background:rgba(251,191,36,.12);color:#fff;font-weight:600}
-.pt .r-con-s td{background:rgba(251,191,36,.12);color:#fff;font-weight:600}
-.pt .r-cpl-s td{color:#fff;font-weight:600}
-.pt .r-perc td{color:#fff;font-weight:600}
-.pt .r-est-h td{color:#fff;font-weight:700}
-.pt .r-est td{color:#fff}
-.pt .r-oth td{color:#fff}
-.pt .r-est-target td{background:rgba(255,255,255,.08);color:#fff;font-weight:700}
-.pt .pt-hd-yr{background:rgba(45,38,160,.9)!important;color:#fff;font-size:13px;font-weight:800;letter-spacing:.05em;text-align:center}
+.pt .pt-lbl{font-weight:500;color:#334155;padding-left:18px}
+.pt .pt-grp{font-weight:700;color:#fff;background:#4f60f5!important;text-align:center;vertical-align:middle}
+.pt .pt-hd-month{background:#e0e7ff!important;color:#4f60f5;cursor:pointer;text-align:center;transition:background .15s;font-weight:700}
+.pt .pt-hd-month:hover{background:#c7d2fe!important;color:#3730a3}
+.pt .r-taxed td{color:#475569}
+.pt .r-con td{background:#ede9fe;color:#5b21b6}
+.pt .r-cpl td{color:#334155}
+.pt .r-sep td{height:3px;padding:0;background:#e0e7ff;border:none}
+.pt .r-total td{background:#f0f4ff;color:#4f60f5;font-weight:700}
+.pt .r-pct td{color:#334155;font-weight:600}
+.pt .r-rev td{background:#fefce8;color:#92400e;font-weight:600}
+.pt .r-con-s td{background:#fefce8;color:#92400e;font-weight:600}
+.pt .r-cpl-s td{color:#334155;font-weight:600}
+.pt .r-perc td{color:#334155;font-weight:600}
+.pt .r-est-h td{color:#1e293b;font-weight:700}
+.pt .r-est td{color:#475569}
+.pt .r-oth td{color:#475569}
+.pt .r-est-target td{background:#f8fafc;color:#1e293b;font-weight:700}
+.pt .pt-hd-yr{background:#4f60f5!important;color:#fff;font-size:13px;font-weight:800;letter-spacing:.05em;text-align:center}
 /* ── Inline editable table ── */
 .et{width:100%;border-collapse:collapse;font-size:12px}
-.et th,.et td{border:1px solid rgba(255,255,255,.07);padding:0;white-space:nowrap}
-.et th{background:rgba(45,40,140,.85);color:#fff;font-weight:600;font-size:11px;letter-spacing:.03em;padding:6px 10px;text-align:center}
-.et td{color:#fff;vertical-align:middle}
-.et .et-date{background:rgba(45,38,160,.6);font-weight:700;font-size:12px;text-align:center;padding:6px 10px;vertical-align:middle}
-.et .et-brand{background:rgba(55,48,163,.5);font-weight:700;text-align:center;padding:6px 10px;vertical-align:middle}
-.et .et-type{padding:5px 10px;color:#94a3b8;font-size:11px;font-weight:600;text-align:left;min-width:46px}
-.et .et-diff .et-type{color:#64748b}
-.et .et-est td{background:rgba(255,255,255,.03)}
-.et .et-prev td{background:rgba(251,191,36,.05)}
-.et .et-diff td{background:rgba(255,255,255,.04)}
-.et .et-sep td{height:4px;padding:0;background:rgba(79,96,245,.3);border:none}
-.et-inp{background:transparent;border:none;color:#fff;text-align:right;width:100%;padding:5px 8px;outline:none;font-size:12px;font-variant-numeric:tabular-nums;font-family:inherit;min-width:64px}
-.et-inp:focus{background:rgba(79,96,245,.25);border-radius:0}
-.et-inp::placeholder{color:rgba(255,255,255,.15)}
+.et th,.et td{border:1px solid #e2e8f0;padding:0;white-space:nowrap}
+.et th{background:#f8fafc;color:#475569;font-weight:600;font-size:11px;letter-spacing:.03em;padding:6px 10px;text-align:center}
+.et td{color:#1e293b;vertical-align:middle}
+.et .et-date{background:#4f60f5;color:#fff;font-weight:700;font-size:12px;text-align:center;padding:6px 10px;vertical-align:middle}
+.et .et-brand{background:#f0f4ff;font-weight:700;text-align:center;padding:6px 10px;vertical-align:middle}
+.et .et-type{padding:5px 10px;color:#64748b;font-size:11px;font-weight:600;text-align:left;min-width:46px}
+.et .et-diff .et-type{color:#94a3b8}
+.et .et-est td{background:#fafafa}
+.et .et-prev td{background:#fffbeb}
+.et .et-diff td{background:#f8fafc}
+.et .et-sep td{height:4px;padding:0;background:#e0e7ff;border:none}
+.et-inp{background:transparent;border:none;color:#1e293b;text-align:right;width:100%;padding:5px 8px;outline:none;font-size:12px;font-variant-numeric:tabular-nums;font-family:inherit;min-width:64px}
+.et-inp:focus{background:#ede9fe;border-radius:0;color:#4f60f5}
+.et-inp::placeholder{color:#cbd5e1}
 .et-diff-val{display:block;text-align:right;padding:5px 8px;min-width:64px;font-variant-numeric:tabular-nums}
-.et-adpct-inp{background:transparent;border:none;color:#7086fb;text-align:center;width:100%;padding:5px 6px;outline:none;font-size:12px;font-weight:700;font-family:inherit}
-.et-adpct-inp:focus{background:rgba(79,96,245,.25)}
+.et-adpct-inp{background:transparent;border:none;color:#4f60f5;text-align:center;width:100%;padding:5px 6px;outline:none;font-size:12px;font-weight:700;font-family:inherit}
+.et-adpct-inp:focus{background:#e0e7ff}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
-<nav class="sticky top-0 z-40 px-4 sm:px-8 py-3 flex items-center justify-between border-b border-white/5" style="background:rgba(13,15,30,.9);backdrop-filter:blur(14px)">
+<nav class="sticky top-0 z-40 px-4 sm:px-8 py-3 flex items-center justify-between border-b" style="background:#fff;border-color:#e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06)">
   <div class="flex items-center gap-3">
     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style="background:linear-gradient(135deg,#4f60f5,#7086fb)">2H</div>
-    <span class="font-bold tracking-tight">2HH <span style="color:#7086fb">Marketing</span></span>
-    <span class="hidden sm:block text-slate-500 text-xs">Dashboard</span>
+    <span class="font-bold tracking-tight text-slate-800">2HH <span style="color:#4f60f5">Marketing</span></span>
+    <span class="hidden sm:block text-slate-400 text-xs">Dashboard</span>
   </div>
   <div class="flex items-center gap-2 text-xs text-slate-400">
-    <span class="w-2 h-2 rounded-full bg-emerald-400 inline-block" style="animation:pulse 2s infinite"></span>
+    <span class="w-2 h-2 rounded-full inline-block" style="background:#22c55e;animation:pulse 2s infinite"></span>
     <span id="live-clock"></span>
   </div>
 </nav>
 
 <!-- PAGE TABS -->
-<div class="px-4 sm:px-8 pt-5 pb-0">
-  <div class="flex gap-1 bg-white/5 rounded-xl p-1 w-fit">
+<div class="px-4 sm:px-8 pt-4 pb-0 border-b" style="border-color:#e2e8f0;background:#fff">
+  <div class="flex gap-1 rounded-xl p-1 w-fit" style="background:#f1f5f9">
     <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">廣告總覽</button>
     <button class="tab-nav-btn" onclick="showTab('seoul',this)">首爾醫美</button>
     <button class="tab-nav-btn" onclick="showTab('entry',this)">資料輸入</button>
@@ -151,7 +161,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- filter bar -->
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-bold text-white">業務數據總覽</h1>
+      <h1 class="text-xl font-bold text-slate-800">業務數據總覽</h1>
       <p class="text-slate-400 text-sm" id="db-date-label"></p>
     </div>
     <div class="flex gap-2 items-center flex-wrap">
@@ -167,25 +177,25 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   <!-- summary cards -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 fade-up">
-    <div class="card card-hover col-span-2 lg:col-span-1" style="background:linear-gradient(135deg,rgba(79,96,245,.2),rgba(112,134,251,.08));border-color:rgba(79,96,245,.35)">
-      <div class="text-slate-300 text-xs mb-1">每日平均 CON</div>
-      <div class="text-4xl font-extrabold text-white" id="kpi-avg-con">—</div>
-      <div class="text-slate-400 text-xs mt-1">本月累計 <span id="kpi-total-con" class="text-white font-semibold">—</span> 筆</div>
+    <div class="kpi-tile col-span-2 lg:col-span-1" style="border-left:4px solid #4f60f5">
+      <div class="kpi-label">每日平均 CON</div>
+      <div class="kpi-val" id="kpi-avg-con">—</div>
+      <div class="kpi-sub">本月累計 <span id="kpi-total-con" style="color:#4f60f5;font-weight:600">—</span> 筆</div>
     </div>
-    <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">首爾</div>
-      <div class="text-2xl font-bold text-white" id="kpi-seoul-con">—</div>
-      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-seoul-pct" class="font-semibold" style="color:#7086fb">—</span></div>
+    <div class="kpi-tile" style="border-left:4px solid #4f60f5">
+      <div class="kpi-label">首爾</div>
+      <div class="kpi-val" style="font-size:22px" id="kpi-seoul-con">—</div>
+      <div class="kpi-sub">佔比 <span id="kpi-seoul-pct" style="color:#4f60f5;font-weight:600">—</span></div>
     </div>
-    <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">新竹</div>
-      <div class="text-2xl font-bold text-white" id="kpi-hsinchu-con">—</div>
-      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-hsinchu-pct" class="font-semibold" style="color:#34d399">—</span></div>
+    <div class="kpi-tile" style="border-left:4px solid #16a34a">
+      <div class="kpi-label">新竹</div>
+      <div class="kpi-val" style="font-size:22px" id="kpi-hsinchu-con">—</div>
+      <div class="kpi-sub">佔比 <span id="kpi-hsinchu-pct" style="color:#16a34a;font-weight:600">—</span></div>
     </div>
-    <div class="card card-hover">
-      <div class="text-slate-300 text-xs mb-1">台中</div>
-      <div class="text-2xl font-bold text-white" id="kpi-taichung-con">—</div>
-      <div class="text-slate-400 text-xs mt-1">佔比 <span id="kpi-taichung-pct" class="font-semibold" style="color:#a78bfa">—</span></div>
+    <div class="kpi-tile" style="border-left:4px solid #7c3aed">
+      <div class="kpi-label">台中</div>
+      <div class="kpi-val" style="font-size:22px" id="kpi-taichung-con">—</div>
+      <div class="kpi-sub">佔比 <span id="kpi-taichung-pct" style="color:#7c3aed;font-weight:600">—</span></div>
     </div>
   </div>
 
@@ -194,7 +204,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div class="card lg:col-span-2 flex flex-col gap-3">
       <div class="flex flex-wrap items-center justify-between gap-2">
         <div class="section-title mb-0">每日營業額趨勢 (NT$)</div>
-        <div class="flex gap-1 bg-white/5 rounded-lg p-0.5">
+        <div class="flex gap-1 rounded-lg p-0.5" style="background:#f1f5f9">
           <button class="tab-nav-btn active" style="padding:4px 12px;font-size:12px" onclick="switchRevType('line',this)">折線</button>
           <button class="tab-nav-btn" style="padding:4px 12px;font-size:12px" onclick="switchRevType('bar',this)">長條</button>
         </div>
@@ -204,31 +214,31 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div class="card flex flex-col gap-3">
       <div class="section-title mb-0">新舊客比例</div>
       <div style="height:200px;position:relative"><canvas id="nr-chart"></canvas></div>
-      <div class="flex justify-center gap-5 text-xs text-slate-400">
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#7086fb"></span>新客</span>
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#34d399"></span>回頭客</span>
+      <div class="flex justify-center gap-5 text-xs" style="color:#94a3b8">
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#4f60f5"></span>新客</span>
+        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#16a34a"></span>回頭客</span>
       </div>
     </div>
   </div>
 
   <!-- KPI row -->
   <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(52,211,153,.15),rgba(16,185,129,.05));border-color:rgba(52,211,153,.3)">
-      <div class="text-xs text-slate-300 mb-1">本月總營業額</div>
-      <div class="text-xl font-bold" style="color:#34d399" id="kpi-rev">NT$ —</div>
+    <div class="kpi-tile" style="border-left:4px solid #16a34a">
+      <div class="kpi-label">本月總營業額</div>
+      <div class="text-xl font-bold" style="color:#16a34a" id="kpi-rev">NT$ —</div>
     </div>
-    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(167,139,250,.15),rgba(139,92,246,.05));border-color:rgba(167,139,250,.3)">
-      <div class="text-xs text-slate-300 mb-1">平均客單價</div>
-      <div class="text-xl font-bold" style="color:#a78bfa" id="kpi-arpu">NT$ —</div>
+    <div class="kpi-tile" style="border-left:4px solid #7c3aed">
+      <div class="kpi-label">平均客單價</div>
+      <div class="text-xl font-bold" style="color:#7c3aed" id="kpi-arpu">NT$ —</div>
     </div>
-    <div class="card card-hover" style="background:linear-gradient(135deg,rgba(251,191,36,.15),rgba(245,158,11,.05));border-color:rgba(251,191,36,.3)">
-      <div class="text-xs text-slate-300 mb-1">有效天數</div>
-      <div class="text-xl font-bold text-amber-400" id="kpi-days">— 天</div>
+    <div class="kpi-tile" style="border-left:4px solid #d97706">
+      <div class="kpi-label">有效天數</div>
+      <div class="text-xl font-bold" style="color:#d97706" id="kpi-days">— 天</div>
     </div>
-    <div class="card card-hover">
-      <div class="text-xs text-slate-300 mb-1">回頭率</div>
-      <div class="text-xl font-bold" style="color:#7086fb" id="kpi-return-rate">— %</div>
-      <div class="w-full bg-white/10 rounded-full h-1.5 mt-2"><div id="kpi-return-bar" class="h-1.5 rounded-full" style="background:#7086fb;width:0%"></div></div>
+    <div class="kpi-tile" style="border-left:4px solid #4f60f5">
+      <div class="kpi-label">回頭率</div>
+      <div class="text-xl font-bold" style="color:#4f60f5" id="kpi-return-rate">— %</div>
+      <div class="w-full rounded-full h-1.5 mt-2" style="background:#e0e7ff"><div id="kpi-return-bar" class="h-1.5 rounded-full" style="background:#4f60f5;width:0%"></div></div>
     </div>
   </div>
 
@@ -261,7 +271,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <div id="tab-seoul" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <div>
-      <h1 class="text-xl font-bold text-white">醫美總表</h1>
+      <h1 class="text-xl font-bold text-slate-800">醫美總表</h1>
       <p class="text-slate-400 text-sm">點擊月份欄位即可輸入數據 · Google 稅後自動計算</p>
     </div>
     <div class="flex gap-2 flex-wrap items-center">
@@ -309,7 +319,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 ══════════════════════════════════════════ -->
 <div id="tab-entry" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
   <div>
-    <h1 class="text-xl font-bold text-white">資料輸入</h1>
+    <h1 class="text-xl font-bold text-slate-800">資料輸入</h1>
     <p class="text-slate-400 text-sm">手動輸入每日到診及業績數據</p>
   </div>
 
@@ -386,7 +396,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="modal-box" style="width:min(95vw,540px)">
     <div class="flex items-center justify-between mb-4">
       <div>
-        <h3 class="text-white font-bold text-base">首爾醫美 廣告數據</h3>
+        <h3 class="text-slate-800 font-bold text-base">首爾醫美 廣告數據</h3>
         <p class="text-slate-400 text-xs mt-0.5" id="bm-subtitle">月份廣告數據</p>
       </div>
       <button onclick="closeBrandModal()" class="text-slate-500 hover:text-white text-xl leading-none">✕</button>
@@ -399,8 +409,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
     <div class="space-y-3">
       <!-- Google -->
-      <div class="rounded-xl p-4" style="background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22)">
-        <div class="text-xs font-bold text-emerald-400 mb-3 flex items-center gap-2 uppercase tracking-wider">
+      <div class="rounded-xl p-4" style="background:#f0fdf4;border:1px solid #bbf7d0">
+        <div class="text-xs font-bold mb-3 flex items-center gap-2 uppercase tracking-wider" style="color:#16a34a">
           <span class="pill pill-gg">Google</span> Google Ads
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -413,8 +423,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
 
       <!-- FB -->
-      <div class="rounded-xl p-4" style="background:rgba(96,165,250,.07);border:1px solid rgba(96,165,250,.22)">
-        <div class="text-xs font-bold text-blue-400 mb-3 flex items-center gap-2 uppercase tracking-wider">
+      <div class="rounded-xl p-4" style="background:#eff6ff;border:1px solid #bfdbfe">
+        <div class="text-xs font-bold mb-3 flex items-center gap-2 uppercase tracking-wider" style="color:#2563eb">
           <span class="pill pill-fb">FB</span> Facebook Ads
         </div>
         <div class="grid grid-cols-2 gap-3">
@@ -426,8 +436,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
 
       <!-- Q -->
-      <div class="rounded-xl p-4" style="background:rgba(167,139,250,.06);border:1px solid rgba(167,139,250,.2)">
-        <div class="text-xs font-bold text-violet-400 mb-3 uppercase tracking-wider">Q</div>
+      <div class="rounded-xl p-4" style="background:#f5f3ff;border:1px solid #ddd6fe">
+        <div class="text-xs font-bold mb-3 uppercase tracking-wider" style="color:#7c3aed">Q</div>
         <div class="grid grid-cols-2 gap-3">
           <div><label class="text-xs text-slate-400 block mb-1">廣告費 NT$</label><input type="number" id="bm-q-spend" class="inp" placeholder="0" min="0"/></div>
           <div><label class="text-xs text-slate-400 block mb-1">詢問數</label><input type="number" id="bm-q-inq" class="inp" placeholder="0" min="0"/></div>
@@ -436,16 +446,16 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
 
       <!-- 其他 -->
-      <div class="rounded-xl p-4" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1)">
-        <div class="text-xs font-bold text-slate-300 mb-3 uppercase tracking-wider">其他</div>
+      <div class="rounded-xl p-4" style="background:#f8fafc;border:1px solid #e2e8f0">
+        <div class="text-xs font-bold mb-3 uppercase tracking-wider" style="color:#64748b">其他</div>
         <div class="grid grid-cols-2 gap-3">
           <div><label class="text-xs text-slate-400 block mb-1">CON 數</label><input type="number" id="bm-other-con" class="inp" placeholder="0" min="0"/></div>
         </div>
       </div>
 
       <!-- 業績 -->
-      <div class="rounded-xl p-4" style="background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2)">
-        <div class="text-xs font-bold text-amber-400 mb-3 uppercase tracking-wider">業績</div>
+      <div class="rounded-xl p-4" style="background:#fefce8;border:1px solid #fde68a">
+        <div class="text-xs font-bold mb-3 uppercase tracking-wider" style="color:#d97706">業績</div>
         <div class="grid grid-cols-1 gap-3">
           <div><label class="text-xs text-slate-400 block mb-1">實際業績 NT$ <span class="text-slate-600">(選填，留空則從每日記錄加總)</span></label><input type="number" id="bm-rev-in" class="inp" placeholder="留空=每日記錄加總" min="0"/></div>
         </div>
@@ -596,23 +606,23 @@ function renderDashboard(){
   if(revChart){ revChart.destroy(); revChart=null; }
   const ctx1 = document.getElementById('rev-chart').getContext('2d');
   const grad = ctx1.createLinearGradient(0,0,0,240);
-  grad.addColorStop(0,'rgba(112,134,251,.3)'); grad.addColorStop(1,'rgba(112,134,251,0)');
+  grad.addColorStop(0,'rgba(79,96,245,.15)'); grad.addColorStop(1,'rgba(79,96,245,0)');
   revChart = new Chart(ctx1,{
     type: revChartType,
     data:{ labels: revLabels, datasets:[{
       label:'營業額',data:revVals,
-      borderColor:'#7086fb',
-      backgroundColor: revChartType==='bar'?'#7086fb':grad,
+      borderColor:'#4f60f5',
+      backgroundColor: revChartType==='bar'?'#4f60f5':grad,
       borderWidth:2,pointRadius:3,fill:revChartType==='line',tension:.4,
       borderRadius: revChartType==='bar'?5:0
     }]},
     options:{ responsive:true,maintainAspectRatio:false,
       plugins:{ legend:{display:false}, tooltip:{
-        backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
+        backgroundColor:'#fff',borderColor:'#e2e8f0',borderWidth:1,
+        titleColor:'#64748b',bodyColor:'#1e293b',
         callbacks:{label:c=>' NT$ '+c.raw.toLocaleString()}}},
-      scales:{ x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},maxRotation:45}},
-               y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}}}
+      scales:{ x:{grid:{color:'#f1f5f9'},ticks:{color:'#94a3b8',font:{size:10},maxRotation:45}},
+               y:{grid:{color:'#f1f5f9'},ticks:{color:'#94a3b8',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}}}
   });
 
   // NR doughnut
@@ -620,9 +630,9 @@ function renderDashboard(){
   const ctx2 = document.getElementById('nr-chart').getContext('2d');
   nrChart = new Chart(ctx2,{
     type:'doughnut',
-    data:{labels:['新客','回頭客'],datasets:[{data:[totalNew,totalRet],backgroundColor:['#7086fb','#34d399'],borderColor:'transparent',hoverOffset:6}]},
+    data:{labels:['新客','回頭客'],datasets:[{data:[totalNew,totalRet],backgroundColor:['#4f60f5','#16a34a'],borderColor:'transparent',hoverOffset:6}]},
     options:{responsive:true,maintainAspectRatio:false,cutout:'65%',
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,bodyColor:'#e2e8f0',
+      plugins:{legend:{display:false},tooltip:{backgroundColor:'#fff',borderColor:'#e2e8f0',borderWidth:1,bodyColor:'#1e293b',
         callbacks:{label:c=>{const t=c.dataset.data.reduce((a,b)=>a+b,0);return ` ${c.label}: ${c.raw} (${t>0?(c.raw/t*100).toFixed(1):'0'}%)` }}}}}
   });
 
@@ -792,14 +802,14 @@ function renderSeoulAds(){
   const baseOpts = {
     responsive:true, maintainAspectRatio:false,
     plugins:{
-      legend:{labels:{color:'#94a3b8',font:{size:11},usePointStyle:true,pointStyleWidth:8}},
-      tooltip:{backgroundColor:'#1e2035',borderColor:'rgba(255,255,255,.1)',borderWidth:1,
-        titleColor:'#94a3b8',bodyColor:'#e2e8f0',
+      legend:{labels:{color:'#64748b',font:{size:11},usePointStyle:true,pointStyleWidth:8}},
+      tooltip:{backgroundColor:'#fff',borderColor:'#e2e8f0',borderWidth:1,
+        titleColor:'#64748b',bodyColor:'#1e293b',
         callbacks:{label:c=>` ${c.dataset.label}: NT$ ${c.raw.toLocaleString()}`}}
     },
     scales:{
-      x:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:11}}},
-      y:{grid:{color:'rgba(255,255,255,.06)'},ticks:{color:'#64748b',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}
+      x:{grid:{color:'#f1f5f9'},ticks:{color:'#94a3b8',font:{size:11}}},
+      y:{grid:{color:'#f1f5f9'},ticks:{color:'#94a3b8',font:{size:10},callback:v=>'NT$'+v.toLocaleString()}}
     }
   };
 
