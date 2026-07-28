@@ -112,6 +112,16 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .et-diff-val{display:block;text-align:right;padding:5px 8px;min-width:64px;font-variant-numeric:tabular-nums}
 .et-adpct-inp{background:transparent;border:none;color:#4f60f5;text-align:center;width:100%;padding:5px 6px;outline:none;font-size:12px;font-weight:700;font-family:inherit}
 .et-adpct-inp:focus{background:#e0e7ff}
+/* ── Brand summary stat cards ── */
+.stat-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px 20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.stat-card-title{font-size:11px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;margin-bottom:14px}
+.stat-brand-row{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.stat-brand-row:last-child{margin-bottom:0}
+.brand-tag{display:inline-flex;align-items:center;padding:2px 10px;border-radius:999px;font-size:11px;font-weight:700;white-space:nowrap;min-width:36px;justify-content:center}
+.brand-tag-seoul{background:#e0e7ff;color:#4f60f5}
+.brand-tag-hh{background:#ede9fe;color:#7c3aed}
+.stat-main-val{font-size:26px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
+.stat-rate-val{font-size:14px;font-weight:600;color:#94a3b8;margin-left:2px}
 </style>
 </head>
 <body>
@@ -160,6 +170,56 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
      TAB 1: DASHBOARD
 ══════════════════════════════════════════ -->
 <div id="tab-dashboard" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5">
+
+  <!-- brand summary stats -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 fade-up">
+    <div class="stat-card">
+      <div class="stat-card-title">詢問數</div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span class="stat-main-val" id="stat-seoul-inq">—</span>
+      </div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span class="stat-main-val" id="stat-hh-inq">—</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">CON / 轉換率</div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span class="stat-main-val" id="stat-seoul-con">—</span>
+        <span class="stat-rate-val" id="stat-seoul-conpct"></span>
+      </div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span class="stat-main-val" id="stat-hh-con">—</span>
+        <span class="stat-rate-val" id="stat-hh-conpct"></span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">業績 (實際)</div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span class="stat-main-val" style="font-size:18px" id="stat-seoul-rev">—</span>
+      </div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span class="stat-main-val" style="font-size:18px" id="stat-hh-rev">—</span>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-card-title">廣告%數 (均)</div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span class="stat-main-val" id="stat-seoul-adpct">—</span>
+      </div>
+      <div class="stat-brand-row">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span class="stat-main-val" id="stat-hh-adpct">—</span>
+      </div>
+    </div>
+  </div>
 
   <!-- daily compare table -->
   <div class="card" style="padding:0;overflow:hidden">
@@ -952,8 +1012,48 @@ function inp(date, brand, type, field, val){
     onchange="onDcmpChange(this)" oninput="onDcmpChange(this)"/>`;
 }
 
+function setText(id, val){
+  const el = document.getElementById(id);
+  if(el) el.textContent = val;
+}
+
+function renderDcmpStats(){
+  const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
+  let recs = loadDcmpAll();
+  if(monthFilter) recs = recs.filter(r => r.date.startsWith(monthFilter));
+
+  let sInq=0, sCon=0, sRev=0, sAdSum=0, sAdDays=0;
+  let hInq=0, hCon=0, hRev=0, hAdSum=0, hAdDays=0;
+  recs.forEach(r => {
+    const sa = r.seoul?.actual||{}, ha = r.hh?.actual||{};
+    sInq += (sa.gg||0)+(sa.fb||0);
+    sCon += sa.con||0;
+    sRev += sa.rev||0;
+    const sap = parseFloat(r.seoul?.adpct)||0;
+    if(sap){ sAdSum+=sap; sAdDays++; }
+    hInq += (ha.gg||0)+(ha.fb||0);
+    hCon += ha.con||0;
+    hRev += ha.rev||0;
+    const hap = parseFloat(r.hh?.adpct)||0;
+    if(hap){ hAdSum+=hap; hAdDays++; }
+  });
+  const N = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const P = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '';
+  setText('stat-seoul-inq', N(sInq));
+  setText('stat-seoul-con', N(sCon));
+  setText('stat-seoul-conpct', P(sCon, sInq));
+  setText('stat-seoul-rev', sRev ? N(sRev) : '—');
+  setText('stat-seoul-adpct', sAdDays ? (sAdSum/sAdDays).toFixed(1)+'%' : '—');
+  setText('stat-hh-inq', N(hInq));
+  setText('stat-hh-con', N(hCon));
+  setText('stat-hh-conpct', P(hCon, hInq));
+  setText('stat-hh-rev', hRev ? N(hRev) : '—');
+  setText('stat-hh-adpct', hAdDays ? (hAdSum/hAdDays).toFixed(1)+'%' : '—');
+}
+
 function renderDcmp(){
   populateBrandMonthFilter();
+  renderDcmpStats();
   const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
   const showSeoul = activeBrand === 'all' || activeBrand === 'seoul';
   const showHH    = activeBrand === 'all' || activeBrand === 'hh';
