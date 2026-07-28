@@ -58,9 +58,11 @@ body{font-family:'Inter',sans-serif;background:#f1f5f9;color:#1e293b;min-height:
 input[type=number]::-webkit-inner-spin-button{opacity:.4}
 /* ── filter chips ── */
 .chip-group{display:flex;gap:6px;flex-wrap:wrap}
-.chip{padding:6px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s}
-.chip.active{background:#4f60f5;color:#fff;border-color:#4f60f5;font-weight:600}
+.chip{padding:5px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s}
+.chip.active{background:#1e293b;color:#fff;border-color:#1e293b;font-weight:600}
 .chip:hover:not(.active){border-color:#4f60f5;color:#4f60f5}
+.chip-seoul.active{background:#4f60f5!important;border-color:#4f60f5!important}
+.chip-hh.active{background:#7c3aed!important;border-color:#7c3aed!important}
 /* ── KPI tile ── */
 .kpi-tile{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .kpi-tile .kpi-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em}
@@ -136,6 +138,24 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 </div>
 
+<!-- BRAND FILTER BAR -->
+<div class="px-4 sm:px-8 py-3 flex flex-wrap items-center gap-5 border-b" style="background:#fff;border-color:#e2e8f0">
+  <div class="flex items-center gap-3">
+    <span class="text-xs font-semibold tracking-widest" style="color:#94a3b8">品牌</span>
+    <div class="flex gap-2">
+      <button class="brand-chip chip active" data-brand="all" onclick="setBrand('all',this)">全部</button>
+      <button class="brand-chip chip chip-seoul" data-brand="seoul" onclick="setBrand('seoul',this)">SEOUL 醫美</button>
+      <button class="brand-chip chip chip-hh" data-brand="hh" onclick="setBrand('hh',this)">HH 醫髮</button>
+    </div>
+  </div>
+  <div class="flex items-center gap-3">
+    <span class="text-xs font-semibold tracking-widest" style="color:#94a3b8">月份</span>
+    <select id="brand-month-filter" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderDcmp()">
+      <option value="">全部月份</option>
+    </select>
+  </div>
+</div>
+
 <!-- ═══════════════════════════════════════
      TAB 1: DASHBOARD
 ══════════════════════════════════════════ -->
@@ -143,8 +163,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   <!-- daily compare table -->
   <div class="card" style="padding:0;overflow:hidden">
-    <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
-      <span class="font-bold text-white text-sm">每日成效對比</span>
+    <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:#e2e8f0">
+      <span class="font-bold text-sm" style="color:#1e293b">每日成效對比</span>
       <div class="flex gap-2 items-center">
         <input type="date" id="dcmp-add-date" class="inp" style="width:148px;padding:5px 8px;font-size:12px"/>
         <button class="btn btn-primary btn-sm" onclick="addDcmpRow()">＋ 新增日期</button>
@@ -539,6 +559,32 @@ function populateMonthSelects(){
 }
 
 // ──────────────────────────────────────────────────────────────
+// BRAND FILTER
+// ──────────────────────────────────────────────────────────────
+let activeBrand = 'all';
+
+function setBrand(b, el){
+  activeBrand = b;
+  document.querySelectorAll('.brand-chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderDcmp();
+}
+
+function populateBrandMonthFilter(){
+  const all = loadDcmpAll();
+  const months = [...new Set(all.map(r=>r.date.slice(0,7)))].sort().reverse();
+  const el = document.getElementById('brand-month-filter');
+  if(!el) return;
+  const cur = el.value;
+  el.innerHTML = '<option value="">全部月份</option>' +
+    months.map(m=>{
+      const [y,mo]=m.split('-');
+      return `<option value="${m}">${parseInt(y)-1911}年${parseInt(mo)}月</option>`;
+    }).join('');
+  if(cur) el.value = cur;
+}
+
+// ──────────────────────────────────────────────────────────────
 // TAB SWITCHING
 // ──────────────────────────────────────────────────────────────
 function showTab(tab, btn){
@@ -907,7 +953,15 @@ function inp(date, brand, type, field, val){
 }
 
 function renderDcmp(){
-  const all = loadDcmpAll();
+  populateBrandMonthFilter();
+  const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
+  const showSeoul = activeBrand === 'all' || activeBrand === 'seoul';
+  const showHH    = activeBrand === 'all' || activeBrand === 'hh';
+  const showBoth  = showSeoul && showHH;
+
+  let all = loadDcmpAll();
+  if(monthFilter) all = all.filter(r => r.date.startsWith(monthFilter));
+
   const thead = document.getElementById('dcmp-et-head');
   const tbody = document.getElementById('dcmp-et-body');
   if(!thead||!tbody) return;
@@ -941,13 +995,16 @@ function renderDcmp(){
     const {date, seoul, hh} = rec;
     const d = new Date(date+'T00:00:00');
     const dateLabel = `${d.getMonth()+1}/${d.getDate()}`;
-    const ROWSPAN = 9; // 4 rows SEOUL + sep + 4 rows HH
 
-    const brandRows = (brand, bdata, color, isFirst)=>{
-      const a=bdata.actual, e=bdata.est||{}, p=bdata.prev||{};
+    // Calculate rowspan based on which brands are visible
+    const brandCount = (showSeoul?1:0) + (showHH?1:0);
+    const ROWSPAN = brandCount * 4 + (showBoth ? 1 : 0); // +1 for separator if both
+
+    const brandRows = (brand, bdata, color, isDateAnchor)=>{
+      const a=bdata.actual||{}, e=bdata.est||{}, p=bdata.prev||{};
       const grp = `<td class="et-brand" style="color:${color}" rowspan="4">${brand}</td>`;
-      const dateCell = isFirst ? `<td class="et-date" rowspan="${ROWSPAN}" id="dcmp-row-${date}">${dateLabel}<br/><span style="font-size:10px;color:#64748b;font-weight:400">${date.slice(0,4)}</span></td>` : '';
-      const delCell  = isFirst ? `<td rowspan="${ROWSPAN}" style="text-align:center;vertical-align:middle"><button class="btn btn-danger btn-sm" onclick="deleteDcmpRow('${date}')">✕</button></td>` : '';
+      const dateCell = isDateAnchor ? `<td class="et-date" rowspan="${ROWSPAN}" id="dcmp-row-${date}">${dateLabel}<br/><span style="font-size:10px;color:#a5b4fc;font-weight:400">${date.slice(0,4)}</span></td>` : '';
+      const delCell  = isDateAnchor ? `<td rowspan="${ROWSPAN}" style="text-align:center;vertical-align:middle"><button class="btn btn-danger btn-sm" onclick="deleteDcmpRow('${date}')">✕</button></td>` : '';
 
       rows.push(`<tr>${dateCell}${grp}<td class="et-type">實際</td>
         <td>${inp(date,brand,'actual','gg',a.gg)}</td>
@@ -971,7 +1028,7 @@ function renderDcmp(){
       </tr>`);
       const dv = (f)=>{
         const v=(a[f]||0)-(p[f]||0);
-        const c=v<0?'#f87171':v>0?'#34d399':'#94a3b8';
+        const c=v<0?'#ef4444':v>0?'#16a34a':'#94a3b8';
         const fw=v!==0?'700':'400';
         return `<span id="diff-${date}-${brand}-${f}" style="color:${c};font-weight:${fw};display:block;text-align:right;padding:5px 8px">${v===0?'0':(v>0?'+':'')+Math.round(v).toLocaleString('zh-TW')}</span>`;
       };
@@ -980,28 +1037,31 @@ function renderDcmp(){
       </tr>`);
     };
 
-    brandRows('SEOUL', seoul, '#7086fb', true);
-    rows.push(`<tr class="et-sep"><td colspan="9"></td></tr>`);
-    brandRows('HH', hh, '#a78bfa', false);
+    // Determine which brand is the date anchor (first visible)
+    if(showSeoul) brandRows('SEOUL', seoul, '#4f60f5', true);
+    if(showBoth) rows.push(`<tr class="et-sep"><td colspan="9"></td></tr>`);
+    if(showHH)   brandRows('HH', hh, '#7c3aed', !showSeoul);
 
-    // 總業績 row
-    const totA = (seoul.actual?.rev||0)+(hh.actual?.rev||0);
-    const totE = (seoul.est?.rev||0)+(hh.est?.rev||0);
-    const totP = (seoul.prev?.rev||0)+(hh.prev?.rev||0);
-    const N = v => v>0?Math.round(v).toLocaleString('zh-TW'):'—';
-    rows.push(`<tr style="background:rgba(251,191,36,.1)">
-      <td colspan="2" class="et-brand" style="color:#fcd34d;text-align:center">總業績</td>
-      <td style="text-align:center;padding:5px 8px;font-size:11px;color:#94a3b8">實際<br/>估值<br/>同期</td>
-      <td colspan="3"></td>
-      <td style="text-align:right;padding:6px 8px;vertical-align:middle">
-        <div id="tot-${date}-actual-rev" style="color:#fcd34d;font-weight:700;font-size:13px">${N(totA)}</div>
-        <div id="tot-${date}-est-rev" style="color:#94a3b8;font-size:11px">${N(totE)}</div>
-        <div id="tot-${date}-prev-rev" style="color:#a5b4fc;font-size:11px">同期 ${N(totP)}</div>
-      </td>
-      <td colspan="2"></td>
-    </tr>`);
+    // 總業績 row — only in 全部 mode
+    if(showBoth){
+      const totA = (seoul.actual?.rev||0)+(hh.actual?.rev||0);
+      const totE = (seoul.est?.rev||0)+(hh.est?.rev||0);
+      const totP = (seoul.prev?.rev||0)+(hh.prev?.rev||0);
+      const N = v => v>0?Math.round(v).toLocaleString('zh-TW'):'—';
+      rows.push(`<tr style="background:#fffbeb">
+        <td colspan="2" class="et-brand" style="color:#d97706;text-align:center">總業績</td>
+        <td style="text-align:center;padding:5px 8px;font-size:11px;color:#94a3b8">實際<br/>估值<br/>同期</td>
+        <td colspan="3"></td>
+        <td style="text-align:right;padding:6px 8px;vertical-align:middle">
+          <div id="tot-${date}-actual-rev" style="color:#d97706;font-weight:700;font-size:13px">${N(totA)}</div>
+          <div id="tot-${date}-est-rev" style="color:#94a3b8;font-size:11px">${N(totE)}</div>
+          <div id="tot-${date}-prev-rev" style="color:#7c3aed;font-size:11px">同期 ${N(totP)}</div>
+        </td>
+        <td colspan="2"></td>
+      </tr>`);
+    }
 
-    rows.push(`<tr><td colspan="9" style="height:8px;background:rgba(79,96,245,.15);border:none;padding:0"></td></tr>`);
+    rows.push(`<tr><td colspan="9" style="height:8px;background:#e0e7ff;border:none;padding:0"></td></tr>`);
   });
 
   tbody.innerHTML = rows.join('');
