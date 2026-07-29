@@ -61,8 +61,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .chip{padding:5px 16px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1.5px solid #e2e8f0;background:#fff;color:#64748b;transition:all .15s}
 .chip.active{background:#1e293b;color:#fff;border-color:#1e293b;font-weight:600}
 .chip:hover:not(.active){border-color:#4f60f5;color:#4f60f5}
-.chip-seoul.active{background:#4f60f5!important;border-color:#4f60f5!important}
-.chip-hh.active{background:#7c3aed!important;border-color:#7c3aed!important}
+.chip-seoul.active{background:#7c3aed!important;border-color:#7c3aed!important}
+.chip-hh.active{background:#2563eb!important;border-color:#2563eb!important}
 /* ── Main page tabs (right side of nav row 2) ── */
 .main-tab-btn{padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
 .main-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
@@ -71,8 +71,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .cs-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .cs-card-header{background:#1e293b;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
 .cs-card-name{color:#fff;font-size:16px;font-weight:800}
-.cs-badge-seoul{background:#4f60f5;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
-.cs-badge-hh{background:#7c3aed;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.cs-badge-seoul{background:#7c3aed;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.cs-badge-hh{background:#2563eb;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
 .cs-tbl{width:100%;border-collapse:collapse;font-size:12px}
 .cs-tbl td,.cs-tbl th{padding:6px 10px;border-bottom:1px solid #f1f5f9}
 .cs-tbl th{color:#94a3b8;font-weight:600;font-size:11px;text-align:center}
@@ -80,7 +80,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .cs-tbl td.cs-label{color:#64748b;font-weight:500}
 .cs-tbl td.cs-num{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
 .cs-inp{border:none;background:transparent;text-align:right;width:100%;font-size:12px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;outline:none;padding:0}
-.cs-inp:focus{background:#ede9fe;border-radius:4px;color:#4f60f5}
+.cs-inp:focus{background:#ede9fe;border-radius:4px;color:#7c3aed}
 .cs-pct-red{color:#ef4444;font-weight:700}
 .cs-pct-grn{color:#16a34a;font-weight:700}
 .cs-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between}
@@ -137,8 +137,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .stat-card-title{font-size:12px;font-weight:600;color:#94a3b8;margin-bottom:16px;letter-spacing:.01em}
 .stat-brand-row{display:flex;align-items:center;gap:12px}
 .brand-tag{display:inline-flex;align-items:center;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700;white-space:nowrap;flex-shrink:0}
-.brand-tag-seoul{background:#e0e7ff;color:#4f60f5}
-.brand-tag-hh{background:#ede9fe;color:#7c3aed}
+.brand-tag-seoul{background:#ede9fe;color:#7c3aed}
+.brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
 @media(max-width:767px){
@@ -832,7 +832,7 @@ function renderCSPersonCard(person, month){
       <!-- left: goals mini table -->
       <div style="flex:0 0 160px;border-right:1px solid #f1f5f9;padding:12px 0">
         <table class="cs-tbl">
-          <tr><th></th><th style="color:#4f60f5">醫美</th><th style="color:#7c3aed">醫髮</th></tr>
+          <tr><th></th><th style="color:#7c3aed">醫美</th><th style="color:#2563eb">醫髮</th></tr>
           <tr><td class="cs-label">個人目標</td>
               <td class="cs-num">${inp('seoul','target',sTgt)}</td>
               <td class="cs-num">${inp('hh','target',hTgt)}</td></tr>
@@ -853,7 +853,7 @@ function renderCSPersonCard(person, month){
       <!-- right: detail table -->
       <div style="flex:1;padding:12px 0">
         <table class="cs-tbl" style="width:100%">
-          <tr><th style="text-align:left;padding-left:14px">指標</th><th style="color:#4f60f5">醫美</th><th style="color:#7c3aed">醫髮</th></tr>
+          <tr><th style="text-align:left;padding-left:14px">指標</th><th style="color:#7c3aed">醫美</th><th style="color:#2563eb">醫髮</th></tr>
           <tr><td class="cs-label" style="padding-left:14px">詢問數</td>
               <td class="cs-num">${inp('seoul','inq',r.seoul.inq)}</td>
               <td class="cs-num">${inp('hh','inq',r.hh.inq)}</td></tr>
@@ -1432,9 +1432,9 @@ function renderDcmp(){
     };
 
     // Determine which brand is the date anchor (first visible)
-    if(showSeoul) brandRows('SEOUL', seoul, '#4f60f5', true);
+    if(showSeoul) brandRows('SEOUL', seoul, '#7c3aed', true);
     if(showBoth) rows.push(`<tr class="et-sep"><td colspan="9"></td></tr>`);
-    if(showHH)   brandRows('HH', hh, '#7c3aed', !showSeoul);
+    if(showHH)   brandRows('HH', hh, '#2563eb', !showSeoul);
 
     // 總業績 row — only in 全部 mode
     if(showBoth){
