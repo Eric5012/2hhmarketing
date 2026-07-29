@@ -141,7 +141,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
-.stat-brand-cell{display:flex;align-items:center;gap:12px;padding:14px 20px;flex:1}
+.stat-brand-cell{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;flex:1}
+.stat-brand-cell .stat-right{display:flex;align-items:baseline;gap:6px}
 @media(max-width:767px){
   .stat-grid{grid-template-columns:repeat(2,1fr)!important}
   .stat-grid>div{border-right:1px solid #f1f5f9!important}
@@ -219,56 +220,54 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div class="grid stat-grid" style="grid-template-columns:repeat(4,1fr)">
 
       <!-- 詢問數 -->
-      <div style="border-left:4px solid #4f60f5;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">詢問數</div>
+      <div style="border-left:4px solid #4f60f5;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">詢問數</div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-seoul">醫美</span>
-          <span class="stat-main-val" id="stat-seoul-inq">—</span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-seoul-inq">—</span></div>
         </div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-hh">醫髮</span>
-          <span class="stat-main-val" id="stat-hh-inq">—</span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-hh-inq">—</span></div>
         </div>
       </div>
 
       <!-- CON / 轉換率 -->
-      <div style="border-left:4px solid #2563eb;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">CON / 轉換率</div>
+      <div style="border-left:4px solid #2563eb;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">CON / 轉換率</div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-seoul">醫美</span>
-          <span class="stat-main-val" id="stat-seoul-con">—</span>
-          <span class="stat-rate-val" id="stat-seoul-conpct"></span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-seoul-con">—</span><span class="stat-rate-val" id="stat-seoul-conpct"></span></div>
         </div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-hh">醫髮</span>
-          <span class="stat-main-val" id="stat-hh-con">—</span>
-          <span class="stat-rate-val" id="stat-hh-conpct"></span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-hh-con">—</span><span class="stat-rate-val" id="stat-hh-conpct"></span></div>
         </div>
       </div>
 
       <!-- 業績 -->
-      <div style="border-left:4px solid #d97706;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">業績 (實際)</div>
+      <div style="border-left:4px solid #d97706;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">業績 (實際)</div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-seoul">醫美</span>
-          <span class="stat-main-val" style="font-size:20px" id="stat-seoul-rev">—</span>
+          <div class="stat-right"><span class="stat-main-val" style="font-size:22px" id="stat-seoul-rev">—</span></div>
         </div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-hh">醫髮</span>
-          <span class="stat-main-val" style="font-size:20px" id="stat-hh-rev">—</span>
+          <div class="stat-right"><span class="stat-main-val" style="font-size:22px" id="stat-hh-rev">—</span></div>
         </div>
       </div>
 
       <!-- 廣告佔比 -->
       <div style="border-left:4px solid #7c3aed;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">廣告佔比 (均)</div>
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">廣告佔比 (均)</div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-seoul">醫美</span>
-          <span class="stat-main-val" id="stat-seoul-adpct">—</span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-seoul-adpct">—</span></div>
         </div>
         <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9">
           <span class="brand-tag brand-tag-hh">醫髮</span>
-          <span class="stat-main-val" id="stat-hh-adpct">—</span>
+          <div class="stat-right"><span class="stat-main-val" id="stat-hh-adpct">—</span></div>
         </div>
       </div>
 
@@ -527,25 +526,25 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- summary stats (same 4-box card) -->
   <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden">
     <div class="grid stat-grid" style="grid-template-columns:repeat(4,1fr)">
-      <div style="border-left:4px solid #4f60f5;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">詢問數</div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-inq">—</span></div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-inq">—</span></div>
+      <div style="border-left:4px solid #4f60f5;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">詢問數</div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-seoul-inq">—</span></div></div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-hh-inq">—</span></div></div>
       </div>
-      <div style="border-left:4px solid #2563eb;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">CON / 轉換率</div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-con">—</span><span class="stat-rate-val" id="cs-stat-seoul-conpct"></span></div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-con">—</span><span class="stat-rate-val" id="cs-stat-hh-conpct"></span></div>
+      <div style="border-left:4px solid #2563eb;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">CON / 轉換率</div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-seoul-con">—</span><span class="stat-rate-val" id="cs-stat-seoul-conpct"></span></div></div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-hh-con">—</span><span class="stat-rate-val" id="cs-stat-hh-conpct"></span></div></div>
       </div>
-      <div style="border-left:4px solid #d97706;border-right:1px solid #f1f5f9;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">新客 / 舊客 CON</div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-cnew">—</span><span class="stat-rate-val" id="cs-stat-seoul-cold"></span></div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-cnew">—</span><span class="stat-rate-val" id="cs-stat-hh-cold"></span></div>
+      <div style="border-left:4px solid #d97706;border-right:1px solid #e2e8f0;display:flex;flex-direction:column">
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">新客 / 舊客 CON</div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-seoul-cnew">—</span><span class="stat-rate-val" id="cs-stat-seoul-cold"></span></div></div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-hh-cnew">—</span><span class="stat-rate-val" id="cs-stat-hh-cold"></span></div></div>
       </div>
       <div style="border-left:4px solid #7c3aed;display:flex;flex-direction:column">
-        <div style="padding:14px 20px 10px;font-size:12px;font-weight:600;color:#94a3b8">實際轉換率</div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-cvr">—</span></div>
-        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-cvr">—</span></div>
+        <div style="padding:16px 24px 8px;font-size:12px;font-weight:500;color:#94a3b8">實際轉換率</div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-seoul">醫美</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-seoul-cvr">—</span></div></div>
+        <div class="stat-brand-cell" style="border-top:1px solid #f1f5f9"><span class="brand-tag brand-tag-hh">醫髮</span><div class="stat-right"><span class="stat-main-val" id="cs-stat-hh-cvr">—</span></div></div>
       </div>
     </div>
   </div>
