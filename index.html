@@ -713,6 +713,8 @@ function populateMonthSelects(){
 const STORAGE_CS = 'dash_cs_v1';
 const CS_PERSONS = ['ivan','jessie','eline'];
 const CS_PERSON_LABELS = {ivan:'Ivan', jessie:'Jessie', eline:'Eline'};
+// which brands each person handles
+const CS_PERSON_BRANDS = {ivan:['seoul'], jessie:['seoul','hh'], eline:['hh']};
 
 function loadCS(){ return JSON.parse(localStorage.getItem(STORAGE_CS)||'[]'); }
 function saveCS(d){ localStorage.setItem(STORAGE_CS, JSON.stringify(d)); }
@@ -784,6 +786,10 @@ function getCurrentMonth(){
 function renderCSPersonCard(person, month){
   const r = loadCSRec(month, person);
   const label = CS_PERSON_LABELS[person];
+  const brands = CS_PERSON_BRANDS[person] || ['seoul','hh'];
+  const hasS = brands.includes('seoul');
+  const hasH = brands.includes('hh');
+
   const sTgt = r.seoul.target||0, hTgt = r.hh.target||0;
   const sCon = (r.seoul.con_new||0)+(r.seoul.con_old||0);
   const hCon = (r.hh.con_new||0)+(r.hh.con_old||0);
@@ -792,77 +798,94 @@ function renderCSPersonCard(person, month){
   const hRate = hTgt>0?(hCon/hTgt*100).toFixed(0)+'%':'—';
   const sCvr  = r.seoul.inq>0?((sCon/r.seoul.inq)*100).toFixed(1)+'%':'—';
   const hCvr  = r.hh.inq>0?((hCon/r.hh.inq)*100).toFixed(1)+'%':'—';
-  const diffC = (v,tgt)=> v===0?'color:#94a3b8':v>0?'color:#16a34a;font-weight:700':'color:#ef4444;font-weight:700';
-  const pctC  = (r,tgt)=>{ const n=parseFloat(r); return n>=100?'cs-pct-grn':'cs-pct-red'; };
+  const diffC = v=> v===0?'color:#94a3b8':v>0?'color:#16a34a;font-weight:700':'color:#ef4444;font-weight:700';
+  const pctC  = rate=>{ const n=parseFloat(rate); return n>=100?'cs-pct-grn':'cs-pct-red'; };
   const inp = (brand,field,val)=>
     `<input class="cs-inp" type="number" value="${val||''}" placeholder="—"
       data-month="${month}" data-person="${person}" data-brand="${brand}" data-field="${field}"
       oninput="onCSChange(this)" onchange="onCSChange(this)"/>`;
 
-  const today=new Date(); const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  const today=new Date();
+  const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
   const dayOfMonth=today.getDate();
   const [y,m]=month.split('-').map(Number);
   const roc=y-1911;
 
+  // badge row — only show badges for this person's brands
+  const badges = [
+    hasS ? `<span class="cs-badge-seoul">醫美 ${sCon}</span>` : '',
+    hasH ? `<span class="cs-badge-hh">醫髮 ${hCon}</span>` : ''
+  ].join('');
+
+  // dynamic column headers
+  const colHeaders = [
+    '<th></th>',
+    hasS ? '<th style="color:#7c3aed">醫美</th>' : '',
+    hasH ? '<th style="color:#2563eb">醫髮</th>' : ''
+  ].join('');
+
+  const goalRow = (label, sField, hField, sVal, hVal) => `
+    <tr><td class="cs-label">${label}</td>
+    ${hasS?`<td class="cs-num">${inp('seoul',sField,sVal)}</td>`:''}
+    ${hasH?`<td class="cs-num">${inp('hh',hField,hVal)}</td>`:''}
+    </tr>`;
+
+  const detailRow = (lbl, sContent, hContent) => `
+    <tr><td class="cs-label" style="padding-left:14px">${lbl}</td>
+    ${hasS?`<td class="cs-num">${sContent}</td>`:''}
+    ${hasH?`<td class="cs-num">${hContent}</td>`:''}
+    </tr>`;
+
+  const detailHeaders = [
+    '<th style="text-align:left;padding-left:14px">指標</th>',
+    hasS ? '<th style="color:#7c3aed">醫美</th>' : '',
+    hasH ? '<th style="color:#2563eb">醫髮</th>' : ''
+  ].join('');
+
+  const footerParts = [
+    hasS ? `<span>醫美・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>` : '',
+    hasH ? `<span>醫髮・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>` : ''
+  ].filter(Boolean).join('');
+
   return `<div class="cs-card">
     <div class="cs-card-header">
       <span class="cs-card-name">${label}</span>
-      <div class="flex gap-2">
-        <span class="cs-badge-seoul">醫美 ${sCon}</span>
-        <span class="cs-badge-hh">醫髮 ${hCon}</span>
-      </div>
+      <div class="flex gap-2">${badges}</div>
     </div>
     <div class="flex" style="min-height:160px">
-      <!-- left: goals mini table -->
       <div style="flex:0 0 160px;border-right:1px solid #f1f5f9;padding:12px 0">
         <table class="cs-tbl">
-          <tr><th></th><th style="color:#7c3aed">醫美</th><th style="color:#2563eb">醫髮</th></tr>
-          <tr><td class="cs-label">個人目標</td>
-              <td class="cs-num">${inp('seoul','target',sTgt)}</td>
-              <td class="cs-num">${inp('hh','target',hTgt)}</td></tr>
-          <tr><td class="cs-label">新客 CON</td>
-              <td class="cs-num">${inp('seoul','con_new',r.seoul.con_new)}</td>
-              <td class="cs-num">${inp('hh','con_new',r.hh.con_new)}</td></tr>
-          <tr><td class="cs-label">舊客 CON</td>
-              <td class="cs-num">${inp('seoul','con_old',r.seoul.con_old)}</td>
-              <td class="cs-num">${inp('hh','con_old',r.hh.con_old)}</td></tr>
+          <tr>${colHeaders}</tr>
+          ${goalRow('個人目標','target','target',sTgt,hTgt)}
+          ${goalRow('新客 CON','con_new','con_new',r.seoul.con_new,r.hh.con_new)}
+          ${goalRow('舊客 CON','con_old','con_old',r.seoul.con_old,r.hh.con_old)}
           <tr><td class="cs-label">月追</td>
-              <td class="cs-num" style="${diffC(sDiff,sTgt)}">${sDiff>0?'+':''}${sDiff}</td>
-              <td class="cs-num" style="${diffC(hDiff,hTgt)}">${hDiff>0?'+':''}${hDiff}</td></tr>
+            ${hasS?`<td class="cs-num" style="${diffC(sDiff)}">${sDiff>0?'+':''}${sDiff}</td>`:''}
+            ${hasH?`<td class="cs-num" style="${diffC(hDiff)}">${hDiff>0?'+':''}${hDiff}</td>`:''}
+          </tr>
           <tr><td class="cs-label">達率</td>
-              <td class="cs-num"><span class="${pctC(sRate,sTgt)}">${sRate}</span></td>
-              <td class="cs-num"><span class="${pctC(hRate,hTgt)}">${hRate}</span></td></tr>
+            ${hasS?`<td class="cs-num"><span class="${pctC(sRate)}">${sRate}</span></td>`:''}
+            ${hasH?`<td class="cs-num"><span class="${pctC(hRate)}">${hRate}</span></td>`:''}
+          </tr>
         </table>
       </div>
-      <!-- right: detail table -->
       <div style="flex:1;padding:12px 0">
         <table class="cs-tbl" style="width:100%">
-          <tr><th style="text-align:left;padding-left:14px">指標</th><th style="color:#7c3aed">醫美</th><th style="color:#2563eb">醫髮</th></tr>
-          <tr><td class="cs-label" style="padding-left:14px">詢問數</td>
-              <td class="cs-num">${inp('seoul','inq',r.seoul.inq)}</td>
-              <td class="cs-num">${inp('hh','inq',r.hh.inq)}</td></tr>
-          <tr><td class="cs-label" style="padding-left:14px">總 CON</td>
-              <td class="cs-num" style="font-weight:700;color:#1e293b">${sCon||'—'}</td>
-              <td class="cs-num" style="font-weight:700;color:#1e293b">${hCon||'—'}</td></tr>
-          <tr><td class="cs-label" style="padding-left:14px">轉換率</td>
-              <td class="cs-num">${sCvr}</td>
-              <td class="cs-num">${hCvr}</td></tr>
-          <tr><td class="cs-label" style="padding-left:14px">新客 CON</td>
-              <td class="cs-num">${r.seoul.con_new||'—'}</td>
-              <td class="cs-num">${r.hh.con_new||'—'}</td></tr>
-          <tr><td class="cs-label" style="padding-left:14px">舊客 CON</td>
-              <td class="cs-num">${r.seoul.con_old||'—'}</td>
-              <td class="cs-num">${r.hh.con_old||'—'}</td></tr>
-          <tr><td class="cs-label" style="padding-left:14px">達率</td>
-              <td class="cs-num"><span class="${pctC(sRate,sTgt)}">${sRate}</span></td>
-              <td class="cs-num"><span class="${pctC(hRate,hTgt)}">${hRate}</span></td></tr>
+          <tr>${detailHeaders}</tr>
+          ${detailRow('詢問數', inp('seoul','inq',r.seoul.inq), inp('hh','inq',r.hh.inq))}
+          ${detailRow('總 CON',
+            `<span style="font-weight:700;color:#1e293b">${sCon||'—'}</span>`,
+            `<span style="font-weight:700;color:#1e293b">${hCon||'—'}</span>`)}
+          ${detailRow('轉換率', sCvr, hCvr)}
+          ${detailRow('新客 CON', r.seoul.con_new||'—', r.hh.con_new||'—')}
+          ${detailRow('舊客 CON', r.seoul.con_old||'—', r.hh.con_old||'—')}
+          ${detailRow('達率',
+            `<span class="${pctC(sRate)}">${sRate}</span>`,
+            `<span class="${pctC(hRate)}">${hRate}</span>`)}
         </table>
       </div>
     </div>
-    <div class="cs-footer">
-      <span>醫美・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>
-      <span>醫髮・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>
-    </div>
+    <div class="cs-footer">${footerParts}</div>
   </div>`;
 }
 
