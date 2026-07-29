@@ -710,25 +710,35 @@ function populateMonthSelects(){
 // ──────────────────────────────────────────────────────────────
 // CS (客服個人成效) DATA
 // ──────────────────────────────────────────────────────────────
-const STORAGE_CS = 'dash_cs_v1';
+const STORAGE_CS = 'dash_cs_v2';
 const CS_PERSONS = ['ivan','jessie','eline'];
 const CS_PERSON_LABELS = {ivan:'Ivan', jessie:'Jessie', eline:'Eline'};
-// which brands each person handles
 const CS_PERSON_BRANDS = {ivan:['seoul'], jessie:['seoul','hh'], eline:['hh']};
+const CS_SOURCES = ['080','gline','fbline','fbdm','other'];
+const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB LINE','fbdm':'FB 私訊','other':'其他'};
 
+function emptyBrandSrc(){
+  const s={};
+  CS_SOURCES.forEach(k=>{ s[k]={inq:0,visit:0}; });
+  return s;
+}
 function loadCS(){ return JSON.parse(localStorage.getItem(STORAGE_CS)||'[]'); }
 function saveCS(d){ localStorage.setItem(STORAGE_CS, JSON.stringify(d)); }
-
 function emptyCSRec(month, person){
-  return { month, person,
-    seoul:{ target:0, inq:0, con_new:0, con_old:0 },
-    hh:  { target:0, inq:0, con_new:0, con_old:0 } };
+  return { month, person, seoul: emptyBrandSrc(), hh: emptyBrandSrc() };
 }
-
 function loadCSRec(month, person){
-  return loadCS().find(r=>r.month===month&&r.person===person) || emptyCSRec(month, person);
+  const rec = loadCS().find(r=>r.month===month&&r.person===person);
+  if(!rec) return emptyCSRec(month, person);
+  // migrate older records that lack source structure
+  ['seoul','hh'].forEach(b=>{
+    if(!rec[b] || typeof rec[b].inq !== 'undefined'){
+      rec[b] = emptyBrandSrc();
+    }
+    CS_SOURCES.forEach(k=>{ if(!rec[b][k]) rec[b][k]={inq:0,visit:0}; });
+  });
+  return rec;
 }
-
 function saveCSRec(rec){
   const all = loadCS().filter(r=>!(r.month===rec.month&&r.person===rec.person));
   all.push(rec); saveCS(all);
@@ -745,38 +755,43 @@ function setCSPerson(p, el){
 }
 
 function onCSChange(el){
-  const {month, person, brand, field} = el.dataset;
+  const {month, person, brand, src, field} = el.dataset;
   const rec = loadCSRec(month, person);
-  rec[brand][field] = parseFloat(el.value)||0;
+  if(!rec[brand][src]) rec[brand][src]={inq:0,visit:0};
+  rec[brand][src][field] = parseFloat(el.value)||0;
   saveCSRec(rec);
   renderCSStats();
+}
+
+function brandTotals(rec, brand){
+  let inq=0, visit=0;
+  CS_SOURCES.forEach(k=>{ inq+=rec[brand][k]?.inq||0; visit+=rec[brand][k]?.visit||0; });
+  return {inq, visit};
 }
 
 function renderCSStats(){
   const month = csActiveMonth || getCurrentMonth();
   const persons = csActivePerson==='all' ? CS_PERSONS : [csActivePerson];
-  let si=0, sc=0, scn=0, sco=0, hi=0, hc=0, hcn=0, hco=0;
+  let si=0, sv=0, hi=0, hv=0;
   persons.forEach(p=>{
     const r = loadCSRec(month, p);
-    si  += r.seoul.inq||0;     sc  += (r.seoul.con_new||0)+(r.seoul.con_old||0);
-    scn += r.seoul.con_new||0; sco += r.seoul.con_old||0;
-    hi  += r.hh.inq||0;       hc  += (r.hh.con_new||0)+(r.hh.con_old||0);
-    hcn += r.hh.con_new||0;   hco += r.hh.con_old||0;
+    const sT = brandTotals(r,'seoul'); si+=sT.inq; sv+=sT.visit;
+    const hT = brandTotals(r,'hh');   hi+=hT.inq; hv+=hT.visit;
   });
-  const N = v => v||v===0 ? v.toLocaleString('zh-TW') : '—';
+  const N = v => v ? v.toLocaleString('zh-TW') : '—';
   const P = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
   setText('cs-stat-seoul-inq',  N(si));
-  setText('cs-stat-seoul-con',  N(sc));
-  setText('cs-stat-seoul-conpct', P(sc,si));
-  setText('cs-stat-seoul-cnew', N(scn));
-  setText('cs-stat-seoul-cold', '/ '+N(sco));
-  setText('cs-stat-seoul-cvr',  P(sc,si));
+  setText('cs-stat-seoul-con',  N(sv));
+  setText('cs-stat-seoul-conpct', P(sv,si));
+  setText('cs-stat-seoul-cnew', N(sv));
+  setText('cs-stat-seoul-cold', '');
+  setText('cs-stat-seoul-cvr',  P(sv,si));
   setText('cs-stat-hh-inq',    N(hi));
-  setText('cs-stat-hh-con',    N(hc));
-  setText('cs-stat-hh-conpct', P(hc,hi));
-  setText('cs-stat-hh-cnew',   N(hcn));
-  setText('cs-stat-hh-cold',   '/ '+N(hco));
-  setText('cs-stat-hh-cvr',    P(hc,hi));
+  setText('cs-stat-hh-con',    N(hv));
+  setText('cs-stat-hh-conpct', P(hv,hi));
+  setText('cs-stat-hh-cnew',   N(hv));
+  setText('cs-stat-hh-cold',   '');
+  setText('cs-stat-hh-cvr',    P(hv,hi));
 }
 
 function getCurrentMonth(){
@@ -790,61 +805,73 @@ function renderCSPersonCard(person, month){
   const hasS = brands.includes('seoul');
   const hasH = brands.includes('hh');
 
-  const sTgt = r.seoul.target||0, hTgt = r.hh.target||0;
-  const sCon = (r.seoul.con_new||0)+(r.seoul.con_old||0);
-  const hCon = (r.hh.con_new||0)+(r.hh.con_old||0);
-  const sDiff = sCon-sTgt, hDiff = hCon-hTgt;
-  const sRate = sTgt>0?(sCon/sTgt*100).toFixed(0)+'%':'—';
-  const hRate = hTgt>0?(hCon/hTgt*100).toFixed(0)+'%':'—';
-  const sCvr  = r.seoul.inq>0?((sCon/r.seoul.inq)*100).toFixed(1)+'%':'—';
-  const hCvr  = r.hh.inq>0?((hCon/r.hh.inq)*100).toFixed(1)+'%':'—';
-  const diffC = v=> v===0?'color:#94a3b8':v>0?'color:#16a34a;font-weight:700':'color:#ef4444;font-weight:700';
-  const pctC  = rate=>{ const n=parseFloat(rate); return n>=100?'cs-pct-grn':'cs-pct-red'; };
-  const inp = (brand,field,val)=>
+  const sT = brandTotals(r,'seoul');
+  const hT = brandTotals(r,'hh');
+
+  const [y,m] = month.split('-').map(Number);
+  const roc = y-1911;
+  const today = new Date();
+  const daysInMonth = new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  const dayOfMonth = today.getDate();
+
+  const N = v => v||'—';
+  const P = (a,b) => b>0?(a/b*100).toFixed(1)+'%':'—';
+
+  // badge shows total visits per brand
+  const badges = [
+    hasS ? `<span class="cs-badge-seoul">醫美 到診 ${sT.visit}</span>` : '',
+    hasH ? `<span class="cs-badge-hh">醫髮 到診 ${hT.visit}</span>` : ''
+  ].join('');
+
+  // inp helper with src key
+  const inp = (brand, src, field, val) =>
     `<input class="cs-inp" type="number" value="${val||''}" placeholder="—"
-      data-month="${month}" data-person="${person}" data-brand="${brand}" data-field="${field}"
+      data-month="${month}" data-person="${person}" data-brand="${brand}" data-src="${src}" data-field="${field}"
       oninput="onCSChange(this)" onchange="onCSChange(this)"/>`;
 
-  const today=new Date();
-  const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
-  const dayOfMonth=today.getDate();
-  const [y,m]=month.split('-').map(Number);
-  const roc=y-1911;
+  // build one brand's source table
+  const brandTable = (brand, color, brandLabel) => {
+    const rows = CS_SOURCES.map(src => {
+      const d = r[brand][src] || {inq:0,visit:0};
+      const cvr = P(d.visit, d.inq);
+      return `<tr>
+        <td class="cs-label">${CS_SOURCE_LABELS[src]}</td>
+        <td class="cs-num">${inp(brand,src,'inq',d.inq)}</td>
+        <td class="cs-num">${inp(brand,src,'visit',d.visit)}</td>
+        <td class="cs-num" style="font-weight:600;color:${parseFloat(cvr)>0?'#1e293b':'#94a3b8'}">${cvr}</td>
+      </tr>`;
+    }).join('');
+    const totInq = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.inq||0),0) : 0;
+    const totVisit = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.visit||0),0) : 0;
+    return `<div style="flex:1;min-width:0">
+      <div style="padding:10px 14px 6px;font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.05em">${brandLabel}</div>
+      <table class="cs-tbl" style="width:100%">
+        <tr>
+          <th style="text-align:left">來源</th>
+          <th>詢問</th>
+          <th>到診數</th>
+          <th>轉換率</th>
+        </tr>
+        ${rows}
+        <tr style="background:#f8fafc;font-weight:700">
+          <td class="cs-label" style="color:#1e293b">合計</td>
+          <td class="cs-num" style="color:#1e293b">${totInq||'—'}</td>
+          <td class="cs-num" style="color:#1e293b">${totVisit||'—'}</td>
+          <td class="cs-num" style="color:${color}">${P(totVisit,totInq)}</td>
+        </tr>
+      </table>
+    </div>`;
+  };
 
-  // badge row — only show badges for this person's brands
-  const badges = [
-    hasS ? `<span class="cs-badge-seoul">醫美 ${sCon}</span>` : '',
-    hasH ? `<span class="cs-badge-hh">醫髮 ${hCon}</span>` : ''
-  ].join('');
-
-  // dynamic column headers
-  const colHeaders = [
-    '<th></th>',
-    hasS ? '<th style="color:#7c3aed">醫美</th>' : '',
-    hasH ? '<th style="color:#2563eb">醫髮</th>' : ''
-  ].join('');
-
-  const goalRow = (label, sField, hField, sVal, hVal) => `
-    <tr><td class="cs-label">${label}</td>
-    ${hasS?`<td class="cs-num">${inp('seoul',sField,sVal)}</td>`:''}
-    ${hasH?`<td class="cs-num">${inp('hh',hField,hVal)}</td>`:''}
-    </tr>`;
-
-  const detailRow = (lbl, sContent, hContent) => `
-    <tr><td class="cs-label" style="padding-left:14px">${lbl}</td>
-    ${hasS?`<td class="cs-num">${sContent}</td>`:''}
-    ${hasH?`<td class="cs-num">${hContent}</td>`:''}
-    </tr>`;
-
-  const detailHeaders = [
-    '<th style="text-align:left;padding-left:14px">指標</th>',
-    hasS ? '<th style="color:#7c3aed">醫美</th>' : '',
-    hasH ? '<th style="color:#2563eb">醫髮</th>' : ''
+  const tables = [
+    hasS ? brandTable('seoul','#7c3aed','醫美') : '',
+    hasS && hasH ? '<div style="width:1px;background:#f1f5f9;margin:0 4px"></div>' : '',
+    hasH ? brandTable('hh','#2563eb','醫髮') : ''
   ].join('');
 
   const footerParts = [
-    hasS ? `<span>醫美・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>` : '',
-    hasH ? `<span>醫髮・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>` : ''
+    hasS ? `<span>醫美・${roc}年${m}月 第${dayOfMonth}天/共${daysInMonth}天</span>` : '',
+    hasH ? `<span>醫髮・${roc}年${m}月 第${dayOfMonth}天/共${daysInMonth}天</span>` : ''
   ].filter(Boolean).join('');
 
   return `<div class="cs-card">
@@ -852,39 +879,7 @@ function renderCSPersonCard(person, month){
       <span class="cs-card-name">${label}</span>
       <div class="flex gap-2">${badges}</div>
     </div>
-    <div class="flex" style="min-height:160px">
-      <div style="flex:0 0 160px;border-right:1px solid #f1f5f9;padding:12px 0">
-        <table class="cs-tbl">
-          <tr>${colHeaders}</tr>
-          ${goalRow('個人目標','target','target',sTgt,hTgt)}
-          ${goalRow('新客 CON','con_new','con_new',r.seoul.con_new,r.hh.con_new)}
-          ${goalRow('舊客 CON','con_old','con_old',r.seoul.con_old,r.hh.con_old)}
-          <tr><td class="cs-label">月追</td>
-            ${hasS?`<td class="cs-num" style="${diffC(sDiff)}">${sDiff>0?'+':''}${sDiff}</td>`:''}
-            ${hasH?`<td class="cs-num" style="${diffC(hDiff)}">${hDiff>0?'+':''}${hDiff}</td>`:''}
-          </tr>
-          <tr><td class="cs-label">達率</td>
-            ${hasS?`<td class="cs-num"><span class="${pctC(sRate)}">${sRate}</span></td>`:''}
-            ${hasH?`<td class="cs-num"><span class="${pctC(hRate)}">${hRate}</span></td>`:''}
-          </tr>
-        </table>
-      </div>
-      <div style="flex:1;padding:12px 0">
-        <table class="cs-tbl" style="width:100%">
-          <tr>${detailHeaders}</tr>
-          ${detailRow('詢問數', inp('seoul','inq',r.seoul.inq), inp('hh','inq',r.hh.inq))}
-          ${detailRow('總 CON',
-            `<span style="font-weight:700;color:#1e293b">${sCon||'—'}</span>`,
-            `<span style="font-weight:700;color:#1e293b">${hCon||'—'}</span>`)}
-          ${detailRow('轉換率', sCvr, hCvr)}
-          ${detailRow('新客 CON', r.seoul.con_new||'—', r.hh.con_new||'—')}
-          ${detailRow('舊客 CON', r.seoul.con_old||'—', r.hh.con_old||'—')}
-          ${detailRow('達率',
-            `<span class="${pctC(sRate)}">${sRate}</span>`,
-            `<span class="${pctC(hRate)}">${hRate}</span>`)}
-        </table>
-      </div>
-    </div>
+    <div class="flex" style="gap:0">${tables}</div>
     <div class="cs-footer">${footerParts}</div>
   </div>`;
 }
