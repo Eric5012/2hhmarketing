@@ -63,6 +63,27 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .chip:hover:not(.active){border-color:#4f60f5;color:#4f60f5}
 .chip-seoul.active{background:#4f60f5!important;border-color:#4f60f5!important}
 .chip-hh.active{background:#7c3aed!important;border-color:#7c3aed!important}
+/* ── Main page tabs (right side of nav row 2) ── */
+.main-tab-btn{padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
+.main-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
+.main-tab-btn:hover:not(.active){color:#4f60f5}
+/* ── CS person cards ── */
+.cs-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.cs-card-header{background:#1e293b;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
+.cs-card-name{color:#fff;font-size:16px;font-weight:800}
+.cs-badge-seoul{background:#4f60f5;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.cs-badge-hh{background:#7c3aed;color:#fff;padding:3px 12px;border-radius:999px;font-size:12px;font-weight:700}
+.cs-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.cs-tbl td,.cs-tbl th{padding:6px 10px;border-bottom:1px solid #f1f5f9}
+.cs-tbl th{color:#94a3b8;font-weight:600;font-size:11px;text-align:center}
+.cs-tbl td{color:#334155}
+.cs-tbl td.cs-label{color:#64748b;font-weight:500}
+.cs-tbl td.cs-num{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.cs-inp{border:none;background:transparent;text-align:right;width:100%;font-size:12px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;outline:none;padding:0}
+.cs-inp:focus{background:#ede9fe;border-radius:4px;color:#4f60f5}
+.cs-pct-red{color:#ef4444;font-weight:700}
+.cs-pct-grn{color:#16a34a;font-weight:700}
+.cs-footer{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:11px;color:#94a3b8;display:flex;justify-content:space-between}
 /* ── KPI tile ── */
 .kpi-tile{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
 .kpi-tile .kpi-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em}
@@ -130,21 +151,58 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 </head>
 <body>
 
-<!-- NAV -->
-<nav class="sticky top-0 z-40 px-4 sm:px-8 py-3 flex items-center justify-between border-b" style="background:#fff;border-color:#e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06)">
-  <div class="flex items-center gap-3">
-    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style="background:linear-gradient(135deg,#4f60f5,#7086fb)">2H</div>
-    <span class="font-bold tracking-tight text-slate-800">2HH <span style="color:#4f60f5">Marketing</span></span>
-    <span class="hidden sm:block text-slate-400 text-xs">Dashboard</span>
+<!-- NAV (row 1) -->
+<nav class="sticky top-0 z-40 px-5 sm:px-8 border-b" style="background:#fff;border-color:#e2e8f0;box-shadow:0 1px 3px rgba(0,0,0,.06)">
+  <!-- row 1: logo + clock -->
+  <div class="flex items-center justify-between py-3">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl flex items-center justify-center text-white font-black text-sm select-none" style="background:linear-gradient(135deg,#4f60f5,#7086fb);letter-spacing:-.5px">首爾</div>
+      <div>
+        <div class="font-black text-slate-800 text-base leading-none tracking-tight">首爾醫美</div>
+        <div class="text-xs text-slate-400 mt-0.5">Seoul Medical Aesthetics</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span class="w-2 h-2 rounded-full inline-block" style="background:#22c55e;animation:pulse 2s infinite"></span>
+      <span id="live-clock"></span>
+    </div>
   </div>
-  <div class="flex items-center gap-2 text-xs text-slate-400">
-    <span class="w-2 h-2 rounded-full inline-block" style="background:#22c55e;animation:pulse 2s infinite"></span>
-    <span id="live-clock"></span>
+  <!-- row 2: filter chips (left) + main tabs (right) -->
+  <div class="flex items-center justify-between pb-0">
+    <!-- left: brand + month -->
+    <div class="flex items-center gap-5">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-400">品牌</span>
+        <div class="flex gap-1.5">
+          <button class="brand-chip chip active" data-brand="all" onclick="setBrand('all',this)">全部</button>
+          <button class="brand-chip chip chip-seoul" data-brand="seoul" onclick="setBrand('seoul',this)">醫美</button>
+          <button class="brand-chip chip chip-hh" data-brand="hh" onclick="setBrand('hh',this)">醫髮</button>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold text-slate-400">月份</span>
+        <select id="brand-month-filter" class="sel" style="font-size:12px;padding:4px 8px" onchange="onMonthFilterChange()">
+          <option value="">全部</option>
+        </select>
+      </div>
+    </div>
+    <!-- right: main page tabs -->
+    <div class="flex gap-0">
+      <button class="main-tab-btn active" onclick="showMainTab('overview',this)">成效總覽</button>
+      <button class="main-tab-btn" onclick="showMainTab('cs',this)">客服個人成效</button>
+      <button class="main-tab-btn" onclick="showMainTab('monthly',this)">月報表</button>
+      <button class="main-tab-btn" onclick="showMainTab('schedule',this)">班表</button>
+    </div>
   </div>
 </nav>
 
-<!-- PAGE TABS -->
-<div class="px-4 sm:px-8 pt-4 pb-0 border-b" style="border-color:#e2e8f0;background:#fff">
+<!-- ═══════════════════════════════════════
+     MAIN TAB: 成效總覽
+══════════════════════════════════════════ -->
+<div id="main-tab-overview" class="main-tab-page">
+
+<!-- sub-tabs (廣告總覽 / 首爾醫美 / 資料輸入) — kept as internal nav -->
+<div class="px-5 sm:px-8 pt-4 pb-0 border-b" style="border-color:#e2e8f0;background:#fff">
   <div class="flex gap-1 rounded-xl p-1 w-fit" style="background:#f1f5f9">
     <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">廣告總覽</button>
     <button class="tab-nav-btn" onclick="showTab('seoul',this)">首爾醫美</button>
@@ -152,27 +210,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 </div>
 
-<!-- BRAND FILTER BAR -->
-<div class="px-4 sm:px-8 py-3 flex flex-wrap items-center gap-5 border-b" style="background:#fff;border-color:#e2e8f0">
-  <div class="flex items-center gap-3">
-    <span class="text-xs font-semibold tracking-widest" style="color:#94a3b8">品牌</span>
-    <div class="flex gap-2">
-      <button class="brand-chip chip active" data-brand="all" onclick="setBrand('all',this)">全部</button>
-      <button class="brand-chip chip chip-seoul" data-brand="seoul" onclick="setBrand('seoul',this)">SEOUL 醫美</button>
-      <button class="brand-chip chip chip-hh" data-brand="hh" onclick="setBrand('hh',this)">HH 醫髮</button>
-    </div>
-  </div>
-  <div class="flex items-center gap-3">
-    <span class="text-xs font-semibold tracking-widest" style="color:#94a3b8">月份</span>
-    <select id="brand-month-filter" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderDcmp()">
-      <option value="">全部月份</option>
-    </select>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     TAB 1: DASHBOARD
-══════════════════════════════════════════ -->
+<!-- TAB 1: DASHBOARD -->
 <div id="tab-dashboard" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5">
 
   <!-- brand summary stats — one unified card, 4 sections -->
@@ -470,6 +508,74 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 </div>
 
+</div><!-- /main-tab-overview -->
+
+<!-- ═══════════════════════════════════════
+     MAIN TAB: 客服個人成效
+══════════════════════════════════════════ -->
+<div id="main-tab-cs" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-6 space-y-5">
+
+  <!-- person chips -->
+  <div class="flex flex-wrap items-center gap-2">
+    <button class="cs-person-chip chip active" onclick="setCSPerson('all',this)">全體</button>
+    <button class="cs-person-chip chip" onclick="setCSPerson('ivan',this)">Ivan</button>
+    <button class="cs-person-chip chip" onclick="setCSPerson('jessie',this)">Jessie</button>
+    <button class="cs-person-chip chip" onclick="setCSPerson('eline',this)">Eline</button>
+  </div>
+
+  <!-- summary stats (same 4-box card) -->
+  <div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 1px 4px rgba(0,0,0,.05);overflow:hidden">
+    <div class="grid stat-grid" style="grid-template-columns:repeat(4,1fr)">
+      <div style="padding:22px 24px;border-left:4px solid #4f60f5;border-right:1px solid #f1f5f9">
+        <div class="stat-card-title">詢問數</div>
+        <div class="stat-brand-row"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-inq">—</span></div>
+        <div class="stat-brand-row" style="margin-top:10px"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-inq">—</span></div>
+      </div>
+      <div style="padding:22px 24px;border-left:4px solid #2563eb;border-right:1px solid #f1f5f9">
+        <div class="stat-card-title">CON / 轉換率</div>
+        <div class="stat-brand-row"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-con">—</span><span class="stat-rate-val" id="cs-stat-seoul-conpct"></span></div>
+        <div class="stat-brand-row" style="margin-top:10px"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-con">—</span><span class="stat-rate-val" id="cs-stat-hh-conpct"></span></div>
+      </div>
+      <div style="padding:22px 24px;border-left:4px solid #d97706;border-right:1px solid #f1f5f9">
+        <div class="stat-card-title">新客 / 舊客 CON</div>
+        <div class="stat-brand-row"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-cnew">—</span><span class="stat-rate-val" id="cs-stat-seoul-cold"></span></div>
+        <div class="stat-brand-row" style="margin-top:10px"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-cnew">—</span><span class="stat-rate-val" id="cs-stat-hh-cold"></span></div>
+      </div>
+      <div style="padding:22px 24px;border-left:4px solid #7c3aed">
+        <div class="stat-card-title">實際轉換率</div>
+        <div class="stat-brand-row"><span class="brand-tag brand-tag-seoul">醫美</span><span class="stat-main-val" id="cs-stat-seoul-cvr">—</span></div>
+        <div class="stat-brand-row" style="margin-top:10px"><span class="brand-tag brand-tag-hh">醫髮</span><span class="stat-main-val" id="cs-stat-hh-cvr">—</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- person cards grid -->
+  <div id="cs-cards-grid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(400px,1fr))"></div>
+
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN TAB: 月報表
+══════════════════════════════════════════ -->
+<div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-10">
+  <div class="card flex flex-col items-center justify-center py-20 text-slate-400">
+    <div class="text-4xl mb-4">📊</div>
+    <div class="font-bold text-slate-600 text-lg">月報表</div>
+    <div class="text-sm mt-2">敬請期待</div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════
+     MAIN TAB: 班表
+══════════════════════════════════════════ -->
+<div id="main-tab-schedule" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-10">
+  <div class="card flex flex-col items-center justify-center py-20 text-slate-400">
+    <div class="text-4xl mb-4">🗓️</div>
+    <div class="font-bold text-slate-600 text-lg">班表</div>
+    <div class="text-sm mt-2">敬請期待</div>
+  </div>
+</div>
+
 <!-- BRAND INPUT MODAL -->
 <div id="brand-modal" class="modal-overlay" onclick="closeBrandModalOutside(event)">
   <div class="modal-box" style="width:min(95vw,540px)">
@@ -618,6 +724,186 @@ function populateMonthSelects(){
 }
 
 // ──────────────────────────────────────────────────────────────
+// CS (客服個人成效) DATA
+// ──────────────────────────────────────────────────────────────
+const STORAGE_CS = 'dash_cs_v1';
+const CS_PERSONS = ['ivan','jessie','eline'];
+const CS_PERSON_LABELS = {ivan:'Ivan', jessie:'Jessie', eline:'Eline'};
+
+function loadCS(){ return JSON.parse(localStorage.getItem(STORAGE_CS)||'[]'); }
+function saveCS(d){ localStorage.setItem(STORAGE_CS, JSON.stringify(d)); }
+
+function emptyCSRec(month, person){
+  return { month, person,
+    seoul:{ target:0, inq:0, con_new:0, con_old:0 },
+    hh:  { target:0, inq:0, con_new:0, con_old:0 } };
+}
+
+function loadCSRec(month, person){
+  return loadCS().find(r=>r.month===month&&r.person===person) || emptyCSRec(month, person);
+}
+
+function saveCSRec(rec){
+  const all = loadCS().filter(r=>!(r.month===rec.month&&r.person===rec.person));
+  all.push(rec); saveCS(all);
+}
+
+let csActivePerson = 'all';
+let csActiveMonth  = '';
+
+function setCSPerson(p, el){
+  csActivePerson = p;
+  document.querySelectorAll('.cs-person-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderCS();
+}
+
+function onCSChange(el){
+  const {month, person, brand, field} = el.dataset;
+  const rec = loadCSRec(month, person);
+  rec[brand][field] = parseFloat(el.value)||0;
+  saveCSRec(rec);
+  renderCSStats();
+}
+
+function renderCSStats(){
+  const month = csActiveMonth || getCurrentMonth();
+  const persons = csActivePerson==='all' ? CS_PERSONS : [csActivePerson];
+  let si=0, sc=0, scn=0, sco=0, hi=0, hc=0, hcn=0, hco=0;
+  persons.forEach(p=>{
+    const r = loadCSRec(month, p);
+    si  += r.seoul.inq||0;     sc  += (r.seoul.con_new||0)+(r.seoul.con_old||0);
+    scn += r.seoul.con_new||0; sco += r.seoul.con_old||0;
+    hi  += r.hh.inq||0;       hc  += (r.hh.con_new||0)+(r.hh.con_old||0);
+    hcn += r.hh.con_new||0;   hco += r.hh.con_old||0;
+  });
+  const N = v => v||v===0 ? v.toLocaleString('zh-TW') : '—';
+  const P = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
+  setText('cs-stat-seoul-inq',  N(si));
+  setText('cs-stat-seoul-con',  N(sc));
+  setText('cs-stat-seoul-conpct', P(sc,si));
+  setText('cs-stat-seoul-cnew', N(scn));
+  setText('cs-stat-seoul-cold', '/ '+N(sco));
+  setText('cs-stat-seoul-cvr',  P(sc,si));
+  setText('cs-stat-hh-inq',    N(hi));
+  setText('cs-stat-hh-con',    N(hc));
+  setText('cs-stat-hh-conpct', P(hc,hi));
+  setText('cs-stat-hh-cnew',   N(hcn));
+  setText('cs-stat-hh-cold',   '/ '+N(hco));
+  setText('cs-stat-hh-cvr',    P(hc,hi));
+}
+
+function getCurrentMonth(){
+  const d=new Date(); return d.getFullYear()+'-'+(String(d.getMonth()+1).padStart(2,'0'));
+}
+
+function renderCSPersonCard(person, month){
+  const r = loadCSRec(month, person);
+  const label = CS_PERSON_LABELS[person];
+  const sTgt = r.seoul.target||0, hTgt = r.hh.target||0;
+  const sCon = (r.seoul.con_new||0)+(r.seoul.con_old||0);
+  const hCon = (r.hh.con_new||0)+(r.hh.con_old||0);
+  const sDiff = sCon-sTgt, hDiff = hCon-hTgt;
+  const sRate = sTgt>0?(sCon/sTgt*100).toFixed(0)+'%':'—';
+  const hRate = hTgt>0?(hCon/hTgt*100).toFixed(0)+'%':'—';
+  const sCvr  = r.seoul.inq>0?((sCon/r.seoul.inq)*100).toFixed(1)+'%':'—';
+  const hCvr  = r.hh.inq>0?((hCon/r.hh.inq)*100).toFixed(1)+'%':'—';
+  const diffC = (v,tgt)=> v===0?'color:#94a3b8':v>0?'color:#16a34a;font-weight:700':'color:#ef4444;font-weight:700';
+  const pctC  = (r,tgt)=>{ const n=parseFloat(r); return n>=100?'cs-pct-grn':'cs-pct-red'; };
+  const inp = (brand,field,val)=>
+    `<input class="cs-inp" type="number" value="${val||''}" placeholder="—"
+      data-month="${month}" data-person="${person}" data-brand="${brand}" data-field="${field}"
+      oninput="onCSChange(this)" onchange="onCSChange(this)"/>`;
+
+  const today=new Date(); const daysInMonth=new Date(today.getFullYear(),today.getMonth()+1,0).getDate();
+  const dayOfMonth=today.getDate();
+  const [y,m]=month.split('-').map(Number);
+  const roc=y-1911;
+
+  return `<div class="cs-card">
+    <div class="cs-card-header">
+      <span class="cs-card-name">${label}</span>
+      <div class="flex gap-2">
+        <span class="cs-badge-seoul">醫美 ${sCon}</span>
+        <span class="cs-badge-hh">醫髮 ${hCon}</span>
+      </div>
+    </div>
+    <div class="flex" style="min-height:160px">
+      <!-- left: goals mini table -->
+      <div style="flex:0 0 160px;border-right:1px solid #f1f5f9;padding:12px 0">
+        <table class="cs-tbl">
+          <tr><th></th><th style="color:#4f60f5">醫美</th><th style="color:#7c3aed">醫髮</th></tr>
+          <tr><td class="cs-label">個人目標</td>
+              <td class="cs-num">${inp('seoul','target',sTgt)}</td>
+              <td class="cs-num">${inp('hh','target',hTgt)}</td></tr>
+          <tr><td class="cs-label">新客 CON</td>
+              <td class="cs-num">${inp('seoul','con_new',r.seoul.con_new)}</td>
+              <td class="cs-num">${inp('hh','con_new',r.hh.con_new)}</td></tr>
+          <tr><td class="cs-label">舊客 CON</td>
+              <td class="cs-num">${inp('seoul','con_old',r.seoul.con_old)}</td>
+              <td class="cs-num">${inp('hh','con_old',r.hh.con_old)}</td></tr>
+          <tr><td class="cs-label">月追</td>
+              <td class="cs-num" style="${diffC(sDiff,sTgt)}">${sDiff>0?'+':''}${sDiff}</td>
+              <td class="cs-num" style="${diffC(hDiff,hTgt)}">${hDiff>0?'+':''}${hDiff}</td></tr>
+          <tr><td class="cs-label">達率</td>
+              <td class="cs-num"><span class="${pctC(sRate,sTgt)}">${sRate}</span></td>
+              <td class="cs-num"><span class="${pctC(hRate,hTgt)}">${hRate}</span></td></tr>
+        </table>
+      </div>
+      <!-- right: detail table -->
+      <div style="flex:1;padding:12px 0">
+        <table class="cs-tbl" style="width:100%">
+          <tr><th style="text-align:left;padding-left:14px">指標</th><th style="color:#4f60f5">醫美</th><th style="color:#7c3aed">醫髮</th></tr>
+          <tr><td class="cs-label" style="padding-left:14px">詢問數</td>
+              <td class="cs-num">${inp('seoul','inq',r.seoul.inq)}</td>
+              <td class="cs-num">${inp('hh','inq',r.hh.inq)}</td></tr>
+          <tr><td class="cs-label" style="padding-left:14px">總 CON</td>
+              <td class="cs-num" style="font-weight:700;color:#1e293b">${sCon||'—'}</td>
+              <td class="cs-num" style="font-weight:700;color:#1e293b">${hCon||'—'}</td></tr>
+          <tr><td class="cs-label" style="padding-left:14px">轉換率</td>
+              <td class="cs-num">${sCvr}</td>
+              <td class="cs-num">${hCvr}</td></tr>
+          <tr><td class="cs-label" style="padding-left:14px">新客 CON</td>
+              <td class="cs-num">${r.seoul.con_new||'—'}</td>
+              <td class="cs-num">${r.hh.con_new||'—'}</td></tr>
+          <tr><td class="cs-label" style="padding-left:14px">舊客 CON</td>
+              <td class="cs-num">${r.seoul.con_old||'—'}</td>
+              <td class="cs-num">${r.hh.con_old||'—'}</td></tr>
+          <tr><td class="cs-label" style="padding-left:14px">達率</td>
+              <td class="cs-num"><span class="${pctC(sRate,sTgt)}">${sRate}</span></td>
+              <td class="cs-num"><span class="${pctC(hRate,hTgt)}">${hRate}</span></td></tr>
+        </table>
+      </div>
+    </div>
+    <div class="cs-footer">
+      <span>醫美・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>
+      <span>醫髮・日進度 ${roc}年${m}月 第${dayOfMonth}天 / 共${daysInMonth}天</span>
+    </div>
+  </div>`;
+}
+
+function renderCS(){
+  const month = csActiveMonth || getCurrentMonth();
+  const persons = csActivePerson==='all' ? CS_PERSONS : [csActivePerson];
+  const grid = document.getElementById('cs-cards-grid');
+  if(!grid) return;
+  grid.innerHTML = persons.map(p=>renderCSPersonCard(p, month)).join('');
+  renderCSStats();
+}
+
+// ──────────────────────────────────────────────────────────────
+// MAIN TAB SWITCHING
+// ──────────────────────────────────────────────────────────────
+function showMainTab(tab, btn){
+  document.querySelectorAll('.main-tab-page').forEach(p=>p.classList.add('hidden'));
+  document.querySelectorAll('.main-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('main-tab-'+tab).classList.remove('hidden');
+  btn.classList.add('active');
+  if(tab==='cs') renderCS();
+  if(tab==='overview'){ renderDashboard(); renderDcmp(); }
+}
+
+// ──────────────────────────────────────────────────────────────
 // BRAND FILTER
 // ──────────────────────────────────────────────────────────────
 let activeBrand = 'all';
@@ -629,13 +915,22 @@ function setBrand(b, el){
   renderDcmp();
 }
 
+function onMonthFilterChange(){
+  const v = (document.getElementById('brand-month-filter')||{}).value||'';
+  csActiveMonth = v;
+  renderDcmp();
+  renderCS();
+}
+
 function populateBrandMonthFilter(){
-  const all = loadDcmpAll();
-  const months = [...new Set(all.map(r=>r.date.slice(0,7)))].sort().reverse();
+  const dcmpMonths = loadDcmpAll().map(r=>r.date.slice(0,7));
+  // Add current month always so CS tab works even without dcmp data
+  const cur_m = getCurrentMonth();
+  const months = [...new Set([cur_m, ...dcmpMonths])].sort().reverse();
   const el = document.getElementById('brand-month-filter');
   if(!el) return;
   const cur = el.value;
-  el.innerHTML = '<option value="">全部月份</option>' +
+  el.innerHTML = '<option value="">全部</option>' +
     months.map(m=>{
       const [y,mo]=m.split('-');
       return `<option value="${m}">${parseInt(y)-1911}年${parseInt(mo)}月</option>`;
@@ -1464,6 +1759,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   document.getElementById('e-date').value = new Date().toISOString().slice(0,10);
   renderDashboard();
   renderDcmp();
+  renderCS();
 });
 </script>
 </body>
