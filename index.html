@@ -141,10 +141,6 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
-/* ── Overview editable inputs ── */
-.ov-inp{border:none;background:transparent;text-align:right;width:100%;font-size:22px;font-weight:800;color:#1e293b;font-variant-numeric:tabular-nums;outline:none;padding:0;line-height:1}
-.ov-inp:focus{background:#f0f4ff;border-radius:6px;color:#4f60f5;padding:2px 6px}
-.ov-inp::placeholder{color:#cbd5e1;font-size:18px;font-weight:400}
 /* ── Daily ad cards ── */
 .day-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .day-card-hd{background:#1e293b;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -268,18 +264,15 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <input class="ov-inp" id="ov-seoul-rev" type="number" placeholder="—"
-            data-brand="seoul" data-field="rev" oninput="onOvChange(this)"/>
+          <span class="scard-val" id="ov-seoul-rev" style="font-size:22px">—</span>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <input class="ov-inp" id="ov-seoul-est" type="number" placeholder="—"
-            data-brand="seoul" data-field="est" oninput="onOvChange(this)"/>
+          <span class="scard-rate" id="ov-seoul-est">—</span>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <input class="ov-inp" id="ov-seoul-prev" type="number" placeholder="—"
-            data-brand="seoul" data-field="prev" oninput="onOvChange(this)"/>
+          <span class="scard-rate" id="ov-seoul-prev">—</span>
         </div>
       </div>
     </div>
@@ -290,18 +283,15 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <input class="ov-inp" id="ov-hh-rev" type="number" placeholder="—"
-            data-brand="hh" data-field="rev" oninput="onOvChange(this)"/>
+          <span class="scard-val" id="ov-hh-rev" style="font-size:22px">—</span>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <input class="ov-inp" id="ov-hh-est" type="number" placeholder="—"
-            data-brand="hh" data-field="est" oninput="onOvChange(this)"/>
+          <span class="scard-rate" id="ov-hh-est">—</span>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <input class="ov-inp" id="ov-hh-prev" type="number" placeholder="—"
-            data-brand="hh" data-field="prev" oninput="onOvChange(this)"/>
+          <span class="scard-rate" id="ov-hh-prev">—</span>
         </div>
       </div>
     </div>
@@ -534,7 +524,7 @@ function seedOvIfEmpty(){
   const month = '2026-07';
   const all = loadOvAll();
   if(all.find(r=>r.month===month)) return;
-  saveOvRec({month, seoul:{rev:1615,est:0,prev:1867}, hh:{rev:1884,est:0,prev:1761}});
+  saveOvRec({month, seoul:{rev:1615,prev:1867}, hh:{rev:1884,prev:1761}});
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -574,19 +564,11 @@ function loadOvAll(){ return JSON.parse(localStorage.getItem(STORAGE_OV)||'[]');
 function saveOvAll(d){ localStorage.setItem(STORAGE_OV, JSON.stringify(d)); }
 function loadOvRec(month){
   return loadOvAll().find(r=>r.month===month) ||
-    {month, seoul:{rev:0,est:0,prev:0}, hh:{rev:0,est:0,prev:0}};
+    {month, seoul:{rev:0,prev:0}, hh:{rev:0,prev:0}};
 }
 function saveOvRec(rec){
   const all = loadOvAll().filter(r=>r.month!==rec.month);
   all.push(rec); saveOvAll(all);
-}
-function onOvChange(el){
-  const month = (document.getElementById('brand-month-filter')||{}).value || getCurrentMonth();
-  const {brand, field} = el.dataset;
-  const rec = loadOvRec(month);
-  rec[brand][field] = parseFloat(el.value)||0;
-  saveOvRec(rec);
-  renderOverviewStats();
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1222,18 +1204,29 @@ function renderOverviewStats(){
   const N  = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
   const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
 
-  // Row 1: 業績 from monthly overview storage (editable)
+  // Row 1: 業績 from monthly overview storage (display-only; future: Google Form)
   const ov = loadOvRec(month);
-  const setInp = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
-  setInp('ov-seoul-rev',  ov.seoul.rev||'');
-  setInp('ov-seoul-est',  ov.seoul.est||'');
-  setInp('ov-seoul-prev', ov.seoul.prev||'');
-  setInp('ov-hh-rev',     ov.hh.rev||'');
-  setInp('ov-hh-est',     ov.hh.est||'');
-  setInp('ov-hh-prev',    ov.hh.prev||'');
-  const totRev  = (ov.seoul.rev||0)+(ov.hh.rev||0);
-  const totEst  = (ov.seoul.est||0)+(ov.hh.est||0);
-  const totPrev = (ov.seoul.prev||0)+(ov.hh.prev||0);
+  // 估值 = 實際 ÷ 已過天數 × 當月總天數
+  const calcEst = (rev, refMonth) => {
+    const [y, m] = refMonth.split('-').map(Number);
+    const today  = new Date();
+    const totalDays = new Date(y, m, 0).getDate();
+    const isCurrentMonth = (today.getFullYear()===y && today.getMonth()+1===m);
+    const daysSoFar = isCurrentMonth ? today.getDate() : totalDays;
+    return daysSoFar > 0 ? Math.round(rev / daysSoFar * totalDays) : 0;
+  };
+  const sRev = ov.seoul.rev||0, hRev = ov.hh.rev||0;
+  const sEst = sRev ? calcEst(sRev, month) : 0;
+  const hEst = hRev ? calcEst(hRev, month) : 0;
+  setText('ov-seoul-rev',  sRev ? N(sRev) : '—');
+  setText('ov-seoul-est',  sEst ? N(sEst) : '—');
+  setText('ov-seoul-prev', ov.seoul.prev ? N(ov.seoul.prev) : '—');
+  setText('ov-hh-rev',     hRev ? N(hRev) : '—');
+  setText('ov-hh-est',     hEst ? N(hEst) : '—');
+  setText('ov-hh-prev',    ov.hh.prev ? N(ov.hh.prev) : '—');
+  const totRev  = sRev + hRev;
+  const totEst  = sEst + hEst;
+  const totPrev = (ov.seoul.prev||0) + (ov.hh.prev||0);
   setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
   setText('ov-total-est',  totEst  ? N(totEst)  : '—');
   setText('ov-total-prev', totPrev ? N(totPrev) : '—');
