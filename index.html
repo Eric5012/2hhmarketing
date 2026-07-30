@@ -234,110 +234,89 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <!-- ═══════════════════════════════════════
      MAIN TAB: 成效總覽
 ══════════════════════════════════════════ -->
-<div id="main-tab-overview" class="main-tab-page px-5 sm:px-8 pb-12 mt-5 space-y-6">
+<div id="main-tab-overview" class="main-tab-page px-5 sm:px-8 pb-12 mt-6 space-y-5">
 
-  <!-- 4 stat summary cards (always visible) -->
+  <!-- 第一行：業績 (3 cards) -->
+  <div class="grid gap-4 fade-up" style="grid-template-columns:repeat(3,1fr)">
+
+    <!-- 總業績 -->
+    <div class="scard" style="border-left:4px solid #d97706">
+      <div class="scard-title">總業績</div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">實際</span>
+          <span class="scard-val" id="ov-total-rev" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">估值</span>
+          <span class="scard-rate" id="ov-total-est">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 醫美業績 -->
+    <div class="scard" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="color:#7c3aed">醫美業績</div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">實際</span>
+          <span class="scard-val" id="ov-seoul-rev" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">估值</span>
+          <span class="scard-rate" id="ov-seoul-est">—</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 醫髮業績 -->
+    <div class="scard" style="border-left:4px solid #2563eb">
+      <div class="scard-title" style="color:#2563eb">醫髮業績</div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">實際</span>
+          <span class="scard-val" id="ov-hh-rev" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8">估值</span>
+          <span class="scard-rate" id="ov-hh-est">—</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 第二行：漏斗指標 (4 scards) -->
   <div class="grid stat-grid fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
 
+    <!-- 詢問數 -->
     <div class="scard" style="border-left:4px solid #4f60f5">
       <div class="scard-title">詢問數</div>
-      <div id="stat-row-seoul-inq" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-inq">—</span></div></div>
-      <div id="stat-row-hh-inq" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-inq">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
     </div>
 
-    <div class="scard" style="border-left:4px solid #2563eb">
-      <div class="scard-title">CON / 轉換率</div>
-      <div id="stat-row-seoul-con" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-con">—</span><span class="scard-rate" id="stat-seoul-conpct"></span></div></div>
-      <div id="stat-row-hh-con" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-con">—</span><span class="scard-rate" id="stat-hh-conpct"></span></div></div>
+    <!-- 預約數 / 預約率 -->
+    <div class="scard" style="border-left:4px solid #0891b2">
+      <div class="scard-title">預約數 / 預約率</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span><span class="scard-rate" id="ov-seoul-apptpct"></span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span><span class="scard-rate" id="ov-hh-apptpct"></span></div></div>
     </div>
 
-    <div class="scard" style="border-left:4px solid #d97706">
-      <div class="scard-title">業績 (實際)</div>
-      <div id="stat-row-seoul-rev" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-seoul-rev">—</span></div></div>
-      <div id="stat-row-hh-rev" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-hh-rev">—</span></div></div>
+    <!-- 到店數 / 到店率 -->
+    <div class="scard" style="border-left:4px solid #16a34a">
+      <div class="scard-title">到店數 / 到店率</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-visit">—</span><span class="scard-rate" id="ov-seoul-visitpct"></span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-visit">—</span><span class="scard-rate" id="ov-hh-visitpct"></span></div></div>
     </div>
 
+    <!-- 實際轉換率 -->
     <div class="scard" style="border-left:4px solid #7c3aed">
-      <div class="scard-title">廣告佔比 (均)</div>
-      <div id="stat-row-seoul-adpct" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-adpct">—</span></div></div>
-      <div id="stat-row-hh-adpct" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-adpct">—</span></div></div>
+      <div class="scard-title">實際轉換率</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-cvr">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-cvr">—</span></div></div>
     </div>
 
-  </div>
-
-  <!-- ── 每日廣告成效 ── -->
-  <div id="overview-daily">
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <div>
-        <h2 class="text-base font-bold text-slate-800">每日廣告成效</h2>
-        <p class="text-xs text-slate-400 mt-0.5">實際 / 估值 / 同期 可直接點擊輸入，落差自動計算</p>
-      </div>
-      <div class="flex gap-2 items-center flex-wrap">
-        <input type="date" id="dcmp-add-date" class="inp" style="font-size:12px;padding:6px 10px;width:auto"/>
-        <button class="btn btn-primary btn-sm" onclick="addDcmpRow()">＋ 新增日期</button>
-      </div>
-    </div>
-    <div id="dcmp-cards" class="space-y-4"></div>
-  </div>
-
-  <!-- ── 醫美 section ── -->
-  <div id="overview-seoul">
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-      <div>
-        <h2 class="text-base font-bold" style="color:#7c3aed">醫美 廣告數據</h2>
-        <p class="text-xs text-slate-400 mt-0.5">點擊月份欄位即可輸入數據 · Google 稅後自動計算</p>
-      </div>
-      <div class="flex gap-2 flex-wrap items-center">
-        <select id="seoul-year" class="sel font-bold" style="font-size:14px" onchange="renderSeoulAds()"></select>
-        <div class="flex items-center gap-2 text-xs text-slate-400 border rounded-lg px-3 py-2" style="border-color:#e2e8f0">
-          <span>Google 稅率</span>
-          <input id="seoul-tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="0" min="0" max="50" onchange="renderSeoulAds()"/>
-          <span>%</span>
-        </div>
-        <button class="btn btn-primary btn-sm" onclick="openBrandModal(null)">＋ 新增 / 編輯月份</button>
-      </div>
-    </div>
-
-    <div class="card mb-4" style="padding:0;overflow:hidden">
-      <div class="overflow-x-auto">
-        <table class="pt" id="seoul-pivot" style="min-width:800px">
-          <thead id="seoul-pt-head"></thead>
-          <tbody id="seoul-pt-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="card mb-4" style="padding:0;overflow:hidden">
-      <div class="overflow-x-auto">
-        <table class="pt" id="seoul-detail" style="min-width:900px">
-          <thead id="seoul-dt-head"></thead>
-          <tbody id="seoul-dt-body"></tbody>
-        </table>
-      </div>
-    </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="card flex flex-col gap-2">
-        <div class="section-title mb-0">月度廣告花費趨勢 (稅後)</div>
-        <div style="height:220px;position:relative"><canvas id="seoul-spend-chart"></canvas></div>
-      </div>
-      <div class="card flex flex-col gap-2">
-        <div class="section-title mb-0">月度 CPL 比較</div>
-        <div style="height:220px;position:relative"><canvas id="seoul-cpl-chart"></canvas></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ── 醫髮 section ── -->
-  <div id="overview-hh">
-    <div class="flex items-center gap-3 mb-4">
-      <h2 class="text-base font-bold" style="color:#2563eb">醫髮 廣告數據</h2>
-    </div>
-    <div class="card flex flex-col items-center justify-center py-16" style="border-style:dashed;border-color:#bfdbfe">
-      <div class="text-3xl mb-3">💈</div>
-      <div class="font-bold text-slate-500">醫髮廣告資料</div>
-      <div class="text-sm text-slate-400 mt-1">功能建置中，敬請期待</div>
-    </div>
   </div>
 
 </div><!-- /main-tab-overview -->
@@ -570,7 +549,7 @@ const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB LINE','fbdm':
 
 function emptyBrandSrc(){
   const s={};
-  CS_SOURCES.forEach(k=>{ s[k]={inq:0,visit:0}; });
+  CS_SOURCES.forEach(k=>{ s[k]={inq:0,appt:0,visit:0}; });
   return s;
 }
 function loadCS(){ return JSON.parse(localStorage.getItem(STORAGE_CS)||'[]'); }
@@ -612,6 +591,7 @@ function onCSChange(el){
   rec[brand][src][field] = parseFloat(el.value)||0;
   saveCSRec(rec);
   renderCSStats();
+  renderOverviewStats();
 }
 
 function brandTotals(rec, brand){
@@ -683,16 +663,18 @@ function renderCSPersonCard(person, month){
   // build one brand's source table
   const brandTable = (brand, color, brandLabel) => {
     const rows = CS_SOURCES.map(src => {
-      const d = r[brand][src] || {inq:0,visit:0};
+      const d = r[brand][src] || {inq:0,appt:0,visit:0};
       const cvr = P(d.visit, d.inq);
       return `<tr>
         <td class="cs-label">${CS_SOURCE_LABELS[src]}</td>
         <td class="cs-num">${inp(brand,src,'inq',d.inq)}</td>
+        <td class="cs-num">${inp(brand,src,'appt',d.appt)}</td>
         <td class="cs-num">${inp(brand,src,'visit',d.visit)}</td>
         <td class="cs-num" style="font-weight:600;color:${parseFloat(cvr)>0?'#1e293b':'#94a3b8'}">${cvr}</td>
       </tr>`;
     }).join('');
-    const totInq = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.inq||0),0) : 0;
+    const totInq   = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.inq||0),0) : 0;
+    const totAppt  = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.appt||0),0) : 0;
     const totVisit = r[brand] ? Object.values(r[brand]).reduce((s,v)=>s+(v.visit||0),0) : 0;
     return `<div style="flex:1;min-width:0">
       <div style="padding:10px 14px 6px;font-size:11px;font-weight:700;color:${color};text-transform:uppercase;letter-spacing:.05em">${brandLabel}</div>
@@ -700,13 +682,15 @@ function renderCSPersonCard(person, month){
         <tr>
           <th style="text-align:left">來源</th>
           <th>詢問</th>
-          <th>到診數</th>
+          <th>預約</th>
+          <th>到店</th>
           <th>轉換率</th>
         </tr>
         ${rows}
         <tr style="background:#f8fafc;font-weight:700">
           <td class="cs-label" style="color:#1e293b">合計</td>
           <td class="cs-num" style="color:#1e293b">${totInq||'—'}</td>
+          <td class="cs-num" style="color:#1e293b">${totAppt||'—'}</td>
           <td class="cs-num" style="color:#1e293b">${totVisit||'—'}</td>
           <td class="cs-num" style="color:${color}">${P(totVisit,totInq)}</td>
         </tr>
@@ -753,7 +737,7 @@ function showMainTab(tab, btn){
   document.getElementById('main-tab-'+tab).classList.remove('hidden');
   btn.classList.add('active');
   if(tab==='cs') renderCS();
-  if(tab==='overview'){ applyBrandVisibility(); renderDcmp(); renderSeoulAds(); }
+  if(tab==='overview'){ renderOverviewStats(); }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1180,43 +1164,60 @@ function setText(id, val){
   if(el) el.textContent = val;
 }
 
-function renderDcmpStats(){
+function renderOverviewStats(){
   const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
+  const N  = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
+
+  // Row 1: 業績 from dcmp data
   let recs = loadDcmpAll();
   if(monthFilter) recs = recs.filter(r => r.date.startsWith(monthFilter));
-
-  let sInq=0, sCon=0, sRev=0, sAdSum=0, sAdDays=0;
-  let hInq=0, hCon=0, hRev=0, hAdSum=0, hAdDays=0;
-  recs.forEach(r => {
-    const sa = r.seoul?.actual||{}, ha = r.hh?.actual||{};
-    sInq += (sa.gg||0)+(sa.fb||0);
-    sCon += sa.con||0;
-    sRev += sa.rev||0;
-    const sap = parseFloat(r.seoul?.adpct)||0;
-    if(sap){ sAdSum+=sap; sAdDays++; }
-    hInq += (ha.gg||0)+(ha.fb||0);
-    hCon += ha.con||0;
-    hRev += ha.rev||0;
-    const hap = parseFloat(r.hh?.adpct)||0;
-    if(hap){ hAdSum+=hap; hAdDays++; }
+  let sRev=0, sEst=0, hRev=0, hEst=0;
+  recs.forEach(r=>{
+    sRev += r.seoul?.actual?.rev||0;
+    sEst += r.seoul?.est?.rev||0;
+    hRev += r.hh?.actual?.rev||0;
+    hEst += r.hh?.est?.rev||0;
   });
-  const N = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
-  const P = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '';
-  setText('stat-seoul-inq', N(sInq));
-  setText('stat-seoul-con', N(sCon));
-  setText('stat-seoul-conpct', P(sCon, sInq));
-  setText('stat-seoul-rev', sRev ? N(sRev) : '—');
-  setText('stat-seoul-adpct', sAdDays ? (sAdSum/sAdDays).toFixed(1)+'%' : '—');
-  setText('stat-hh-inq', N(hInq));
-  setText('stat-hh-con', N(hCon));
-  setText('stat-hh-conpct', P(hCon, hInq));
-  setText('stat-hh-rev', hRev ? N(hRev) : '—');
-  setText('stat-hh-adpct', hAdDays ? (hAdSum/hAdDays).toFixed(1)+'%' : '—');
+  setText('ov-seoul-rev', sRev ? N(sRev) : '—');
+  setText('ov-seoul-est', sEst ? N(sEst) : '—');
+  setText('ov-hh-rev',   hRev ? N(hRev) : '—');
+  setText('ov-hh-est',   hEst ? N(hEst) : '—');
+  setText('ov-total-rev', (sRev||hRev) ? N(sRev+hRev) : '—');
+  setText('ov-total-est', (sEst||hEst) ? N(sEst+hEst) : '—');
+
+  // Row 2: funnel from CS data
+  const month = monthFilter || getCurrentMonth();
+  const persons = CS_PERSONS;
+  let si=0, sa=0, sv=0, hi=0, ha=0, hv=0;
+  persons.forEach(p=>{
+    const r = loadCSRec(month, p);
+    CS_SOURCES.forEach(k=>{
+      si += r.seoul[k]?.inq||0;
+      sa += r.seoul[k]?.appt||0;
+      sv += r.seoul[k]?.visit||0;
+      hi += r.hh[k]?.inq||0;
+      ha += r.hh[k]?.appt||0;
+      hv += r.hh[k]?.visit||0;
+    });
+  });
+  setText('ov-seoul-inq',      N(si));
+  setText('ov-seoul-appt',     N(sa));
+  setText('ov-seoul-apptpct',  P(sa,si));
+  setText('ov-seoul-visit',    N(sv));
+  setText('ov-seoul-visitpct', P(sv,si));
+  setText('ov-seoul-cvr',      P(sv,si));
+  setText('ov-hh-inq',        N(hi));
+  setText('ov-hh-appt',       N(ha));
+  setText('ov-hh-apptpct',    P(ha,hi));
+  setText('ov-hh-visit',      N(hv));
+  setText('ov-hh-visitpct',   P(hv,hi));
+  setText('ov-hh-cvr',        P(hv,hi));
 }
 
 function renderDcmp(){
   populateBrandMonthFilter();
-  renderDcmpStats();
+  renderOverviewStats();
   const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
   const showSeoul = activeBrand === 'all' || activeBrand === 'seoul';
   const showHH    = activeBrand === 'all' || activeBrand === 'hh';
@@ -1627,9 +1628,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   startClock();
   populateMonthSelects();
   populateSeoulYears();
-  applyBrandVisibility();
-  renderDcmp();
-  renderSeoulAds();
+  populateBrandMonthFilter();
+  renderOverviewStats();
   renderCS();
 });
 </script>
