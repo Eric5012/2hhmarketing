@@ -208,286 +208,96 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <!-- ═══════════════════════════════════════
      MAIN TAB: 成效總覽
 ══════════════════════════════════════════ -->
-<div id="main-tab-overview" class="main-tab-page">
+<div id="main-tab-overview" class="main-tab-page px-5 sm:px-8 pb-12 mt-5 space-y-6">
 
-<!-- sub-tabs (廣告總覽 / 首爾醫美 / 資料輸入) — kept as internal nav -->
-<div class="px-5 sm:px-8 pt-4 pb-0 border-b" style="border-color:#e2e8f0;background:#fff">
-  <div class="flex gap-1 rounded-xl p-1 w-fit" style="background:#f1f5f9">
-    <button class="tab-nav-btn active" onclick="showTab('dashboard',this)">廣告總覽</button>
-    <button class="tab-nav-btn" onclick="showTab('seoul',this)">首爾醫美</button>
-    <button class="tab-nav-btn" onclick="showTab('entry',this)">資料輸入</button>
-  </div>
-</div>
-
-<!-- TAB 1: DASHBOARD -->
-<div id="tab-dashboard" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5">
-
-  <!-- brand summary stats — 4 separate cards -->
+  <!-- 4 stat summary cards (always visible) -->
   <div class="grid stat-grid fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
 
-    <!-- 詢問數 -->
     <div class="scard" style="border-left:4px solid #4f60f5">
       <div class="scard-title">詢問數</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-inq">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-inq">—</span></div></div>
+      <div id="stat-row-seoul-inq" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-inq">—</span></div></div>
+      <div id="stat-row-hh-inq" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-inq">—</span></div></div>
     </div>
 
-    <!-- CON / 轉換率 -->
     <div class="scard" style="border-left:4px solid #2563eb">
       <div class="scard-title">CON / 轉換率</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-con">—</span><span class="scard-rate" id="stat-seoul-conpct"></span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-con">—</span><span class="scard-rate" id="stat-hh-conpct"></span></div></div>
+      <div id="stat-row-seoul-con" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-con">—</span><span class="scard-rate" id="stat-seoul-conpct"></span></div></div>
+      <div id="stat-row-hh-con" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-con">—</span><span class="scard-rate" id="stat-hh-conpct"></span></div></div>
     </div>
 
-    <!-- 業績 -->
     <div class="scard" style="border-left:4px solid #d97706">
       <div class="scard-title">業績 (實際)</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-seoul-rev">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-hh-rev">—</span></div></div>
+      <div id="stat-row-seoul-rev" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-seoul-rev">—</span></div></div>
+      <div id="stat-row-hh-rev" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" style="font-size:22px" id="stat-hh-rev">—</span></div></div>
     </div>
 
-    <!-- 廣告佔比 -->
     <div class="scard" style="border-left:4px solid #7c3aed">
       <div class="scard-title">廣告佔比 (均)</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-adpct">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-adpct">—</span></div></div>
+      <div id="stat-row-seoul-adpct" class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="stat-seoul-adpct">—</span></div></div>
+      <div id="stat-row-hh-adpct" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-adpct">—</span></div></div>
     </div>
 
   </div>
 
-
-  <!-- filter bar -->
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <h1 class="text-xl font-bold text-slate-800">業務數據總覽</h1>
-      <p class="text-slate-400 text-sm" id="db-date-label"></p>
-    </div>
-    <div class="flex gap-2 items-center flex-wrap">
-      <select class="sel text-xs" id="db-month-filter" onchange="renderDashboard()"></select>
-      <select class="sel text-xs" id="db-branch-filter" onchange="renderDashboard()">
-        <option value="all">全部分店</option>
-        <option value="seoul">首爾</option>
-        <option value="hsinchu">新竹</option>
-        <option value="taichung">台中</option>
-      </select>
-    </div>
-  </div>
-
-  <!-- summary cards -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 fade-up">
-    <div class="kpi-tile col-span-2 lg:col-span-1" style="border-left:4px solid #4f60f5">
-      <div class="kpi-label">每日平均 CON</div>
-      <div class="kpi-val" id="kpi-avg-con">—</div>
-      <div class="kpi-sub">本月累計 <span id="kpi-total-con" style="color:#4f60f5;font-weight:600">—</span> 筆</div>
-    </div>
-    <div class="kpi-tile" style="border-left:4px solid #4f60f5">
-      <div class="kpi-label">首爾</div>
-      <div class="kpi-val" style="font-size:22px" id="kpi-seoul-con">—</div>
-      <div class="kpi-sub">佔比 <span id="kpi-seoul-pct" style="color:#4f60f5;font-weight:600">—</span></div>
-    </div>
-    <div class="kpi-tile" style="border-left:4px solid #16a34a">
-      <div class="kpi-label">新竹</div>
-      <div class="kpi-val" style="font-size:22px" id="kpi-hsinchu-con">—</div>
-      <div class="kpi-sub">佔比 <span id="kpi-hsinchu-pct" style="color:#16a34a;font-weight:600">—</span></div>
-    </div>
-    <div class="kpi-tile" style="border-left:4px solid #7c3aed">
-      <div class="kpi-label">台中</div>
-      <div class="kpi-val" style="font-size:22px" id="kpi-taichung-con">—</div>
-      <div class="kpi-sub">佔比 <span id="kpi-taichung-pct" style="color:#7c3aed;font-weight:600">—</span></div>
-    </div>
-  </div>
-
-  <!-- revenue + NR row -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-    <div class="card lg:col-span-2 flex flex-col gap-3">
-      <div class="flex flex-wrap items-center justify-between gap-2">
-        <div class="section-title mb-0">每日營業額趨勢 (NT$)</div>
-        <div class="flex gap-1 rounded-lg p-0.5" style="background:#f1f5f9">
-          <button class="tab-nav-btn active" style="padding:4px 12px;font-size:12px" onclick="switchRevType('line',this)">折線</button>
-          <button class="tab-nav-btn" style="padding:4px 12px;font-size:12px" onclick="switchRevType('bar',this)">長條</button>
+  <!-- ── 醫美 section ── -->
+  <div id="overview-seoul">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-base font-bold" style="color:#7c3aed">醫美 廣告數據</h2>
+        <p class="text-xs text-slate-400 mt-0.5">點擊月份欄位即可輸入數據 · Google 稅後自動計算</p>
+      </div>
+      <div class="flex gap-2 flex-wrap items-center">
+        <select id="seoul-year" class="sel font-bold" style="font-size:14px" onchange="renderSeoulAds()"></select>
+        <div class="flex items-center gap-2 text-xs text-slate-400 border rounded-lg px-3 py-2" style="border-color:#e2e8f0">
+          <span>Google 稅率</span>
+          <input id="seoul-tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="0" min="0" max="50" onchange="renderSeoulAds()"/>
+          <span>%</span>
         </div>
+        <button class="btn btn-primary btn-sm" onclick="openBrandModal(null)">＋ 新增 / 編輯月份</button>
       </div>
-      <div style="height:240px;position:relative"><canvas id="rev-chart"></canvas></div>
     </div>
-    <div class="card flex flex-col gap-3">
-      <div class="section-title mb-0">新舊客比例</div>
-      <div style="height:200px;position:relative"><canvas id="nr-chart"></canvas></div>
-      <div class="flex justify-center gap-5 text-xs" style="color:#94a3b8">
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#4f60f5"></span>新客</span>
-        <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full inline-block" style="background:#16a34a"></span>回頭客</span>
+
+    <div class="card mb-4" style="padding:0;overflow:hidden">
+      <div class="overflow-x-auto">
+        <table class="pt" id="seoul-pivot" style="min-width:800px">
+          <thead id="seoul-pt-head"></thead>
+          <tbody id="seoul-pt-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card mb-4" style="padding:0;overflow:hidden">
+      <div class="overflow-x-auto">
+        <table class="pt" id="seoul-detail" style="min-width:900px">
+          <thead id="seoul-dt-head"></thead>
+          <tbody id="seoul-dt-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="card flex flex-col gap-2">
+        <div class="section-title mb-0">月度廣告花費趨勢 (稅後)</div>
+        <div style="height:220px;position:relative"><canvas id="seoul-spend-chart"></canvas></div>
+      </div>
+      <div class="card flex flex-col gap-2">
+        <div class="section-title mb-0">月度 CPL 比較</div>
+        <div style="height:220px;position:relative"><canvas id="seoul-cpl-chart"></canvas></div>
       </div>
     </div>
   </div>
 
-  <!-- KPI row -->
-  <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
-    <div class="kpi-tile" style="border-left:4px solid #16a34a">
-      <div class="kpi-label">本月總營業額</div>
-      <div class="text-xl font-bold" style="color:#16a34a" id="kpi-rev">NT$ —</div>
+  <!-- ── 醫髮 section ── -->
+  <div id="overview-hh">
+    <div class="flex items-center gap-3 mb-4">
+      <h2 class="text-base font-bold" style="color:#2563eb">醫髮 廣告數據</h2>
     </div>
-    <div class="kpi-tile" style="border-left:4px solid #7c3aed">
-      <div class="kpi-label">平均客單價</div>
-      <div class="text-xl font-bold" style="color:#7c3aed" id="kpi-arpu">NT$ —</div>
-    </div>
-    <div class="kpi-tile" style="border-left:4px solid #d97706">
-      <div class="kpi-label">有效天數</div>
-      <div class="text-xl font-bold" style="color:#d97706" id="kpi-days">— 天</div>
-    </div>
-    <div class="kpi-tile" style="border-left:4px solid #4f60f5">
-      <div class="kpi-label">回頭率</div>
-      <div class="text-xl font-bold" style="color:#4f60f5" id="kpi-return-rate">— %</div>
-      <div class="w-full rounded-full h-1.5 mt-2" style="background:#e0e7ff"><div id="kpi-return-bar" class="h-1.5 rounded-full" style="background:#4f60f5;width:0%"></div></div>
+    <div class="card flex flex-col items-center justify-center py-16" style="border-style:dashed;border-color:#bfdbfe">
+      <div class="text-3xl mb-3">💈</div>
+      <div class="font-bold text-slate-500">醫髮廣告資料</div>
+      <div class="text-sm text-slate-400 mt-1">功能建置中，敬請期待</div>
     </div>
   </div>
-
-  <!-- daily table -->
-  <div class="card">
-    <div class="section-title">每日到診明細</div>
-    <p class="section-sub">Daily Visit Records</p>
-    <div class="overflow-x-auto">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>日期</th>
-            <th>分店</th>
-            <th class="num">到診(CON)</th>
-            <th class="num">新客</th>
-            <th class="num">回頭客</th>
-            <th class="num">營業額 NT$</th>
-            <th class="num">客單價</th>
-          </tr>
-        </thead>
-        <tbody id="daily-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     TAB 2: 首爾醫美 ADS
-══════════════════════════════════════════ -->
-<div id="tab-seoul" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
-  <div class="flex flex-wrap items-center justify-between gap-3">
-    <div>
-      <h1 class="text-xl font-bold text-slate-800">醫美總表</h1>
-      <p class="text-slate-400 text-sm">點擊月份欄位即可輸入數據 · Google 稅後自動計算</p>
-    </div>
-    <div class="flex gap-2 flex-wrap items-center">
-      <select id="seoul-year" class="sel font-bold" style="font-size:14px" onchange="renderSeoulAds()"></select>
-      <div class="flex items-center gap-2 text-xs text-slate-400 bg-white/5 border border-white/10 rounded-lg px-3 py-2">
-        <span>Google 稅率</span>
-        <input id="seoul-tax-rate" type="number" class="inp text-xs text-center" style="width:52px;padding:3px 6px" value="0" min="0" max="50" onchange="renderSeoulAds()"/>
-        <span>%</span>
-      </div>
-      <button class="btn btn-primary btn-sm" onclick="openBrandModal(null)">＋ 新增 / 編輯月份</button>
-    </div>
-  </div>
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="overflow-x-auto">
-      <table class="pt" id="seoul-pivot" style="min-width:800px">
-        <thead id="seoul-pt-head"></thead>
-        <tbody id="seoul-pt-body"></tbody>
-      </table>
-    </div>
-  </div>
-  <!-- detail pivot table -->
-  <div class="card" style="padding:0;overflow:hidden">
-    <div class="overflow-x-auto">
-      <table class="pt" id="seoul-detail" style="min-width:900px">
-        <thead id="seoul-dt-head"></thead>
-        <tbody id="seoul-dt-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-    <div class="card flex flex-col gap-2">
-      <div class="section-title mb-0">月度廣告花費趨勢 (稅後)</div>
-      <div style="height:220px;position:relative"><canvas id="seoul-spend-chart"></canvas></div>
-    </div>
-    <div class="card flex flex-col gap-2">
-      <div class="section-title mb-0">月度 CPL 比較</div>
-      <div style="height:220px;position:relative"><canvas id="seoul-cpl-chart"></canvas></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════
-     TAB 3: DATA ENTRY
-══════════════════════════════════════════ -->
-<div id="tab-entry" class="tab-page px-4 sm:px-8 pb-12 mt-5 space-y-5 hidden">
-  <div>
-    <h1 class="text-xl font-bold text-slate-800">資料輸入</h1>
-    <p class="text-slate-400 text-sm">手動輸入每日到診及業績數據</p>
-  </div>
-
-  <!-- entry form -->
-  <div class="card max-w-2xl">
-    <div class="section-title">新增每日記錄</div>
-    <p class="section-sub">Add Daily Visit Record</p>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">日期</label>
-        <input type="date" id="e-date" class="inp"/>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">分店</label>
-        <select id="e-branch" class="sel w-full">
-          <option value="seoul">首爾 Seoul</option>
-          <option value="hsinchu">新竹 Hsinchu</option>
-          <option value="taichung">台中 Taichung</option>
-        </select>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">到診數 (CON)</label>
-        <input type="number" id="e-con" class="inp" placeholder="0" min="0"/>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">新客數</label>
-        <input type="number" id="e-new" class="inp" placeholder="0" min="0"/>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">回頭客數</label>
-        <input type="number" id="e-ret" class="inp" placeholder="0" min="0"/>
-      </div>
-      <div>
-        <label class="text-xs text-slate-400 block mb-1">營業額 NT$</label>
-        <input type="number" id="e-rev" class="inp" placeholder="0" min="0"/>
-      </div>
-    </div>
-    <div class="mt-4 flex gap-2">
-      <button class="btn btn-primary" onclick="addDailyRecord()">儲存記錄</button>
-      <span id="entry-msg" class="text-xs text-emerald-400 self-center hidden">✓ 已儲存！</span>
-    </div>
-  </div>
-
-  <!-- records list -->
-  <div class="card">
-    <div class="flex items-center justify-between mb-3">
-      <div class="section-title mb-0">所有記錄</div>
-      <div class="flex gap-2 items-center">
-        <select class="sel text-xs" id="list-month-filter" onchange="renderEntryList()"></select>
-        <select class="sel text-xs" id="list-branch-filter" onchange="renderEntryList()">
-          <option value="all">全部分店</option>
-          <option value="seoul">首爾</option>
-          <option value="hsinchu">新竹</option>
-          <option value="taichung">台中</option>
-        </select>
-      </div>
-    </div>
-    <div class="overflow-x-auto">
-      <table class="tbl">
-        <thead>
-          <tr>
-            <th>日期</th><th>分店</th><th class="num">CON</th><th class="num">新客</th>
-            <th class="num">回頭客</th><th class="num">營業額</th><th class="num">操作</th>
-          </tr>
-        </thead>
-        <tbody id="entry-tbody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
 
 </div><!-- /main-tab-overview -->
 
@@ -902,7 +712,7 @@ function showMainTab(tab, btn){
   document.getElementById('main-tab-'+tab).classList.remove('hidden');
   btn.classList.add('active');
   if(tab==='cs') renderCS();
-  if(tab==='overview'){ renderDashboard(); renderDcmp(); }
+  if(tab==='overview'){ applyBrandVisibility(); renderDcmp(); renderSeoulAds(); }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -914,7 +724,23 @@ function setBrand(b, el){
   activeBrand = b;
   document.querySelectorAll('.brand-chip').forEach(c => c.classList.remove('active'));
   el.classList.add('active');
+  applyBrandVisibility();
   renderDcmp();
+  renderCS();
+}
+
+function applyBrandVisibility(){
+  const showS = activeBrand === 'all' || activeBrand === 'seoul';
+  const showH = activeBrand === 'all' || activeBrand === 'hh';
+  const tog = (id, show) => { const el=document.getElementById(id); if(el) el.style.display=show?'':'none'; };
+  // stat card rows
+  ['inq','con','rev','adpct'].forEach(k=>{
+    tog('stat-row-seoul-'+k, showS);
+    tog('stat-row-hh-'+k,   showH);
+  });
+  // overview brand sections
+  tog('overview-seoul', showS);
+  tog('overview-hh',    showH);
 }
 
 function onMonthFilterChange(){
@@ -1758,9 +1584,9 @@ document.addEventListener('DOMContentLoaded',()=>{
   startClock();
   populateMonthSelects();
   populateSeoulYears();
-  document.getElementById('e-date').value = new Date().toISOString().slice(0,10);
-  renderDashboard();
+  applyBrandVisibility();
   renderDcmp();
+  renderSeoulAds();
   renderCS();
 });
 </script>
