@@ -141,6 +141,32 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
+/* ── Daily ad cards ── */
+.day-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.day-card-hd{background:#1e293b;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.day-card-date{color:#fff;font-size:15px;font-weight:800}
+.day-card-totals{display:flex;gap:20px;font-size:12px}
+.day-card-totals span{color:#94a3b8}
+.day-card-totals strong{color:#e2e8f0;margin-left:4px}
+.day-card-body{display:flex}
+.day-panel{flex:1;min-width:0;border-right:1px solid #f1f5f9}
+.day-panel:last-child{border-right:none}
+.day-panel-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 16px 6px}
+.day-panel-label{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.day-adpct-tag{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.day-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.day-tbl th{padding:5px 12px;color:#94a3b8;font-size:10px;font-weight:600;text-align:right;letter-spacing:.03em;border-bottom:1px solid #f1f5f9}
+.day-tbl th:first-child{text-align:left}
+.day-tbl td{padding:6px 12px;border-top:1px solid #f8fafc;color:#334155;vertical-align:middle;font-variant-numeric:tabular-nums}
+.day-tbl td:first-child{color:#64748b;font-weight:500;font-size:11px}
+.day-tbl td:not(:first-child){text-align:right}
+.day-tbl tr.day-row-diff td{background:#f8fafc;font-size:11px}
+.day-tbl tr.day-row-diff td:first-child{color:#94a3b8}
+.day-inp{border:none;background:transparent;text-align:right;width:72px;font-size:12px;font-weight:600;color:#1e293b;font-variant-numeric:tabular-nums;outline:none;padding:0}
+.day-inp:focus{background:#f0f4ff;border-radius:4px;color:#4f60f5}
+.day-diff-pos{color:#16a34a;font-weight:700}
+.day-diff-neg{color:#ef4444;font-weight:700}
+.day-card-ft{background:#f8fafc;border-top:1px solid #f1f5f9;padding:8px 16px;font-size:11px;color:#94a3b8;display:flex;justify-content:flex-end}
 /* ── Separate stat cards ── */
 .scard{background:#fff;border:1px solid #e2e8f0;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.05);display:flex;flex-direction:column;overflow:hidden}
 .scard-title{padding:14px 18px 8px;font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em}
@@ -237,6 +263,21 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       <div id="stat-row-hh-adpct" class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="stat-hh-adpct">—</span></div></div>
     </div>
 
+  </div>
+
+  <!-- ── 每日廣告成效 ── -->
+  <div id="overview-daily">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <div>
+        <h2 class="text-base font-bold text-slate-800">每日廣告成效</h2>
+        <p class="text-xs text-slate-400 mt-0.5">實際 / 估值 / 同期 可直接點擊輸入，落差自動計算</p>
+      </div>
+      <div class="flex gap-2 items-center flex-wrap">
+        <input type="date" id="dcmp-add-date" class="inp" style="font-size:12px;padding:6px 10px;width:auto"/>
+        <button class="btn btn-primary btn-sm" onclick="addDcmpRow()">＋ 新增日期</button>
+      </div>
+    </div>
+    <div id="dcmp-cards" class="space-y-4"></div>
   </div>
 
   <!-- ── 醫美 section ── -->
@@ -1181,112 +1222,114 @@ function renderDcmp(){
   const showHH    = activeBrand === 'all' || activeBrand === 'hh';
   const showBoth  = showSeoul && showHH;
 
-  let all = loadDcmpAll();
-  if(monthFilter) all = all.filter(r => r.date.startsWith(monthFilter));
-
-  const thead = document.getElementById('dcmp-et-head');
-  const tbody = document.getElementById('dcmp-et-body');
-  if(!thead||!tbody) return;
-
   // Set default date to today
   const dateEl = document.getElementById('dcmp-add-date');
   if(dateEl && !dateEl.value) dateEl.value = new Date().toISOString().slice(0,10);
 
-  thead.innerHTML = `<tr>
-    <th rowspan="2" style="min-width:80px">日期</th>
-    <th rowspan="2" style="min-width:50px">品牌</th>
-    <th rowspan="2" style="min-width:44px"></th>
-    <th>Google</th><th>FB</th><th>總CON</th><th>業績</th>
-    <th rowspan="2" style="color:#7086fb;min-width:62px">廣告%數</th>
-    <th rowspan="2" style="min-width:44px">刪除</th>
-  </tr>
-  <tr style="background:rgba(30,26,100,.6)">
-    <th style="font-size:10px;color:#a5b4fc">數值</th>
-    <th style="font-size:10px;color:#a5b4fc">數值</th>
-    <th style="font-size:10px;color:#a5b4fc">數值</th>
-    <th style="font-size:10px;color:#a5b4fc">業績</th>
-  </tr>`;
+  let all = loadDcmpAll();
+  if(monthFilter) all = all.filter(r => r.date.startsWith(monthFilter));
+
+  const container = document.getElementById('dcmp-cards');
+  if(!container) return;
 
   if(!all.length){
-    tbody.innerHTML=`<tr><td colspan="9" class="text-center text-slate-500 py-8">尚無資料，請選擇日期後點擊「＋ 新增日期」</td></tr>`;
+    container.innerHTML = `<div class="card flex flex-col items-center justify-center py-14 text-slate-400" style="border-style:dashed">
+      <div class="text-3xl mb-3">📋</div>
+      <div class="font-semibold text-slate-500">尚無資料</div>
+      <div class="text-sm mt-1">請選擇日期後點擊「＋ 新增日期」</div>
+    </div>`;
     return;
   }
 
-  const rows=[];
-  all.forEach(rec=>{
+  const N  = v => (v||0) ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const dv = (a, p, f) => {
+    const v = (a[f]||0)-(p[f]||0);
+    const cls = v<0?'day-diff-neg':v>0?'day-diff-pos':'';
+    const txt = v===0?'0':(v>0?'+':'')+Math.round(v).toLocaleString('zh-TW');
+    return `<span id="diff-${f}" class="${cls}">${txt}</span>`;
+  };
+
+  const dinp = (date, brand, type, field, val) =>
+    `<input type="number" class="day-inp" placeholder="—" value="${val||''}"
+      data-date="${date}" data-brand="${brand}" data-type="${type}" data-field="${field}"
+      onchange="onDcmpChange(this)" oninput="onDcmpChange(this)"/>`;
+
+  const brandPanel = (date, brand, bdata, color, label) => {
+    const a=bdata.actual||{}, e=bdata.est||{}, p=bdata.prev||{};
+    const adpct = bdata.adpct||'';
+    const adpctColor = color;
+    return `<div class="day-panel">
+      <div class="day-panel-hd">
+        <span class="day-panel-label" style="color:${color}">${label}</span>
+        <span class="day-adpct-tag" style="background:${color}18;color:${color}">
+          <input type="number" step="0.01" class="day-inp" style="width:44px;color:${color};font-weight:800"
+            placeholder="0.00" value="${adpct}"
+            data-date="${date}" data-brand="${brand}" data-type="adpct" data-field="adpct"
+            onchange="onDcmpChange(this)"/> %
+        </span>
+      </div>
+      <table class="day-tbl">
+        <tr>
+          <th style="text-align:left"></th>
+          <th>Google</th><th>FB</th><th>總CON</th><th>業績</th>
+        </tr>
+        <tr>
+          <td>實際</td>
+          <td>${dinp(date,brand,'actual','gg',a.gg)}</td>
+          <td>${dinp(date,brand,'actual','fb',a.fb)}</td>
+          <td>${dinp(date,brand,'actual','con',a.con)}</td>
+          <td>${dinp(date,brand,'actual','rev',a.rev)}</td>
+        </tr>
+        <tr>
+          <td style="color:#94a3b8">估值</td>
+          <td>${dinp(date,brand,'est','gg',e.gg)}</td>
+          <td>${dinp(date,brand,'est','fb',e.fb)}</td>
+          <td>${dinp(date,brand,'est','con',e.con)}</td>
+          <td>${dinp(date,brand,'est','rev',e.rev)}</td>
+        </tr>
+        <tr>
+          <td style="color:#7c3aed">同期</td>
+          <td>${dinp(date,brand,'prev','gg',p.gg)}</td>
+          <td>${dinp(date,brand,'prev','fb',p.fb)}</td>
+          <td>${dinp(date,brand,'prev','con',p.con)}</td>
+          <td>${dinp(date,brand,'prev','rev',p.rev)}</td>
+        </tr>
+        <tr class="day-row-diff">
+          <td>落差</td>
+          <td>${dv(a,p,'gg')}</td>
+          <td>${dv(a,p,'fb')}</td>
+          <td>${dv(a,p,'con')}</td>
+          <td>${dv(a,p,'rev')}</td>
+        </tr>
+      </table>
+    </div>`;
+  };
+
+  container.innerHTML = all.map(rec=>{
     const {date, seoul, hh} = rec;
     const d = new Date(date+'T00:00:00');
-    const dateLabel = `${d.getMonth()+1}/${d.getDate()}`;
+    const dateLabel = `${d.getMonth()+1}月${d.getDate()}日`;
+    const totA = (showSeoul?(seoul.actual?.rev||0):0)+(showHH?(hh.actual?.rev||0):0);
+    const totP = (showSeoul?(seoul.prev?.rev||0):0)+(showHH?(hh.prev?.rev||0):0);
 
-    // Calculate rowspan based on which brands are visible
-    const brandCount = (showSeoul?1:0) + (showHH?1:0);
-    const ROWSPAN = brandCount * 4 + (showBoth ? 1 : 0); // +1 for separator if both
+    const panels = [
+      showSeoul ? brandPanel(date,'SEOUL',seoul,'#7c3aed','醫美 SEOUL') : '',
+      showSeoul && showHH ? '<div style="width:1px;background:#f1f5f9"></div>' : '',
+      showHH    ? brandPanel(date,'HH',hh,'#2563eb','醫髮 HH') : ''
+    ].join('');
 
-    const brandRows = (brand, bdata, color, isDateAnchor)=>{
-      const a=bdata.actual||{}, e=bdata.est||{}, p=bdata.prev||{};
-      const grp = `<td class="et-brand" style="color:${color}" rowspan="4">${brand}</td>`;
-      const dateCell = isDateAnchor ? `<td class="et-date" rowspan="${ROWSPAN}" id="dcmp-row-${date}">${dateLabel}<br/><span style="font-size:10px;color:#a5b4fc;font-weight:400">${date.slice(0,4)}</span></td>` : '';
-      const delCell  = isDateAnchor ? `<td rowspan="${ROWSPAN}" style="text-align:center;vertical-align:middle"><button class="btn btn-danger btn-sm" onclick="deleteDcmpRow('${date}')">✕</button></td>` : '';
-
-      rows.push(`<tr>${dateCell}${grp}<td class="et-type">實際</td>
-        <td>${inp(date,brand,'actual','gg',a.gg)}</td>
-        <td>${inp(date,brand,'actual','fb',a.fb)}</td>
-        <td>${inp(date,brand,'actual','con',a.con)}</td>
-        <td>${inp(date,brand,'actual','rev',a.rev)}</td>
-        <td rowspan="4" style="text-align:center;vertical-align:middle"><input type="number" step="0.01" class="et-adpct-inp" placeholder="0.00" value="${bdata.adpct||''}" data-date="${date}" data-brand="${brand}" data-type="adpct" data-field="adpct" onchange="onDcmpChange(this)"/>%</td>
-        ${delCell}
-      </tr>`);
-      rows.push(`<tr class="et-est"><td class="et-type">估值</td>
-        <td>${inp(date,brand,'est','gg',e.gg)}</td>
-        <td>${inp(date,brand,'est','fb',e.fb)}</td>
-        <td>${inp(date,brand,'est','con',e.con)}</td>
-        <td>${inp(date,brand,'est','rev',e.rev)}</td>
-      </tr>`);
-      rows.push(`<tr class="et-prev"><td class="et-type">同期</td>
-        <td>${inp(date,brand,'prev','gg',p.gg)}</td>
-        <td>${inp(date,brand,'prev','fb',p.fb)}</td>
-        <td>${inp(date,brand,'prev','con',p.con)}</td>
-        <td>${inp(date,brand,'prev','rev',p.rev)}</td>
-      </tr>`);
-      const dv = (f)=>{
-        const v=(a[f]||0)-(p[f]||0);
-        const c=v<0?'#ef4444':v>0?'#16a34a':'#94a3b8';
-        const fw=v!==0?'700':'400';
-        return `<span id="diff-${date}-${brand}-${f}" style="color:${c};font-weight:${fw};display:block;text-align:right;padding:5px 8px">${v===0?'0':(v>0?'+':'')+Math.round(v).toLocaleString('zh-TW')}</span>`;
-      };
-      rows.push(`<tr class="et-diff"><td class="et-type" style="color:#64748b">落差</td>
-        <td>${dv('gg')}</td><td>${dv('fb')}</td><td>${dv('con')}</td><td>${dv('rev')}</td>
-      </tr>`);
-    };
-
-    // Determine which brand is the date anchor (first visible)
-    if(showSeoul) brandRows('SEOUL', seoul, '#7c3aed', true);
-    if(showBoth) rows.push(`<tr class="et-sep"><td colspan="9"></td></tr>`);
-    if(showHH)   brandRows('HH', hh, '#2563eb', !showSeoul);
-
-    // 總業績 row — only in 全部 mode
-    if(showBoth){
-      const totA = (seoul.actual?.rev||0)+(hh.actual?.rev||0);
-      const totE = (seoul.est?.rev||0)+(hh.est?.rev||0);
-      const totP = (seoul.prev?.rev||0)+(hh.prev?.rev||0);
-      const N = v => v>0?Math.round(v).toLocaleString('zh-TW'):'—';
-      rows.push(`<tr style="background:#fffbeb">
-        <td colspan="2" class="et-brand" style="color:#d97706;text-align:center">總業績</td>
-        <td style="text-align:center;padding:5px 8px;font-size:11px;color:#94a3b8">實際<br/>估值<br/>同期</td>
-        <td colspan="3"></td>
-        <td style="text-align:right;padding:6px 8px;vertical-align:middle">
-          <div id="tot-${date}-actual-rev" style="color:#d97706;font-weight:700;font-size:13px">${N(totA)}</div>
-          <div id="tot-${date}-est-rev" style="color:#94a3b8;font-size:11px">${N(totE)}</div>
-          <div id="tot-${date}-prev-rev" style="color:#7c3aed;font-size:11px">同期 ${N(totP)}</div>
-        </td>
-        <td colspan="2"></td>
-      </tr>`);
-    }
-
-    rows.push(`<tr><td colspan="9" style="height:8px;background:#e0e7ff;border:none;padding:0"></td></tr>`);
-  });
-
-  tbody.innerHTML = rows.join('');
+    return `<div class="day-card">
+      <div class="day-card-hd">
+        <span class="day-card-date">${dateLabel}</span>
+        <div class="day-card-totals">
+          ${showBoth?`<span>總業績 <strong>${N(totA)}</strong></span>`:''}
+          ${totP?`<span>同期 <strong>${N(totP)}</strong></span>`:''}
+        </div>
+        <button class="btn btn-danger btn-sm" onclick="deleteDcmpRow('${date}')">✕ 刪除</button>
+      </div>
+      <div class="day-card-body">${panels}</div>
+    </div>`;
+  }).join('');
 }
 
 // ──────────────────────────────────────────────────────────────
