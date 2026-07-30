@@ -141,6 +141,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
+/* ── Overview editable inputs ── */
+.ov-inp{border:none;background:transparent;text-align:right;width:100%;font-size:22px;font-weight:800;color:#1e293b;font-variant-numeric:tabular-nums;outline:none;padding:0;line-height:1}
+.ov-inp:focus{background:#f0f4ff;border-radius:6px;color:#4f60f5;padding:2px 6px}
+.ov-inp::placeholder{color:#cbd5e1;font-size:18px;font-weight:400}
 /* ── Daily ad cards ── */
 .day-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .day-card-hd{background:#1e293b;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -242,14 +246,18 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 總業績 -->
     <div class="scard" style="border-left:4px solid #d97706">
       <div class="scard-title">總業績</div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">實際</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
           <span class="scard-val" id="ov-total-rev" style="font-size:26px">—</span>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">估值</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
           <span class="scard-rate" id="ov-total-est">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <span class="scard-rate" id="ov-total-prev">—</span>
         </div>
       </div>
     </div>
@@ -257,14 +265,21 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 醫美業績 -->
     <div class="scard" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="color:#7c3aed">醫美業績</div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">實際</span>
-          <span class="scard-val" id="ov-seoul-rev" style="font-size:26px">—</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <input class="ov-inp" id="ov-seoul-rev" type="number" placeholder="—"
+            data-brand="seoul" data-field="rev" oninput="onOvChange(this)"/>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">估值</span>
-          <span class="scard-rate" id="ov-seoul-est">—</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <input class="ov-inp" id="ov-seoul-est" type="number" placeholder="—"
+            data-brand="seoul" data-field="est" oninput="onOvChange(this)"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <input class="ov-inp" id="ov-seoul-prev" type="number" placeholder="—"
+            data-brand="seoul" data-field="prev" oninput="onOvChange(this)"/>
         </div>
       </div>
     </div>
@@ -272,14 +287,21 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 醫髮業績 -->
     <div class="scard" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="color:#2563eb">醫髮業績</div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:4px">
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">實際</span>
-          <span class="scard-val" id="ov-hh-rev" style="font-size:26px">—</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <input class="ov-inp" id="ov-hh-rev" type="number" placeholder="—"
+            data-brand="hh" data-field="rev" oninput="onOvChange(this)"/>
         </div>
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8">估值</span>
-          <span class="scard-rate" id="ov-hh-est">—</span>
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <input class="ov-inp" id="ov-hh-est" type="number" placeholder="—"
+            data-brand="hh" data-field="est" oninput="onOvChange(this)"/>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <input class="ov-inp" id="ov-hh-prev" type="number" placeholder="—"
+            data-brand="hh" data-field="prev" oninput="onOvChange(this)"/>
         </div>
       </div>
     </div>
@@ -289,22 +311,22 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- 第二行：漏斗指標 (4 scards) -->
   <div class="grid stat-grid fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
 
-    <!-- 詢問數 -->
-    <div class="scard" style="border-left:4px solid #4f60f5">
-      <div class="scard-title">詢問數</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
+    <!-- Google -->
+    <div class="scard" style="border-left:4px solid #16a34a">
+      <div class="scard-title">Google</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-gg">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-gg">—</span></div></div>
     </div>
 
-    <!-- 預約數 / 預約率 -->
-    <div class="scard" style="border-left:4px solid #0891b2">
-      <div class="scard-title">預約數 / 預約率</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span><span class="scard-rate" id="ov-seoul-apptpct"></span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span><span class="scard-rate" id="ov-hh-apptpct"></span></div></div>
+    <!-- FB -->
+    <div class="scard" style="border-left:4px solid #2563eb">
+      <div class="scard-title">FB</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-fb">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-fb">—</span></div></div>
     </div>
 
     <!-- 到店數 / 到店率 -->
-    <div class="scard" style="border-left:4px solid #16a34a">
+    <div class="scard" style="border-left:4px solid #0891b2">
       <div class="scard-title">到店數 / 到店率</div>
       <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-visit">—</span><span class="scard-rate" id="ov-seoul-visitpct"></span></div></div>
       <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-visit">—</span><span class="scard-rate" id="ov-hh-visitpct"></span></div></div>
@@ -508,6 +530,13 @@ function seedIfEmpty(){
   // ads intentionally NOT seeded — user fills manually
 }
 
+function seedOvIfEmpty(){
+  const month = '2026-07';
+  const all = loadOvAll();
+  if(all.find(r=>r.month===month)) return;
+  saveOvRec({month, seoul:{rev:1615,est:0,prev:1867}, hh:{rev:1884,est:0,prev:1761}});
+}
+
 // ──────────────────────────────────────────────────────────────
 // UTILS
 // ──────────────────────────────────────────────────────────────
@@ -535,6 +564,29 @@ function populateMonthSelects(){
       months.map(m=>`<option value="${m}">${m}</option>`).join('');
     if(cur) el.value = cur;
   });
+}
+
+// ──────────────────────────────────────────────────────────────
+// MONTHLY OVERVIEW DATA  (業績 summary per month)
+// ──────────────────────────────────────────────────────────────
+const STORAGE_OV = 'dash_ov_v1';
+function loadOvAll(){ return JSON.parse(localStorage.getItem(STORAGE_OV)||'[]'); }
+function saveOvAll(d){ localStorage.setItem(STORAGE_OV, JSON.stringify(d)); }
+function loadOvRec(month){
+  return loadOvAll().find(r=>r.month===month) ||
+    {month, seoul:{rev:0,est:0,prev:0}, hh:{rev:0,est:0,prev:0}};
+}
+function saveOvRec(rec){
+  const all = loadOvAll().filter(r=>r.month!==rec.month);
+  all.push(rec); saveOvAll(all);
+}
+function onOvChange(el){
+  const month = (document.getElementById('brand-month-filter')||{}).value || getCurrentMonth();
+  const {brand, field} = el.dataset;
+  const rec = loadOvRec(month);
+  rec[brand][field] = parseFloat(el.value)||0;
+  saveOvRec(rec);
+  renderOverviewStats();
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1166,53 +1218,54 @@ function setText(id, val){
 
 function renderOverviewStats(){
   const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
+  const month = monthFilter || getCurrentMonth();
   const N  = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
   const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
 
-  // Row 1: 業績 from dcmp data
-  let recs = loadDcmpAll();
-  if(monthFilter) recs = recs.filter(r => r.date.startsWith(monthFilter));
-  let sRev=0, sEst=0, hRev=0, hEst=0;
-  recs.forEach(r=>{
-    sRev += r.seoul?.actual?.rev||0;
-    sEst += r.seoul?.est?.rev||0;
-    hRev += r.hh?.actual?.rev||0;
-    hEst += r.hh?.est?.rev||0;
-  });
-  setText('ov-seoul-rev', sRev ? N(sRev) : '—');
-  setText('ov-seoul-est', sEst ? N(sEst) : '—');
-  setText('ov-hh-rev',   hRev ? N(hRev) : '—');
-  setText('ov-hh-est',   hEst ? N(hEst) : '—');
-  setText('ov-total-rev', (sRev||hRev) ? N(sRev+hRev) : '—');
-  setText('ov-total-est', (sEst||hEst) ? N(sEst+hEst) : '—');
+  // Row 1: 業績 from monthly overview storage (editable)
+  const ov = loadOvRec(month);
+  const setInp = (id, val) => { const el=document.getElementById(id); if(el) el.value=val||''; };
+  setInp('ov-seoul-rev',  ov.seoul.rev||'');
+  setInp('ov-seoul-est',  ov.seoul.est||'');
+  setInp('ov-seoul-prev', ov.seoul.prev||'');
+  setInp('ov-hh-rev',     ov.hh.rev||'');
+  setInp('ov-hh-est',     ov.hh.est||'');
+  setInp('ov-hh-prev',    ov.hh.prev||'');
+  const totRev  = (ov.seoul.rev||0)+(ov.hh.rev||0);
+  const totEst  = (ov.seoul.est||0)+(ov.hh.est||0);
+  const totPrev = (ov.seoul.prev||0)+(ov.hh.prev||0);
+  setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
+  setText('ov-total-est',  totEst  ? N(totEst)  : '—');
+  setText('ov-total-prev', totPrev ? N(totPrev) : '—');
 
-  // Row 2: funnel from CS data
-  const month = monthFilter || getCurrentMonth();
-  const persons = CS_PERSONS;
-  let si=0, sa=0, sv=0, hi=0, ha=0, hv=0;
-  persons.forEach(p=>{
+  // Row 2: Google/FB from dcmp data, 到店/轉換率 from CS data
+  let dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
+  let sGg=0, sFb=0, hGg=0, hFb=0;
+  dcmpRecs.forEach(r=>{
+    sGg += r.seoul?.actual?.gg||0;
+    sFb += r.seoul?.actual?.fb||0;
+    hGg += r.hh?.actual?.gg||0;
+    hFb += r.hh?.actual?.fb||0;
+  });
+  setText('ov-seoul-gg', N(sGg));
+  setText('ov-hh-gg',    N(hGg));
+  setText('ov-seoul-fb', N(sFb));
+  setText('ov-hh-fb',    N(hFb));
+
+  let sv=0, hv=0, si=0, hi=0;
+  CS_PERSONS.forEach(p=>{
     const r = loadCSRec(month, p);
     CS_SOURCES.forEach(k=>{
-      si += r.seoul[k]?.inq||0;
-      sa += r.seoul[k]?.appt||0;
-      sv += r.seoul[k]?.visit||0;
-      hi += r.hh[k]?.inq||0;
-      ha += r.hh[k]?.appt||0;
-      hv += r.hh[k]?.visit||0;
+      si += r.seoul[k]?.inq||0;   sv += r.seoul[k]?.visit||0;
+      hi += r.hh[k]?.inq||0;     hv += r.hh[k]?.visit||0;
     });
   });
-  setText('ov-seoul-inq',      N(si));
-  setText('ov-seoul-appt',     N(sa));
-  setText('ov-seoul-apptpct',  P(sa,si));
   setText('ov-seoul-visit',    N(sv));
-  setText('ov-seoul-visitpct', P(sv,si));
-  setText('ov-seoul-cvr',      P(sv,si));
-  setText('ov-hh-inq',        N(hi));
-  setText('ov-hh-appt',       N(ha));
-  setText('ov-hh-apptpct',    P(ha,hi));
+  setText('ov-seoul-visitpct', P(sv, sGg+sFb));
+  setText('ov-seoul-cvr',      P(sv, sGg+sFb));
   setText('ov-hh-visit',      N(hv));
-  setText('ov-hh-visitpct',   P(hv,hi));
-  setText('ov-hh-cvr',        P(hv,hi));
+  setText('ov-hh-visitpct',   P(hv, hGg+hFb));
+  setText('ov-hh-cvr',        P(hv, hGg+hFb));
 }
 
 function renderDcmp(){
@@ -1625,6 +1678,7 @@ function startClock(){
 // ──────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',()=>{
   seedIfEmpty();
+  seedOvIfEmpty();
   startClock();
   populateMonthSelects();
   populateSeoulYears();
