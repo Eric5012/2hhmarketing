@@ -255,6 +255,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
           <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
           <span class="scard-rate" id="ov-total-prev">—</span>
         </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-total-gap">—</span>
+        </div>
       </div>
     </div>
 
@@ -274,6 +278,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
           <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
           <span class="scard-rate" id="ov-seoul-prev">—</span>
         </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-seoul-gap">—</span>
+        </div>
       </div>
     </div>
 
@@ -292,6 +300,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
           <span class="scard-rate" id="ov-hh-prev">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-hh-gap">—</span>
         </div>
       </div>
     </div>
@@ -1230,6 +1242,17 @@ function renderOverviewStats(){
   setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
   setText('ov-total-est',  totEst  ? N(totEst)  : '—');
   setText('ov-total-prev', totPrev ? N(totPrev) : '—');
+  const setGap = (id, est, prev) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(!est || !prev){ el.textContent='—'; el.style.color=''; return; }
+    const diff = est - prev;
+    el.textContent = (diff>=0?'+':'')+N(diff);
+    el.style.color = diff>=0 ? '#16a34a' : '#dc2626';
+  };
+  setGap('ov-seoul-gap', sEst, ov.seoul.prev||0);
+  setGap('ov-hh-gap',    hEst, ov.hh.prev||0);
+  setGap('ov-total-gap', totEst, totPrev);
 
   // Row 2: Google/FB from dcmp data, 到店/轉換率 from CS data
   let dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
