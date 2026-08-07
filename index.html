@@ -1079,6 +1079,29 @@ function seedCSIfEmpty(){
     jessieRec.seoul['mgm']   = {inq:0,   appt:0,  visit:0};
     saveCSRec(jessieRec);
   }
+  // ELINE 醫髮 2026-07
+  const elineRec = loadCSRec(month, 'eline');
+  if(!elineRec.hh.gline?.inq){
+    elineRec.hh['080']   = {inq:0,   appt:0,  visit:0};
+    elineRec.hh['gline'] = {inq:103, appt:64, visit:64};
+    elineRec.hh['fbline']= {inq:49,  appt:13, visit:13};
+    elineRec.hh['fbdm']  = {inq:230, appt:25, visit:25};
+    elineRec.hh['kol']   = {inq:0,   appt:0,  visit:0};
+    elineRec.hh['other'] = {inq:12,  appt:9,  visit:9};
+    elineRec.hh['mgm']   = {inq:0,   appt:0,  visit:0};
+    saveCSRec(elineRec);
+  }
+  // JESSIE 醫髮 2026-07
+  if(!jessieRec.hh.gline?.inq){
+    jessieRec.hh['080']   = {inq:0,  appt:0,  visit:0};
+    jessieRec.hh['gline'] = {inq:91, appt:48, visit:48};
+    jessieRec.hh['fbline']= {inq:52, appt:15, visit:15};
+    jessieRec.hh['fbdm']  = {inq:192,appt:17, visit:17};
+    jessieRec.hh['kol']   = {inq:0,  appt:0,  visit:0};
+    jessieRec.hh['other'] = {inq:0,  appt:0,  visit:0};
+    jessieRec.hh['mgm']   = {inq:1,  appt:1,  visit:1};
+    saveCSRec(jessieRec);
+  }
 }
 
 // ──────────────────────────────────────────────────────────────
