@@ -291,7 +291,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
     <!-- 總業績 -->
     <div class="scard ov-total-card" style="border-left:4px solid #d97706">
-      <div class="scard-title">總業績</div>
+      <div class="scard-title">總業績 <span style="font-weight:400;color:#cbd5e1">萬</span></div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
@@ -314,7 +314,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
     <!-- 醫美業績 -->
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
-      <div class="scard-title" style="color:#7c3aed">醫美業績</div>
+      <div class="scard-title" style="color:#7c3aed">醫美業績 <span style="font-weight:400;color:#c4b5fd">萬</span></div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
@@ -337,7 +337,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
     <!-- 醫髮業績 -->
     <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
-      <div class="scard-title" style="color:#2563eb">醫髮業績</div>
+      <div class="scard-title" style="color:#2563eb">醫髮業績 <span style="font-weight:400;color:#93c5fd">萬</span></div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
           <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
@@ -1512,6 +1512,7 @@ function renderOverviewStats(){
   const monthFilter = (document.getElementById('brand-month-filter')||{}).value || '';
   const month = monthFilter || getCurrentMonth();
   const N  = v => v ? Math.round(v).toLocaleString('zh-TW') : '—';
+  const W  = v => v ? Math.floor(v/10000).toLocaleString('zh-TW') : '—'; // 萬元
   const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
 
   // Row 1: 業績 from monthly overview storage (display-only; future: Google Form)
@@ -1531,25 +1532,26 @@ function renderOverviewStats(){
   const sRev = showS ? (ov.seoul.rev||0) : 0, hRev = showH ? (ov.hh.rev||0) : 0;
   const sEst = sRev ? calcEst(sRev, month) : 0;
   const hEst = hRev ? calcEst(hRev, month) : 0;
-  setText('ov-seoul-rev',  sRev ? N(sRev) : '—');
-  setText('ov-seoul-est',  sEst ? N(sEst) : '—');
-  setText('ov-seoul-prev', ov.seoul.prev ? N(ov.seoul.prev) : '—');
-  setText('ov-hh-rev',     hRev ? N(hRev) : '—');
-  setText('ov-hh-est',     hEst ? N(hEst) : '—');
-  setText('ov-hh-prev',    ov.hh.prev ? N(ov.hh.prev) : '—');
+  setText('ov-seoul-rev',  sRev ? W(sRev) : '—');
+  setText('ov-seoul-est',  sEst ? W(sEst) : '—');
+  setText('ov-seoul-prev', ov.seoul.prev ? W(ov.seoul.prev) : '—');
+  setText('ov-hh-rev',     hRev ? W(hRev) : '—');
+  setText('ov-hh-est',     hEst ? W(hEst) : '—');
+  setText('ov-hh-prev',    ov.hh.prev ? W(ov.hh.prev) : '—');
   const totRev  = sRev + hRev;
   const totEst  = sEst + hEst;
   const totPrev = (showS?ov.seoul.prev||0:0) + (showH?ov.hh.prev||0:0);
-  setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
-  setText('ov-total-est',  totEst  ? N(totEst)  : '—');
-  setText('ov-total-prev', totPrev ? N(totPrev) : '—');
+  setText('ov-total-rev',  totRev  ? W(totRev)  : '—');
+  setText('ov-total-est',  totEst  ? W(totEst)  : '—');
+  setText('ov-total-prev', totPrev ? W(totPrev) : '—');
   const setGap = (id, est, prev) => {
     const el = document.getElementById(id);
     if(!el) return;
     if(!est || !prev){ el.innerHTML='<span style="color:#94a3b8">—</span>'; return; }
     const diff = est - prev;
     const pos = diff >= 0;
-    el.innerHTML = `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;background:${pos?'#dcfce7':'#fee2e2'};color:${pos?'#16a34a':'#dc2626'}">${pos?'+':''}${N(diff)}</span>`;
+    const dw = Math.floor(Math.abs(diff)/10000).toLocaleString('zh-TW');
+    el.innerHTML = `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;background:${pos?'#dcfce7':'#fee2e2'};color:${pos?'#16a34a':'#dc2626'}">${pos?'+':'-'}${dw}</span>`;
   };
   setGap('ov-seoul-gap', sEst, ov.seoul.prev||0);
   setGap('ov-hh-gap',    hEst, ov.hh.prev||0);
