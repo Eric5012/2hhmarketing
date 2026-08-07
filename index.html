@@ -717,7 +717,9 @@ function renderCSSummary(){
     {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
     {key:'fbline', label:'FB LINE', bg:'#fee2e2'},
     {key:'fbdm',   label:'FB 私訊', bg:'#ede9fe'},
+    {key:'kol',    label:'KOL',     bg:'#fef3c7'},
     {key:'other',  label:'其他',    bg:'#f1f5f9'},
+    {key:'mgm',    label:'MGM',     bg:'#fce7f3'},
   ];
 
   // Persons visible for this brand
@@ -1051,6 +1053,34 @@ function seedYrIfEmpty(){
   }
 }
 
+function seedCSIfEmpty(){
+  const month = '2026-07';
+  // IVAN 醫美 2026-07
+  const ivanRec = loadCSRec(month, 'ivan');
+  if(!ivanRec.seoul.gline?.inq){
+    ivanRec.seoul['080']   = {inq:0,   appt:0,  visit:0};
+    ivanRec.seoul['gline'] = {inq:175, appt:98, visit:98};
+    ivanRec.seoul['fbline']= {inq:109, appt:33, visit:33};
+    ivanRec.seoul['fbdm']  = {inq:379, appt:56, visit:56};
+    ivanRec.seoul['kol']   = {inq:2,   appt:0,  visit:0};
+    ivanRec.seoul['other'] = {inq:2,   appt:2,  visit:2};
+    ivanRec.seoul['mgm']   = {inq:2,   appt:2,  visit:2};
+    saveCSRec(ivanRec);
+  }
+  // JESSIE 醫美 2026-07
+  const jessieRec = loadCSRec(month, 'jessie');
+  if(!jessieRec.seoul.gline?.inq){
+    jessieRec.seoul['080']   = {inq:1,   appt:1,  visit:1};
+    jessieRec.seoul['gline'] = {inq:81,  appt:53, visit:53};
+    jessieRec.seoul['fbline']= {inq:49,  appt:12, visit:12};
+    jessieRec.seoul['fbdm']  = {inq:123, appt:17, visit:17};
+    jessieRec.seoul['kol']   = {inq:0,   appt:0,  visit:0};
+    jessieRec.seoul['other'] = {inq:0,   appt:0,  visit:0};
+    jessieRec.seoul['mgm']   = {inq:0,   appt:0,  visit:0};
+    saveCSRec(jessieRec);
+  }
+}
+
 // ──────────────────────────────────────────────────────────────
 // UTILS
 // ──────────────────────────────────────────────────────────────
@@ -1102,8 +1132,8 @@ const STORAGE_CS = 'dash_cs_v2';
 const CS_PERSONS = ['ivan','jessie','eline'];
 const CS_PERSON_LABELS = {ivan:'Ivan', jessie:'Jessie', eline:'Eline'};
 const CS_PERSON_BRANDS = {ivan:['seoul'], jessie:['seoul','hh'], eline:['hh']};
-const CS_SOURCES = ['080','gline','fbline','fbdm','other'];
-const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB LINE','fbdm':'FB 私訊','other':'其他'};
+const CS_SOURCES = ['080','gline','fbline','fbdm','kol','other','mgm'];
+const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB LINE','fbdm':'FB 私訊','kol':'KOL','other':'其他','mgm':'MGM'};
 
 function emptyBrandSrc(){
   const s={};
@@ -2239,6 +2269,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   seedIfEmpty();
   seedOvIfEmpty();
   seedYrIfEmpty();
+  seedCSIfEmpty();
   startClock();
   populateMonthSelects();
   populateSeoulYears();
