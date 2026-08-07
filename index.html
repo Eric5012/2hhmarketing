@@ -67,6 +67,19 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .main-tab-btn{padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
 .main-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
 .main-tab-btn:hover:not(.active){color:#4f60f5}
+/* ── Report sub-tabs ── */
+.rpt-tab-btn{padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
+.rpt-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
+.rpt-tab-btn:hover:not(.active){color:#4f60f5}
+.rpt-panel{display:block}
+.rpt-panel.hidden{display:none}
+/* CS Summary Table */
+.cs-sum-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.cs-sum-tbl th{background:#f8fafc;padding:7px 10px;text-align:center;font-weight:700;font-size:11px;color:#475569;white-space:nowrap;border:1px solid #e2e8f0}
+.cs-sum-tbl td{padding:7px 10px;text-align:center;border:1px solid #e2e8f0;white-space:nowrap}
+.cs-sum-tbl .src-cell{text-align:left;font-weight:600;font-size:12px}
+.cs-sum-tbl .grp-hd{background:#f1f5f9;font-weight:800;font-size:11px;color:#334155;text-align:center;padding:5px 8px;border:1px solid #e2e8f0}
+.cs-sum-tbl .total-row{background:#f8fafc;font-weight:700}
 /* ── CS person cards ── */
 .cs-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .cs-card-header{background:#1e293b;padding:16px 20px;display:flex;align-items:center;justify-content:space-between}
@@ -275,7 +288,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div class="nav-tabs flex gap-0">
       <button class="main-tab-btn active" onclick="showMainTab('overview',this)">成效總覽</button>
       <button class="main-tab-btn" onclick="showMainTab('cs',this)">客服個人成效</button>
-      <button class="main-tab-btn" onclick="showMainTab('monthly',this)">年報表</button>
+      <button class="main-tab-btn" onclick="showMainTab('monthly',this)">報表</button>
       <button class="main-tab-btn" onclick="showMainTab('schedule',this)">班表</button>
     </div>
   </div>
@@ -486,26 +499,53 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 </div>
 
 <!-- ═══════════════════════════════════════
-     MAIN TAB: 年報表
+     MAIN TAB: 報表
 ══════════════════════════════════════════ -->
-<div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-6 space-y-5">
+<div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-6">
 
-  <!-- brand + year selector -->
-  <div class="flex items-center gap-4 flex-wrap">
-    <div class="flex gap-2">
-      <button class="yr-brand-btn chip active" data-brand="seoul" onclick="setYrBrand('seoul',this)">醫美</button>
-      <button class="yr-brand-btn chip" data-brand="hh" onclick="setYrBrand('hh',this)">醫髮</button>
-    </div>
-    <select id="yr-year-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderYrTable()">
-    </select>
-    <button class="btn btn-primary btn-sm" onclick="addYrYear()">＋ 新增年份</button>
+  <!-- Sub-tab nav -->
+  <div class="flex gap-0 border-b border-slate-200 mb-5 -mx-5 sm:-mx-8 px-5 sm:px-8">
+    <button class="rpt-tab-btn active" onclick="showRptPanel('yr',this)">年報表</button>
+    <button class="rpt-tab-btn" onclick="showRptPanel('cs',this)">客服總表</button>
   </div>
 
-  <!-- yearly table -->
-  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-    <table id="yr-table" class="yr-tbl">
-      <tbody id="yr-tbody"></tbody>
-    </table>
+  <!-- ── 年報表 panel ── -->
+  <div id="rpt-yr" class="rpt-panel space-y-5">
+    <!-- brand + year selector -->
+    <div class="flex items-center gap-4 flex-wrap">
+      <div class="flex gap-2">
+        <button class="yr-brand-btn chip active" data-brand="seoul" onclick="setYrBrand('seoul',this)">醫美</button>
+        <button class="yr-brand-btn chip" data-brand="hh" onclick="setYrBrand('hh',this)">醫髮</button>
+      </div>
+      <select id="yr-year-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderYrTable()">
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="addYrYear()">＋ 新增年份</button>
+    </div>
+    <!-- yearly table -->
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <table id="yr-table" class="yr-tbl">
+        <tbody id="yr-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 客服總表 panel ── -->
+  <div id="rpt-cs" class="rpt-panel hidden space-y-5">
+    <!-- selectors -->
+    <div class="flex items-center gap-3 flex-wrap">
+      <div class="flex gap-2">
+        <button class="cs-sum-brand-btn chip active" data-brand="seoul" onclick="setCsSumBrand('seoul',this)">醫美</button>
+        <button class="cs-sum-brand-btn chip" data-brand="hh" onclick="setCsSumBrand('hh',this)">醫髮</button>
+      </div>
+      <select id="cs-sum-month-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderCSSummary()"></select>
+    </div>
+    <!-- table -->
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+      <table class="cs-sum-tbl" id="cs-sum-table">
+        <thead id="cs-sum-thead"></thead>
+        <tbody id="cs-sum-tbody"></tbody>
+      </table>
+    </div>
   </div>
 
 </div>
@@ -633,6 +673,135 @@ function loadYrRec(year, brand){
 function saveYrRec(rec){
   const all = loadYrAll().filter(r=>!(r.year===rec.year&&r.brand===rec.brand));
   all.push(rec); saveYrAll(all);
+}
+
+// ── Report sub-tab switching ──
+function showRptPanel(id, el){
+  document.querySelectorAll('.rpt-panel').forEach(p=>p.classList.add('hidden'));
+  document.querySelectorAll('.rpt-tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('rpt-'+id).classList.remove('hidden');
+  el.classList.add('active');
+  if(id==='cs') renderCSSummary();
+}
+
+// ── 客服總表 ──
+let csSumBrand = 'seoul';
+function setCsSumBrand(b, el){
+  csSumBrand = b;
+  document.querySelectorAll('.cs-sum-brand-btn').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderCSSummary();
+}
+
+function populateCsSumMonths(){
+  const sel = document.getElementById('cs-sum-month-sel');
+  if(!sel) return;
+  const cur = getCurrentMonth();
+  const months = [];
+  const now = new Date();
+  for(let i=0; i<24; i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  sel.innerHTML = months.map(m=>`<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+}
+
+function renderCSSummary(){
+  const month = document.getElementById('cs-sum-month-sel')?.value || getCurrentMonth();
+  const brand = csSumBrand;
+  const N = v => (v||0) > 0 ? (v).toLocaleString('zh-TW') : '—';
+  const P = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '—';
+
+  const sources = [
+    {key:'080',    label:'080',     bg:'#fef9c3'},
+    {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
+    {key:'fbline', label:'FB LINE', bg:'#fee2e2'},
+    {key:'fbdm',   label:'FB 私訊', bg:'#ede9fe'},
+    {key:'other',  label:'其他',    bg:'#f1f5f9'},
+  ];
+
+  // Persons visible for this brand
+  const persons = CS_PERSONS.filter(p => CS_PERSON_BRANDS[p].includes(brand));
+
+  // Load all person data
+  const pData = {};
+  CS_PERSONS.forEach(p => { pData[p] = loadCSRec(month, p); });
+
+  // Aggregate by source
+  const srcRows = sources.map(src => {
+    let tInq=0, tAppt=0, tVisit=0;
+    const pp = {};
+    persons.forEach(p => {
+      const d = pData[p][brand][src.key] || {inq:0,appt:0,visit:0};
+      pp[p] = d;
+      tInq   += d.inq||0;
+      tAppt  += d.appt||0;
+      tVisit += d.visit||0;
+    });
+    return {src, tInq, tAppt, tVisit, pp};
+  });
+
+  // Grand totals
+  const gtInq   = srcRows.reduce((s,r)=>s+r.tInq,0);
+  const gtAppt  = srcRows.reduce((s,r)=>s+r.tAppt,0);
+  const gtVisit = srcRows.reduce((s,r)=>s+r.tVisit,0);
+  const gtPP = {};
+  persons.forEach(p => {
+    gtPP[p] = {
+      inq:   srcRows.reduce((s,r)=>s+(r.pp[p]?.inq||0),0),
+      appt:  srcRows.reduce((s,r)=>s+(r.pp[p]?.appt||0),0),
+      visit: srcRows.reduce((s,r)=>s+(r.pp[p]?.visit||0),0),
+    };
+  });
+
+  // 總業績 from OV
+  const ov = loadOvRec(month);
+  const totalRev = ov[brand]?.rev || 0;
+  const perCon   = gtVisit>0 ? Math.round(totalRev/gtVisit) : 0;
+
+  // Build thead
+  const thead = document.getElementById('cs-sum-thead');
+  const tbody  = document.getElementById('cs-sum-tbody');
+  if(!thead||!tbody) return;
+
+  // Header: row1 = group labels, row2 = sub-columns
+  const pCols = persons.map(p=>`<th colspan="3" class="grp-hd" style="background:#e0e7ff;color:#3730a3">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
+  thead.innerHTML = `
+    <tr>
+      <th class="grp-hd" rowspan="2">來源</th>
+      <th colspan="3" class="grp-hd">合計</th>
+      <th colspan="2" class="grp-hd" style="background:#fef3c7;color:#92400e">業績</th>
+      ${pCols}
+    </tr>
+    <tr>
+      <th>詢問</th><th>預約</th><th>到店</th>
+      <th style="background:#fef9c3">總業績(萬)</th><th style="background:#fef9c3">PerCon</th>
+      ${persons.map(()=>'<th>詢問</th><th>預約</th><th>到店</th>').join('')}
+    </tr>`;
+
+  // Body rows
+  tbody.innerHTML = srcRows.map(r => {
+    const pCells = persons.map(p => {
+      const d = r.pp[p]||{inq:0,appt:0,visit:0};
+      return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
+    }).join('');
+    return `<tr style="background:${r.src.bg}">
+      <td class="src-cell">${r.src.label}</td>
+      <td>${N(r.tInq)}</td><td>${N(r.tAppt)}</td><td>${N(r.tVisit)}</td>
+      <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
+      ${pCells}
+    </tr>`;
+  }).join('') + `
+    <tr class="total-row">
+      <td class="src-cell">總數</td>
+      <td>${N(gtInq)}</td><td>${N(gtAppt)}</td><td>${N(gtVisit)}</td>
+      <td style="background:#fef9c3;font-weight:700">${totalRev?Math.floor(totalRev/10000).toLocaleString('zh-TW'):'—'}</td>
+      <td style="background:#fef9c3;font-weight:700">${perCon?perCon.toLocaleString('zh-TW'):'—'}</td>
+      ${persons.map(p=>{
+        const d = gtPP[p];
+        return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
+      }).join('')}
+    </tr>`;
 }
 
 let yrBrand = 'seoul';
@@ -1127,7 +1296,7 @@ function showMainTab(tab, btn){
   btn.classList.add('active');
   if(tab==='cs') renderCS();
   if(tab==='overview'){ renderOverviewStats(); applyBrandVisibility(); }
-  if(tab==='monthly'){ populateYrYears(); renderYrTable(); }
+  if(tab==='monthly'){ populateYrYears(); renderYrTable(); populateCsSumMonths(); }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -2075,6 +2244,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   populateSeoulYears();
   populateBrandMonthFilter();
   populateYrYears();
+  populateCsSumMonths();
   renderOverviewStats();
   renderCS();
 });
