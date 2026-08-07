@@ -275,7 +275,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div class="nav-tabs flex gap-0">
       <button class="main-tab-btn active" onclick="showMainTab('overview',this)">成效總覽</button>
       <button class="main-tab-btn" onclick="showMainTab('cs',this)">客服個人成效</button>
-      <button class="main-tab-btn" onclick="showMainTab('monthly',this)">月報表</button>
+      <button class="main-tab-btn" onclick="showMainTab('monthly',this)">年報表</button>
       <button class="main-tab-btn" onclick="showMainTab('schedule',this)">班表</button>
     </div>
   </div>
@@ -462,7 +462,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 </div>
 
 <!-- ═══════════════════════════════════════
-     MAIN TAB: 月報表
+     MAIN TAB: 年報表
 ══════════════════════════════════════════ -->
 <div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-6 space-y-5">
 
@@ -589,7 +589,7 @@ function loadSeoulAds(){ return JSON.parse(localStorage.getItem(STORAGE_SEOUL)||
 function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d)); }
 
 // ──────────────────────────────────────────────────────────────
-// YEARLY REPORT  (月報表)
+// YEARLY REPORT  (年報表)
 // ──────────────────────────────────────────────────────────────
 const STORAGE_YR = 'dash_yr_v1';
 function loadYrAll(){ return JSON.parse(localStorage.getItem(STORAGE_YR)||'[]'); }
@@ -795,22 +795,35 @@ function seedOvIfEmpty(){
 }
 
 function seedYrIfEmpty(){
-  const existing = loadYrAll().find(r=>r.year===2026&&r.brand==='seoul');
-  if(existing) return;
-  const data = [
-    {gg_cost:501719,gg_rev:3789385,gg_con:153, fb_cost:535352,fb_rev:2905902,fb_con:120, total_rev:21795840,total_con:331},
-    {gg_cost:460763,gg_rev:2108986,gg_con:109, fb_cost:428532,fb_rev:1169498,fb_con:93,  total_rev:13912694,total_con:237},
-    {gg_cost:506326,gg_rev:3977551,gg_con:169, fb_cost:573395,fb_rev:2210983,fb_con:118, total_rev:18766540,total_con:325},
-    {gg_cost:399530,gg_rev:2612043,gg_con:110, fb_cost:426273,fb_rev:1012897,fb_con:94,  total_rev:14200510,total_con:239},
-    {gg_cost:381098,gg_rev:2331625,gg_con:114, fb_cost:496060,fb_rev:2682132,fb_con:118, total_rev:15352239,total_con:304},
-    {gg_cost:466550,gg_rev:3780324,gg_con:145, fb_cost:505201,fb_rev:1991299,fb_con:102, total_rev:17380800,total_con:303},
-    {gg_cost:415287,gg_rev:3499658,gg_con:151, fb_cost:441447,fb_rev:1949702,fb_con:118, total_rev:9809534, total_con:320},
-    {gg_cost:70203, gg_rev:0,      gg_con:24,  fb_cost:95059, fb_rev:0,      fb_con:20,  total_rev:3462952, total_con:60},
-    ...Array(4).fill(null).map(()=>({gg_cost:0,gg_rev:0,gg_con:0,fb_cost:0,fb_rev:0,fb_con:0,total_rev:0,total_con:0}))
-  ];
-  saveYrRec({year:2026, brand:'seoul', months:data});
-  // also sync to OV
-  syncYrToOv(2026,'seoul');
+  const empty4 = Array(4).fill(null).map(()=>({gg_cost:0,gg_rev:0,gg_con:0,fb_cost:0,fb_rev:0,fb_con:0,total_rev:0,total_con:0}));
+  if(!loadYrAll().find(r=>r.year===2026&&r.brand==='seoul')){
+    saveYrRec({year:2026, brand:'seoul', months:[
+      {gg_cost:501719,gg_rev:3789385,gg_con:153, fb_cost:535352,fb_rev:2905902,fb_con:120, total_rev:21795840,total_con:331},
+      {gg_cost:460763,gg_rev:2108986,gg_con:109, fb_cost:428532,fb_rev:1169498,fb_con:93,  total_rev:13912694,total_con:237},
+      {gg_cost:506326,gg_rev:3977551,gg_con:169, fb_cost:573395,fb_rev:2210983,fb_con:118, total_rev:18766540,total_con:325},
+      {gg_cost:399530,gg_rev:2612043,gg_con:110, fb_cost:426273,fb_rev:1012897,fb_con:94,  total_rev:14200510,total_con:239},
+      {gg_cost:381098,gg_rev:2331625,gg_con:114, fb_cost:496060,fb_rev:2682132,fb_con:118, total_rev:15352239,total_con:304},
+      {gg_cost:466550,gg_rev:3780324,gg_con:145, fb_cost:505201,fb_rev:1991299,fb_con:102, total_rev:17380800,total_con:303},
+      {gg_cost:415287,gg_rev:3499658,gg_con:151, fb_cost:441447,fb_rev:1949702,fb_con:118, total_rev:9809534, total_con:320},
+      {gg_cost:70203, gg_rev:0,      gg_con:24,  fb_cost:95059, fb_rev:0,      fb_con:20,  total_rev:3462952, total_con:60},
+      ...empty4
+    ]});
+    syncYrToOv(2026,'seoul');
+  }
+  if(!loadYrAll().find(r=>r.year===2026&&r.brand==='hh')){
+    saveYrRec({year:2026, brand:'hh', months:[
+      {gg_cost:514323,gg_rev:2658753,gg_con:127, fb_cost:536338,fb_rev:1373150,fb_con:65,  total_rev:18302912,total_con:243},
+      {gg_cost:437319,gg_rev:2118339,gg_con:69,  fb_cost:451010,fb_rev:1910087,fb_con:55,  total_rev:15054505,total_con:152},
+      {gg_cost:502963,gg_rev:1634134,gg_con:75,  fb_cost:553196,fb_rev:1847911,fb_con:72,  total_rev:16506549,total_con:192},
+      {gg_cost:441714,gg_rev:3347228,gg_con:104, fb_cost:497267,fb_rev:1405324,fb_con:68,  total_rev:14913308,total_con:205},
+      {gg_cost:605795,gg_rev:3601874,gg_con:108, fb_cost:575225,fb_rev:1169326,fb_con:70,  total_rev:15641356,total_con:216},
+      {gg_cost:522102,gg_rev:2979547,gg_con:109, fb_cost:512870,fb_rev:1315897,fb_con:71,  total_rev:16801661,total_con:214},
+      {gg_cost:474610,gg_rev:3047032,gg_con:112, fb_cost:600223,fb_rev:2243800,fb_con:70,  total_rev:14555018,total_con:241},
+      {gg_cost:91777, gg_rev:0,      gg_con:26,  fb_cost:106737,fb_rev:0,      fb_con:20,  total_rev:4701461, total_con:57},
+      ...empty4
+    ]});
+    syncYrToOv(2026,'hh');
+  }
 }
 
 // ──────────────────────────────────────────────────────────────
