@@ -184,8 +184,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   .nav-tabs::-webkit-scrollbar{display:none}
   .main-tab-btn{padding:9px 16px;font-size:12px;white-space:nowrap;flex-shrink:0}
   /* ── Overview grids ── */
+  /* ov-grid-1 mobile: JS controls columns when single-brand; default 全部 = total spans full + 2 brands side-by-side */
   .ov-grid-1{grid-template-columns:repeat(2,1fr)!important}
-  .ov-grid-1>:first-child{grid-column:1/-1}
+  .ov-grid-1>.ov-total-card{grid-column:1/-1}
   .ov-grid-2{grid-template-columns:1fr!important}
   .ov-grid-3{grid-template-columns:repeat(2,1fr)!important}
   /* ── Business card nums smaller ── */
@@ -267,7 +268,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="grid ov-grid-1 gap-4 fade-up" style="grid-template-columns:repeat(3,1fr)">
 
     <!-- 總業績 -->
-    <div class="scard" style="border-left:4px solid #d97706">
+    <div class="scard ov-total-card" style="border-left:4px solid #d97706">
       <div class="scard-title">總業績</div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
@@ -849,15 +850,24 @@ function setBrand(b, el){
 function applyBrandVisibility(){
   const showS = activeBrand === 'all' || activeBrand === 'seoul';
   const showH = activeBrand === 'all' || activeBrand === 'hh';
-  // overview: brand cards (醫美/醫髮業績)
+  const isAll = activeBrand === 'all';
+
+  // 總業績 card: only when showing all brands
+  const totalCard = document.querySelector('.ov-total-card');
+  if(totalCard) totalCard.style.display = isAll ? '' : 'none';
+
+  // brand cards: show/hide + full-width when single brand
+  const grid1 = document.querySelector('.ov-grid-1');
+  if(grid1) grid1.style.gridTemplateColumns = isAll ? 'repeat(3,1fr)' : '1fr';
   document.querySelectorAll('.ov-brand-card').forEach(el => {
     el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
   });
-  // overview: brand rows inside shared funnel/ad cards
+
+  // brand rows inside shared funnel/ad cards
   document.querySelectorAll('.ov-brand-row').forEach(el => {
     el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
   });
-  // 總業績 card: hide/show the whole card only when single-brand selected? Keep it always visible
+
   renderOverviewStats();
 }
 
@@ -1289,9 +1299,6 @@ function renderOverviewStats(){
   const totRev  = sRev + hRev;
   const totEst  = sEst + hEst;
   const totPrev = (showS?ov.seoul.prev||0:0) + (showH?ov.hh.prev||0:0);
-  // 總業績 card title updates based on filter
-  const totalTitle = document.querySelector('#main-tab-overview .scard-title');
-  if(totalTitle) totalTitle.textContent = brand==='seoul'?'醫美業績總計':brand==='hh'?'醫髮業績總計':'總業績';
   setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
   setText('ov-total-est',  totEst  ? N(totEst)  : '—');
   setText('ov-total-prev', totPrev ? N(totPrev) : '—');
