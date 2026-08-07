@@ -824,6 +824,22 @@ function seedYrIfEmpty(){
     ]});
     syncYrToOv(2026,'hh');
   }
+  if(!loadYrAll().find(r=>r.year===2025&&r.brand==='seoul')){
+    saveYrRec({year:2025, brand:'seoul', months:[
+      {gg_cost:413999,gg_rev:3186945,gg_con:180, fb_cost:451322,fb_rev:2357909,fb_con:110, total_rev:19593237,total_con:346},
+      {gg_cost:467263,gg_rev:4811615,gg_con:183, fb_cost:451502,fb_rev:1331452,fb_con:136, total_rev:19923807,total_con:374},
+      {gg_cost:486117,gg_rev:4393585,gg_con:180, fb_cost:551713,fb_rev:3121156,fb_con:149, total_rev:21663081,total_con:384},
+      {gg_cost:453487,gg_rev:2103110,gg_con:136, fb_cost:477930,fb_rev:2170753,fb_con:104, total_rev:15831643,total_con:275},
+      {gg_cost:519516,gg_rev:3367485,gg_con:148, fb_cost:529906,fb_rev:2146997,fb_con:138, total_rev:19705513,total_con:339},
+      {gg_cost:475299,gg_rev:2881681,gg_con:119, fb_cost:541397,fb_rev:2426902,fb_con:141, total_rev:16991010,total_con:313},
+      {gg_cost:480516,gg_rev:4515681,gg_con:153, fb_cost:513840,fb_rev:2630448,fb_con:139, total_rev:18678271,total_con:333},
+      {gg_cost:480805,gg_rev:3578526,gg_con:125, fb_cost:532998,fb_rev:1962206,fb_con:118, total_rev:17279983,total_con:284},
+      {gg_cost:442485,gg_rev:2701001,gg_con:99,  fb_cost:413873,fb_rev:2486146,fb_con:110, total_rev:14557092,total_con:236},
+      {gg_cost:456545,gg_rev:2786158,gg_con:127, fb_cost:456149,fb_rev:3197624,fb_con:108, total_rev:15705589,total_con:280},
+      {gg_cost:447880,gg_rev:3106445,gg_con:135, fb_cost:485910,fb_rev:2663796,fb_con:136, total_rev:16939749,total_con:322},
+      {gg_cost:531865,gg_rev:4240346,gg_con:154, fb_cost:556193,fb_rev:3919557,fb_con:161, total_rev:21273092,total_con:372},
+    ]});
+  }
   if(!loadYrAll().find(r=>r.year===2025&&r.brand==='hh')){
     saveYrRec({year:2025, brand:'hh', months:[
       {gg_cost:445688,gg_rev:2159902,gg_con:97,  fb_cost:516701,fb_rev:1775500,fb_con:56,  total_rev:17994934,total_con:201},
