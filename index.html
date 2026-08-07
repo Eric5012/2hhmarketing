@@ -141,6 +141,24 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
+/* ── Yearly report table ── */
+.yr-tbl{border-collapse:collapse;font-size:12px;min-width:900px;width:100%;background:#fff}
+.yr-tbl th,.yr-tbl td{border:1px solid #e2e8f0;padding:0;white-space:nowrap}
+.yr-tbl th{background:#f8fafc;color:#475569;font-weight:700;font-size:11px;padding:7px 10px;text-align:center;position:sticky;top:0;z-index:2}
+.yr-tbl th.yr-th-hd{background:#1e293b;color:#fff;font-size:13px;font-weight:800;letter-spacing:.04em;padding:9px 14px;position:sticky;left:0;z-index:3}
+.yr-tbl td.yr-label{background:#f8fafc;color:#475569;font-weight:600;font-size:11px;padding:6px 12px;position:sticky;left:0;z-index:1;border-right:2px solid #e2e8f0;min-width:76px}
+.yr-tbl td.yr-group{background:#1e293b;color:#fff;font-weight:700;font-size:11px;padding:6px 10px;text-align:center;position:sticky;left:0;z-index:1;border-right:2px solid #334155;letter-spacing:.04em}
+.yr-tbl td.yr-num{text-align:right;font-variant-numeric:tabular-nums;color:#334155;padding:0}
+.yr-tbl td.yr-auto{text-align:right;font-variant-numeric:tabular-nums;color:#64748b;background:#fafafa;padding:5px 10px;font-size:11px}
+.yr-tbl tr.yr-sep td{height:3px;padding:0;background:#e0e7ff;border:none}
+.yr-tbl tr.yr-total td{background:#fef9c3}
+.yr-tbl tr.yr-total td.yr-label{background:#fde68a;color:#92400e;font-weight:700}
+.yr-tbl tr.yr-total td.yr-auto{background:#fef9c3;color:#92400e;font-weight:700}
+.yr-tbl tr.yr-est td{background:#f0fdf4}
+.yr-tbl tr.yr-est td.yr-label{background:#dcfce7;color:#166534;font-weight:700}
+.yr-tbl tr.yr-est td.yr-auto{background:#f0fdf4;color:#166534;font-weight:700}
+.yr-inp{border:none;background:transparent;text-align:right;width:100%;padding:5px 10px;font-size:12px;font-variant-numeric:tabular-nums;font-family:inherit;color:#1e293b;outline:none;min-width:80px}
+.yr-inp:focus{background:#ede9fe;color:#6d28d9}
 /* ── Overview brand metric cells (horizontal layout) ── */
 .ov-metric-cell{display:flex;flex-direction:column;gap:6px;padding:16px 20px}
 .ov-metric-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em}
@@ -446,12 +464,26 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 <!-- ═══════════════════════════════════════
      MAIN TAB: 月報表
 ══════════════════════════════════════════ -->
-<div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-10">
-  <div class="card flex flex-col items-center justify-center py-20 text-slate-400">
-    <div class="text-4xl mb-4">📊</div>
-    <div class="font-bold text-slate-600 text-lg">月報表</div>
-    <div class="text-sm mt-2">敬請期待</div>
+<div id="main-tab-monthly" class="main-tab-page hidden px-5 sm:px-8 pb-12 mt-6 space-y-5">
+
+  <!-- brand + year selector -->
+  <div class="flex items-center gap-4 flex-wrap">
+    <div class="flex gap-2">
+      <button class="yr-brand-btn chip active" data-brand="seoul" onclick="setYrBrand('seoul',this)">醫美</button>
+      <button class="yr-brand-btn chip" data-brand="hh" onclick="setYrBrand('hh',this)">醫髮</button>
+    </div>
+    <select id="yr-year-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderYrTable()">
+    </select>
+    <button class="btn btn-primary btn-sm" onclick="addYrYear()">＋ 新增年份</button>
   </div>
+
+  <!-- yearly table -->
+  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+    <table id="yr-table" class="yr-tbl">
+      <tbody id="yr-tbody"></tbody>
+    </table>
+  </div>
+
 </div>
 
 <!-- ═══════════════════════════════════════
@@ -557,6 +589,178 @@ function loadSeoulAds(){ return JSON.parse(localStorage.getItem(STORAGE_SEOUL)||
 function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d)); }
 
 // ──────────────────────────────────────────────────────────────
+// YEARLY REPORT  (月報表)
+// ──────────────────────────────────────────────────────────────
+const STORAGE_YR = 'dash_yr_v1';
+function loadYrAll(){ return JSON.parse(localStorage.getItem(STORAGE_YR)||'[]'); }
+function saveYrAll(d){ localStorage.setItem(STORAGE_YR, JSON.stringify(d)); }
+
+function emptyYrMonths(){
+  return Array.from({length:12},()=>({
+    gg_cost:0, gg_rev:0, gg_con:0,
+    fb_cost:0, fb_rev:0, fb_con:0,
+    total_rev:0, total_con:0
+  }));
+}
+function loadYrRec(year, brand){
+  return loadYrAll().find(r=>r.year===year&&r.brand===brand) ||
+    {year, brand, months: emptyYrMonths()};
+}
+function saveYrRec(rec){
+  const all = loadYrAll().filter(r=>!(r.year===rec.year&&r.brand===rec.brand));
+  all.push(rec); saveYrAll(all);
+}
+
+let yrBrand = 'seoul';
+function setYrBrand(b, el){
+  yrBrand = b;
+  document.querySelectorAll('.yr-brand-btn').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderYrTable();
+}
+
+function addYrYear(){
+  const yr = parseInt(prompt('輸入年份（例如 2026）',''));
+  if(!yr||isNaN(yr)) return;
+  const all = loadYrAll();
+  if(!all.find(r=>r.year===yr&&r.brand===yrBrand)){
+    const rec = {year:yr, brand:yrBrand, months:emptyYrMonths()};
+    all.push(rec); saveYrAll(all);
+  }
+  populateYrYears(yr);
+  renderYrTable();
+}
+
+function populateYrYears(selectYear){
+  const sel = document.getElementById('yr-year-sel');
+  if(!sel) return;
+  const years = [...new Set(loadYrAll().map(r=>r.year))].sort((a,b)=>b-a);
+  if(!years.length){ years.push(new Date().getFullYear()); }
+  sel.innerHTML = years.map(y=>`<option value="${y}"${y===(selectYear||years[0])?'selected':''}>${y}年</option>`).join('');
+}
+
+function getYrYear(){
+  const sel = document.getElementById('yr-year-sel');
+  return sel ? parseInt(sel.value) : new Date().getFullYear();
+}
+
+const N2 = v => (v||0).toLocaleString('zh-TW');
+const pct2 = (a,b) => b>0 ? (a/b*100).toFixed(2)+'%' : '—';
+const div2 = (a,b) => b>0 ? Math.round(a/b).toLocaleString('zh-TW') : '—';
+
+function yrInp(year, brand, mi, field, val){
+  return `<input class="yr-inp" type="number" value="${val||''}" placeholder="—"
+    data-year="${year}" data-brand="${brand}" data-mi="${mi}" data-field="${field}"
+    oninput="onYrInp(this)"/>`;
+}
+
+function onYrInp(el){
+  const {year, brand, mi, field} = el.dataset;
+  const rec = loadYrRec(parseInt(year), brand);
+  rec.months[parseInt(mi)][field] = parseFloat(el.value)||0;
+  saveYrRec(rec);
+  renderYrTable();
+  // sync to OV storage for overview cards
+  syncYrToOv(parseInt(year), brand);
+}
+
+function syncYrToOv(year, brand){
+  for(let mi=0; mi<12; mi++){
+    const month = `${year}-${String(mi+1).padStart(2,'0')}`;
+    const rec = loadYrRec(year, brand);
+    const m = rec.months[mi];
+    if(!m.total_rev) continue;
+    const ovRec = loadOvRec(month);
+    ovRec[brand].rev = m.total_rev;
+    saveOvRec(ovRec);
+  }
+  renderOverviewStats();
+}
+
+function renderYrTable(){
+  const tbody = document.getElementById('yr-tbody');
+  if(!tbody) return;
+  const year = getYrYear();
+  const brand = yrBrand;
+  const rec = loadYrRec(year, brand);
+  const ms = rec.months;
+  const color = brand==='seoul'?'#7c3aed':'#2563eb';
+  const brandLabel = brand==='seoul'?'醫美':'醫髮';
+
+  const today = new Date();
+  const curMi = (today.getFullYear()===year) ? today.getMonth() : -1;
+
+  const thCols = Array.from({length:12},(_,i)=>{
+    const isNow = i===curMi;
+    return `<th style="${isNow?'background:#ede9fe;color:#7c3aed':''}">${i+1}月</th>`;
+  }).join('');
+
+  // auto-calc per month
+  const ggCpl  = ms.map(m=> m.gg_con>0 ? Math.round(m.gg_cost/m.gg_con) : 0);
+  const fbCpl  = ms.map(m=> m.fb_con>0 ? Math.round(m.fb_cost/m.fb_con) : 0);
+  const totCost= ms.map(m=> (m.gg_cost||0)+(m.fb_cost||0));
+  const adPct  = ms.map((m,i)=> m.total_rev>0 ? (totCost[i]/m.total_rev*100).toFixed(2)+'%' : '—');
+  const cpl    = ms.map((m,i)=> m.total_con>0 ? Math.round(totCost[i]/m.total_con) : 0);
+  const perC   = ms.map(m=> m.total_con>0 ? Math.round(m.total_rev/m.total_con) : 0);
+
+  // CTB: total_rev / (gg_rev + fb_rev)  × 1 (倍)
+  const ctb    = ms.map(m=>{
+    const adRev=(m.gg_rev||0)+(m.fb_rev||0);
+    return adRev>0 ? (m.total_rev/adRev).toFixed(1) : '—';
+  });
+
+  // 估值: total_rev / daysSoFar * totalDays (only for current year-month)
+  const est = ms.map((m,i)=>{
+    if(!m.total_rev) return {rev:'—',con:'—'};
+    const mi2=i;
+    const totalDays=new Date(year,mi2+1,0).getDate();
+    const isCur=(today.getFullYear()===year&&today.getMonth()===mi2);
+    const daysSoFar=isCur?today.getDate():totalDays;
+    return {
+      rev: daysSoFar>0 ? Math.round(m.total_rev/daysSoFar*totalDays).toLocaleString('zh-TW') : '—',
+      con: daysSoFar>0&&m.total_con>0 ? Math.round(m.total_con/daysSoFar*totalDays) : '—'
+    };
+  });
+
+  const row=(cls,label,cells)=>`<tr class="${cls}"><td class="${cls==='yr-total'||cls==='yr-est'?'yr-label':cls==='yr-group'?'yr-group':'yr-label'}">${label}</td>${cells}</tr>`;
+  const autoCell=(v)=>`<td class="yr-auto">${v||v===0?N2(v):'—'}</td>`;
+  const inpCell=(mi,field,val)=>`<td class="yr-num">${yrInp(year,brand,mi,field,val)}</td>`;
+
+  tbody.innerHTML = `
+    <tr>
+      <th class="yr-th-hd">${year} ${brandLabel}</th>
+      ${thCols}
+    </tr>
+    <!-- Google -->
+    ${row('yr-group','Google','')}
+    <tr><td class="yr-label">廣告花費</td>${ms.map((_,i)=>inpCell(i,'gg_cost',ms[i].gg_cost)).join('')}</tr>
+    <tr><td class="yr-label">新客業績</td>${ms.map((_,i)=>inpCell(i,'gg_rev',ms[i].gg_rev)).join('')}</tr>
+    <tr><td class="yr-label">CON</td>${ms.map((_,i)=>inpCell(i,'gg_con',ms[i].gg_con)).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">CPL</td>${ggCpl.map(v=>`<td class="yr-auto">${v?N2(v):'—'}</td>`).join('')}</tr>
+    <tr class="yr-sep"><td colspan="13"></td></tr>
+    <!-- FB -->
+    ${row('yr-group','FB','')}
+    <tr><td class="yr-label">廣告花費</td>${ms.map((_,i)=>inpCell(i,'fb_cost',ms[i].fb_cost)).join('')}</tr>
+    <tr><td class="yr-label">新客業績</td>${ms.map((_,i)=>inpCell(i,'fb_rev',ms[i].fb_rev)).join('')}</tr>
+    <tr><td class="yr-label">CON</td>${ms.map((_,i)=>inpCell(i,'fb_con',ms[i].fb_con)).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">CPL</td>${fbCpl.map(v=>`<td class="yr-auto">${v?N2(v):'—'}</td>`).join('')}</tr>
+    <tr class="yr-sep"><td colspan="13"></td></tr>
+    <!-- Summary -->
+    <tr><td class="yr-label" style="font-weight:700">花費總計</td>${totCost.map(v=>`<td class="yr-auto" style="font-weight:700">${v?N2(v):'—'}</td>`).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">廣告占比</td>${adPct.map(v=>`<td class="yr-auto">${v}</td>`).join('')}</tr>
+    <tr class="yr-sep"><td colspan="13"></td></tr>
+    <tr class="yr-total"><td class="yr-label">總業績</td>${ms.map((_,i)=>inpCell(i,'total_rev',ms[i].total_rev)).join('')}</tr>
+    <tr class="yr-total"><td class="yr-label">總CON</td>${ms.map((_,i)=>inpCell(i,'total_con',ms[i].total_con)).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">CPL</td>${cpl.map(v=>`<td class="yr-auto">${v?N2(v):'—'}</td>`).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">PerC</td>${perC.map(v=>`<td class="yr-auto">${v?N2(v):'—'}</td>`).join('')}</tr>
+    <tr><td class="yr-label" style="color:#64748b">CTB</td>${ctb.map(v=>`<td class="yr-auto">${v}</td>`).join('')}</tr>
+    <tr class="yr-sep"><td colspan="13"></td></tr>
+    <tr class="yr-est"><td class="yr-label">估值・總業績</td>${est.map(e=>`<td class="yr-auto">${e.rev}</td>`).join('')}</tr>
+    <tr class="yr-est"><td class="yr-label">估值・CON</td>${est.map(e=>`<td class="yr-auto">${e.con==='—'?'—':N2(e.con)}</td>`).join('')}</tr>
+  `;
+}
+
+// ──────────────────────────────────────────────────────────────
 // SEED DATA (daily only — ads start empty)
 // ──────────────────────────────────────────────────────────────
 function seedIfEmpty(){
@@ -588,6 +792,25 @@ function seedOvIfEmpty(){
   const all = loadOvAll();
   if(all.find(r=>r.month===month)) return;
   saveOvRec({month, seoul:{rev:1615,prev:1867}, hh:{rev:1884,prev:1761}});
+}
+
+function seedYrIfEmpty(){
+  const existing = loadYrAll().find(r=>r.year===2026&&r.brand==='seoul');
+  if(existing) return;
+  const data = [
+    {gg_cost:501719,gg_rev:3789385,gg_con:153, fb_cost:535352,fb_rev:2905902,fb_con:120, total_rev:21795840,total_con:331},
+    {gg_cost:460763,gg_rev:2108986,gg_con:109, fb_cost:428532,fb_rev:1169498,fb_con:93,  total_rev:13912694,total_con:237},
+    {gg_cost:506326,gg_rev:3977551,gg_con:169, fb_cost:573395,fb_rev:2210983,fb_con:118, total_rev:18766540,total_con:325},
+    {gg_cost:399530,gg_rev:2612043,gg_con:110, fb_cost:426273,fb_rev:1012897,fb_con:94,  total_rev:14200510,total_con:239},
+    {gg_cost:381098,gg_rev:2331625,gg_con:114, fb_cost:496060,fb_rev:2682132,fb_con:118, total_rev:15352239,total_con:304},
+    {gg_cost:466550,gg_rev:3780324,gg_con:145, fb_cost:505201,fb_rev:1991299,fb_con:102, total_rev:17380800,total_con:303},
+    {gg_cost:415287,gg_rev:3499658,gg_con:151, fb_cost:441447,fb_rev:1949702,fb_con:118, total_rev:9809534, total_con:320},
+    {gg_cost:70203, gg_rev:0,      gg_con:24,  fb_cost:95059, fb_rev:0,      fb_con:20,  total_rev:3462952, total_con:60},
+    ...Array(4).fill(null).map(()=>({gg_cost:0,gg_rev:0,gg_con:0,fb_cost:0,fb_rev:0,fb_con:0,total_rev:0,total_con:0}))
+  ];
+  saveYrRec({year:2026, brand:'seoul', months:data});
+  // also sync to OV
+  syncYrToOv(2026,'seoul');
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -834,7 +1057,8 @@ function showMainTab(tab, btn){
   document.getElementById('main-tab-'+tab).classList.remove('hidden');
   btn.classList.add('active');
   if(tab==='cs') renderCS();
-  if(tab==='overview'){ renderOverviewStats(); }
+  if(tab==='overview'){ renderOverviewStats(); applyBrandVisibility(); }
+  if(tab==='monthly'){ populateYrYears(); renderYrTable(); }
 }
 
 // ──────────────────────────────────────────────────────────────
@@ -1761,10 +1985,12 @@ function startClock(){
 document.addEventListener('DOMContentLoaded',()=>{
   seedIfEmpty();
   seedOvIfEmpty();
+  seedYrIfEmpty();
   startClock();
   populateMonthSelects();
   populateSeoulYears();
   populateBrandMonthFilter();
+  populateYrYears();
   renderOverviewStats();
   renderCS();
 });
