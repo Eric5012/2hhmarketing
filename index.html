@@ -290,7 +290,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     </div>
 
     <!-- 醫美業績 -->
-    <div class="scard" style="border-left:4px solid #7c3aed">
+    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="color:#7c3aed">醫美業績</div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
@@ -313,7 +313,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     </div>
 
     <!-- 醫髮業績 -->
-    <div class="scard" style="border-left:4px solid #2563eb">
+    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="color:#2563eb">醫髮業績</div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
         <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
@@ -343,15 +343,15 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- Google -->
     <div class="scard" style="border-left:4px solid #16a34a">
       <div class="scard-title">Google 廣告詢問</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-gg">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-gg">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-gg">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-gg">—</span></div></div>
     </div>
 
     <!-- FB -->
     <div class="scard" style="border-left:4px solid #3b82f6">
       <div class="scard-title">FB 廣告詢問</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-fb">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-fb">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-fb">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-fb">—</span></div></div>
     </div>
 
   </div>
@@ -362,29 +362,29 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 詢問數 -->
     <div class="scard" style="border-left:4px solid #f59e0b">
       <div class="scard-title">詢問數</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
     </div>
 
     <!-- 預約數 -->
     <div class="scard" style="border-left:4px solid #f97316">
       <div class="scard-title">預約數</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span></div></div>
     </div>
 
     <!-- 到店數 / 到店率 -->
     <div class="scard" style="border-left:4px solid #0891b2">
       <div class="scard-title">到店數 / 到店率</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-visit">—</span><span class="scard-rate" id="ov-seoul-visitpct"></span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-visit">—</span><span class="scard-rate" id="ov-hh-visitpct"></span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-visit">—</span><span class="scard-rate" id="ov-seoul-visitpct"></span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-visit">—</span><span class="scard-rate" id="ov-hh-visitpct"></span></div></div>
     </div>
 
     <!-- 實際轉換率 -->
     <div class="scard" style="border-left:4px solid #7c3aed">
       <div class="scard-title">實際轉換率</div>
-      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-cvr">—</span></div></div>
-      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-cvr">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-cvr">—</span></div></div>
+      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-cvr">—</span></div></div>
     </div>
 
   </div>
@@ -849,15 +849,16 @@ function setBrand(b, el){
 function applyBrandVisibility(){
   const showS = activeBrand === 'all' || activeBrand === 'seoul';
   const showH = activeBrand === 'all' || activeBrand === 'hh';
-  const tog = (id, show) => { const el=document.getElementById(id); if(el) el.style.display=show?'':'none'; };
-  // stat card rows
-  ['inq','con','rev','adpct'].forEach(k=>{
-    tog('stat-row-seoul-'+k, showS);
-    tog('stat-row-hh-'+k,   showH);
+  // overview: brand cards (醫美/醫髮業績)
+  document.querySelectorAll('.ov-brand-card').forEach(el => {
+    el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
   });
-  // overview brand sections
-  tog('overview-seoul', showS);
-  tog('overview-hh',    showH);
+  // overview: brand rows inside shared funnel/ad cards
+  document.querySelectorAll('.ov-brand-row').forEach(el => {
+    el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
+  });
+  // 總業績 card: hide/show the whole card only when single-brand selected? Keep it always visible
+  renderOverviewStats();
 }
 
 function onMonthFilterChange(){
@@ -1273,7 +1274,10 @@ function renderOverviewStats(){
     const daysSoFar = isCurrentMonth ? today.getDate() : totalDays;
     return daysSoFar > 0 ? Math.round(rev / daysSoFar * totalDays) : 0;
   };
-  const sRev = ov.seoul.rev||0, hRev = ov.hh.rev||0;
+  const brand = typeof activeBrand !== 'undefined' ? activeBrand : 'all';
+  const showS = brand==='all'||brand==='seoul';
+  const showH = brand==='all'||brand==='hh';
+  const sRev = showS ? (ov.seoul.rev||0) : 0, hRev = showH ? (ov.hh.rev||0) : 0;
   const sEst = sRev ? calcEst(sRev, month) : 0;
   const hEst = hRev ? calcEst(hRev, month) : 0;
   setText('ov-seoul-rev',  sRev ? N(sRev) : '—');
@@ -1284,7 +1288,10 @@ function renderOverviewStats(){
   setText('ov-hh-prev',    ov.hh.prev ? N(ov.hh.prev) : '—');
   const totRev  = sRev + hRev;
   const totEst  = sEst + hEst;
-  const totPrev = (ov.seoul.prev||0) + (ov.hh.prev||0);
+  const totPrev = (showS?ov.seoul.prev||0:0) + (showH?ov.hh.prev||0:0);
+  // 總業績 card title updates based on filter
+  const totalTitle = document.querySelector('#main-tab-overview .scard-title');
+  if(totalTitle) totalTitle.textContent = brand==='seoul'?'醫美業績總計':brand==='hh'?'醫髮業績總計':'總業績';
   setText('ov-total-rev',  totRev  ? N(totRev)  : '—');
   setText('ov-total-est',  totEst  ? N(totEst)  : '—');
   setText('ov-total-prev', totPrev ? N(totPrev) : '—');
