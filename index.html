@@ -141,6 +141,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .brand-tag-hh{background:#dbeafe;color:#2563eb}
 .stat-main-val{font-size:32px;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 .stat-rate-val{font-size:16px;font-weight:600;color:#94a3b8;margin-left:4px}
+/* ── Overview brand metric cells (horizontal layout) ── */
+.ov-metric-cell{display:flex;flex-direction:column;gap:6px;padding:16px 20px}
+.ov-metric-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:.04em}
+.ov-metric-val{font-size:24px!important;font-weight:800;color:#1e293b;line-height:1;font-variant-numeric:tabular-nums}
 /* ── Daily ad cards ── */
 .day-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .day-card-hd{background:#1e293b;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
@@ -293,22 +297,22 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 醫美業績 -->
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="color:#7c3aed">醫美業績</div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-seoul-rev" style="font-size:22px">—</span>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #f1f5f9">
+        <div class="ov-metric-cell">
+          <span class="ov-metric-label">實際</span>
+          <span class="ov-metric-val scard-val" id="ov-seoul-rev">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-seoul-est">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">估值</span>
+          <span class="ov-metric-val scard-rate" id="ov-seoul-est">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-seoul-prev">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">同期</span>
+          <span class="ov-metric-val scard-rate" id="ov-seoul-prev">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-seoul-gap">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">落差</span>
+          <span class="ov-metric-val scard-rate" id="ov-seoul-gap">—</span>
         </div>
       </div>
     </div>
@@ -316,22 +320,22 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <!-- 醫髮業績 -->
     <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="color:#2563eb">醫髮業績</div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-hh-rev" style="font-size:22px">—</span>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid #f1f5f9">
+        <div class="ov-metric-cell">
+          <span class="ov-metric-label">實際</span>
+          <span class="ov-metric-val scard-val" id="ov-hh-rev">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-hh-est">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">估值</span>
+          <span class="ov-metric-val scard-rate" id="ov-hh-est">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-hh-prev">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">同期</span>
+          <span class="ov-metric-val scard-rate" id="ov-hh-prev">—</span>
         </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-hh-gap">—</span>
+        <div class="ov-metric-cell" style="border-left:1px solid #f1f5f9">
+          <span class="ov-metric-label">落差</span>
+          <span class="ov-metric-val scard-rate" id="ov-hh-gap">—</span>
         </div>
       </div>
     </div>
