@@ -363,18 +363,42 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- 第二行：廣告來源 -->
   <div class="grid ov-grid-2 fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
-    <!-- 廣告詢問 -->
+    <!-- Google 廣告詢問 / 到店數 -->
     <div class="scard" style="border-left:4px solid #16a34a">
-      <div class="scard-title">廣告詢問</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-gg">—</span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-gg">—</span></div></div>
+      <div class="scard-title">Google 廣告詢問 / 到店數</div>
+      <div class="scard-row ov-brand-row" data-brand="seoul">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <div class="scard-nums">
+          <span class="scard-val" id="ov-seoul-gg">—</span>
+          <span class="scard-rate" style="color:#0891b2">到店 <span id="ov-seoul-gg-visit">—</span></span>
+        </div>
+      </div>
+      <div class="scard-row ov-brand-row" data-brand="hh">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <div class="scard-nums">
+          <span class="scard-val" id="ov-hh-gg">—</span>
+          <span class="scard-rate" style="color:#0891b2">到店 <span id="ov-hh-gg-visit">—</span></span>
+        </div>
+      </div>
     </div>
 
-    <!-- 到店數 -->
-    <div class="scard" style="border-left:4px solid #0891b2">
-      <div class="scard-title">到店數</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-fb">—</span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-fb">—</span></div></div>
+    <!-- FB 廣告詢問 / 到店數 -->
+    <div class="scard" style="border-left:4px solid #3b82f6">
+      <div class="scard-title">FB 廣告詢問 / 到店數</div>
+      <div class="scard-row ov-brand-row" data-brand="seoul">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <div class="scard-nums">
+          <span class="scard-val" id="ov-seoul-fb">—</span>
+          <span class="scard-rate" style="color:#0891b2">到店 <span id="ov-seoul-fb-visit">—</span></span>
+        </div>
+      </div>
+      <div class="scard-row ov-brand-row" data-brand="hh">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <div class="scard-nums">
+          <span class="scard-val" id="ov-hh-fb">—</span>
+          <span class="scard-rate" style="color:#0891b2">到店 <span id="ov-hh-fb-visit">—</span></span>
+        </div>
+      </div>
     </div>
 
   </div>
@@ -1595,7 +1619,7 @@ function renderOverviewStats(){
   setGap('ov-hh-gap',    hEst, hPrev);
   setGap('ov-total-gap', totEst, totPrev);
 
-  // Row 2: 廣告詢問 (GG+FB con) / 到店數 from CS data
+  // Row 2: Google / FB 廣告詢問 + 到店數
   let dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
   let sGg=0, sFb=0, hGg=0, hFb=0;
   dcmpRecs.forEach(r=>{
@@ -1604,9 +1628,11 @@ function renderOverviewStats(){
     hGg += r.hh?.actual?.gg||0;
     hFb += r.hh?.actual?.fb||0;
   });
-  // 廣告詢問 = GG + FB 合計
-  setText('ov-seoul-gg', N(sGg+sFb));
-  setText('ov-hh-gg',    N(hGg+hFb));
+  // 廣告詢問（各自）
+  setText('ov-seoul-gg', N(sGg));
+  setText('ov-hh-gg',    N(hGg));
+  setText('ov-seoul-fb', N(sFb));
+  setText('ov-hh-fb',    N(hFb));
 
   let sv=0, hv=0, si=0, hi=0, sa=0, ha=0;
   CS_PERSONS.forEach(p=>{
@@ -1616,9 +1642,11 @@ function renderOverviewStats(){
       hi += r.hh[k]?.inq||0;    ha += r.hh[k]?.appt||0;     hv += r.hh[k]?.visit||0;
     });
   });
-  // 到店數
-  setText('ov-seoul-fb', N(sv));
-  setText('ov-hh-fb',    N(hv));
+  // 到店數（顯示在每張廣告卡的副標）
+  setText('ov-seoul-gg-visit', N(sv));
+  setText('ov-hh-gg-visit',    N(hv));
+  setText('ov-seoul-fb-visit', N(sv));
+  setText('ov-hh-fb-visit',    N(hv));
 
   setText('ov-seoul-inq',  N(si));  setText('ov-hh-inq',  N(hi));
   setText('ov-seoul-appt', N(sa));  setText('ov-hh-appt', N(ha));
