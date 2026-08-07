@@ -1591,8 +1591,8 @@ function renderOverviewStats(){
     const dw = Math.floor(Math.abs(diff)/10000).toLocaleString('zh-TW');
     el.innerHTML = `<span style="display:inline-block;padding:2px 10px;border-radius:20px;font-size:13px;font-weight:700;background:${pos?'#dcfce7':'#fee2e2'};color:${pos?'#16a34a':'#dc2626'}">${pos?'+':'-'}${dw}</span>`;
   };
-  setGap('ov-seoul-gap', sEst, ov.seoul.prev||0);
-  setGap('ov-hh-gap',    hEst, ov.hh.prev||0);
+  setGap('ov-seoul-gap', sEst, sPrev);
+  setGap('ov-hh-gap',    hEst, hPrev);
   setGap('ov-total-gap', totEst, totPrev);
 
   // Row 2: Google/FB from dcmp data, 到店/轉換率 from CS data
