@@ -310,21 +310,40 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   </div>
 
-  <!-- 第二行：漏斗指標 (4 scards) -->
-  <div class="grid stat-grid fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
+  <!-- 第二行：廣告來源 -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <!-- Google -->
     <div class="scard" style="border-left:4px solid #16a34a">
-      <div class="scard-title">Google</div>
+      <div class="scard-title">Google 廣告詢問</div>
       <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-gg">—</span></div></div>
       <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-gg">—</span></div></div>
     </div>
 
     <!-- FB -->
-    <div class="scard" style="border-left:4px solid #2563eb">
-      <div class="scard-title">FB</div>
+    <div class="scard" style="border-left:4px solid #3b82f6">
+      <div class="scard-title">FB 廣告詢問</div>
       <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-fb">—</span></div></div>
       <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-fb">—</span></div></div>
+    </div>
+
+  </div>
+
+  <!-- 第三行：漏斗指標 -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
+
+    <!-- 詢問數 -->
+    <div class="scard" style="border-left:4px solid #f59e0b">
+      <div class="scard-title">詢問數</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
+    </div>
+
+    <!-- 預約數 -->
+    <div class="scard" style="border-left:4px solid #f97316">
+      <div class="scard-title">預約數</div>
+      <div class="scard-row"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span></div></div>
+      <div class="scard-row"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span></div></div>
     </div>
 
     <!-- 到店數 / 到店率 -->
@@ -1268,14 +1287,16 @@ function renderOverviewStats(){
   setText('ov-seoul-fb', N(sFb));
   setText('ov-hh-fb',    N(hFb));
 
-  let sv=0, hv=0, si=0, hi=0;
+  let sv=0, hv=0, si=0, hi=0, sa=0, ha=0;
   CS_PERSONS.forEach(p=>{
     const r = loadCSRec(month, p);
     CS_SOURCES.forEach(k=>{
-      si += r.seoul[k]?.inq||0;   sv += r.seoul[k]?.visit||0;
-      hi += r.hh[k]?.inq||0;     hv += r.hh[k]?.visit||0;
+      si += r.seoul[k]?.inq||0;  sa += r.seoul[k]?.appt||0;  sv += r.seoul[k]?.visit||0;
+      hi += r.hh[k]?.inq||0;    ha += r.hh[k]?.appt||0;     hv += r.hh[k]?.visit||0;
     });
   });
+  setText('ov-seoul-inq',  N(si));  setText('ov-hh-inq',  N(hi));
+  setText('ov-seoul-appt', N(sa));  setText('ov-hh-appt', N(ha));
   setText('ov-seoul-visit',    N(sv));
   setText('ov-seoul-visitpct', P(sv, sGg+sFb));
   setText('ov-seoul-cvr',      P(sv, sGg+sFb));
