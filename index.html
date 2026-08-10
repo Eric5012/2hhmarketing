@@ -81,11 +81,15 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .rpt-panel{display:block}
 .rpt-panel.hidden{display:none}
 /* CS Summary Table */
-.cs-sum-tbl{width:100%;border-collapse:collapse;font-size:12px}
-.cs-sum-tbl th{background:#f8fafc;padding:7px 10px;text-align:center;font-weight:700;font-size:11px;color:#475569;white-space:nowrap;border:1px solid #e2e8f0}
-.cs-sum-tbl td{padding:7px 10px;text-align:center;border:1px solid #e2e8f0;white-space:nowrap}
-.cs-sum-tbl .src-cell{text-align:left;font-weight:600;font-size:12px}
-.cs-sum-tbl .grp-hd{background:#f1f5f9;font-weight:800;font-size:11px;color:#334155;text-align:center;padding:5px 8px;border:1px solid #e2e8f0}
+.cs-sum-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
+.cs-sum-tbl th{background:#f8fafc;padding:7px 10px;text-align:center;font-weight:700;font-size:11px;color:#475569;white-space:nowrap;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
+.cs-sum-tbl th:first-child{border-left:1px solid #e2e8f0}
+.cs-sum-tbl thead tr:first-child th{border-top:1px solid #e2e8f0}
+.cs-sum-tbl td{padding:7px 10px;text-align:center;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;white-nowrap:nowrap}
+.cs-sum-tbl tr td:first-child{border-left:1px solid #e2e8f0}
+.cs-sum-tbl .src-cell{font-weight:600;font-size:12px;position:sticky;left:0;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.06)}
+.cs-sum-tbl thead .grp-hd:first-child,.cs-sum-tbl thead .grp-hd[colspan="2"]:first-child{position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)}
+.cs-sum-tbl .grp-hd{background:#f1f5f9;font-weight:800;font-size:11px;color:#334155;text-align:center;padding:5px 8px;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
 .cs-sum-tbl .total-row{background:#f8fafc;font-weight:700}
 /* ── CS person cards ── */
 .cs-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
@@ -826,8 +830,8 @@ function renderInqTable(month, brand){
   <table class="cs-sum-tbl" style="min-width:520px">
     <thead>
       <tr>
-        <th rowspan="2" class="grp-hd" colspan="2">來源</th>
-        <th rowspan="2" class="grp-hd">來源</th>
+        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
+        <th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3">來源</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#4472c4;color:#fff">男</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#d4789a;color:#fff">女</th>
         <th rowspan="2" class="grp-hd">總計</th>
@@ -996,7 +1000,7 @@ function renderCSSummary(){
   const pCols = persons.map(p=>`<th colspan="3" class="grp-hd" style="background:#e0e7ff;color:#3730a3">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
   thead.innerHTML = `
     <tr>
-      <th class="grp-hd" rowspan="2">來源</th>
+      <th class="grp-hd" rowspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
       <th colspan="3" class="grp-hd">合計</th>
       <th colspan="2" class="grp-hd" style="background:#fef3c7;color:#92400e">業績</th>
       ${pCols}
