@@ -1483,22 +1483,26 @@ function seedCSIfEmpty(){
 
   // ── 醫美 2026-08 ──
   const ivan8 = loadCSRec(month8, 'ivan');
-  if(!ivan8.seoul.gline?.inq){
-    ivan8.seoul['080']   = {inq:0,  appt:0,  visit:0};
-    ivan8.seoul['gline'] = {inq:27, appt:20, visit:20};
-    ivan8.seoul['fbline']= {inq:19, appt:8,  visit:8};
-    ivan8.seoul['fbdm']  = {inq:58, appt:9,  visit:9};
-    ivan8.seoul['kol']   = {inq:0,  appt:0,  visit:0};
-    ivan8.seoul['other'] = {inq:1,  appt:0,  visit:0};
-    ivan8.seoul['mgm']   = {inq:0,  appt:0,  visit:0};
+  if((ivan8.seoul.gline?.inq||0) !== 43){  // re-seed if not yet updated to Aug actuals
+    ivan8.seoul['080']   = {inq:0,   appt:0,  visit:0};
+    ivan8.seoul['gline'] = {inq:43,  appt:25, visit:25};
+    ivan8.seoul['fbline']= {inq:35,  appt:10, visit:10};
+    ivan8.seoul['fb2']   = {inq:0,   appt:0,  visit:0};
+    ivan8.seoul['fb3']   = {inq:0,   appt:0,  visit:0};
+    ivan8.seoul['fbdm']  = {inq:108, appt:12, visit:12};
+    ivan8.seoul['kol']   = {inq:0,   appt:0,  visit:0};
+    ivan8.seoul['other'] = {inq:2,   appt:0,  visit:0};
+    ivan8.seoul['mgm']   = {inq:0,   appt:0,  visit:0};
     saveCSRec(ivan8);
   }
   const jessie8 = loadCSRec(month8, 'jessie');
-  if(!jessie8.seoul.gline?.inq){
+  if((jessie8.seoul.gline?.inq||0) !== 19){  // re-seed if not yet updated to Aug actuals
     jessie8.seoul['080']   = {inq:0,  appt:0, visit:0};
-    jessie8.seoul['gline'] = {inq:19, appt:4, visit:4};
-    jessie8.seoul['fbline']= {inq:12, appt:2, visit:2};
-    jessie8.seoul['fbdm']  = {inq:47, appt:1, visit:1};
+    jessie8.seoul['gline'] = {inq:19, appt:8, visit:8};
+    jessie8.seoul['fbline']= {inq:12, appt:3, visit:3};
+    jessie8.seoul['fb2']   = {inq:0,  appt:0, visit:0};
+    jessie8.seoul['fb3']   = {inq:0,  appt:0, visit:0};
+    jessie8.seoul['fbdm']  = {inq:54, appt:5, visit:5};
     jessie8.seoul['kol']   = {inq:0,  appt:0, visit:0};
     jessie8.seoul['other'] = {inq:0,  appt:0, visit:0};
     jessie8.seoul['mgm']   = {inq:0,  appt:0, visit:0};
