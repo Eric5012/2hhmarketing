@@ -1003,6 +1003,11 @@ function renderCSSummary(){
   const pData = {};
   CS_PERSONS.forEach(p => { pData[p] = loadCSRec(month, p); });
 
+  // Pull 廣告成效 (dcmp) totals for this month/brand
+  const dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
+  const dcmpGg = dcmpRecs.reduce((s,r)=>s+(r[brand]?.actual?.gg||0),0); // Google 詢問
+  const dcmpFb = dcmpRecs.reduce((s,r)=>s+(r[brand]?.actual?.fb||0),0); // FB 詢問 (合計)
+
   // Aggregate by source
   const srcRows = sources.map(src => {
     let tInq=0, tAppt=0, tVisit=0;
@@ -1014,6 +1019,8 @@ function renderCSSummary(){
       tAppt  += d.appt||0;
       tVisit += d.visit||0;
     });
+    // GLINE 詢問 → 廣告成效 Google 詢問 (if dcmp data exists)
+    if(src.key === 'gline' && dcmpGg > 0) tInq = dcmpGg;
     return {src, tInq, tAppt, tVisit, pp};
   });
 
@@ -1055,18 +1062,49 @@ function renderCSSummary(){
       ${persons.map(()=>'<th>詢問</th><th>預約</th><th>到店</th>').join('')}
     </tr>`;
 
+  // FB合計 (廣告): sum of fbline+fb2+fb3+fbdm visits from CS, inq from dcmp.fb
+  const fbVisitTotal = srcRows
+    .filter(r=>['fbline','fb2','fb3','fbdm'].includes(r.src.key))
+    .reduce((s,r)=>s+r.tVisit, 0);
+  const fbApptTotal = srcRows
+    .filter(r=>['fbline','fb2','fb3','fbdm'].includes(r.src.key))
+    .reduce((s,r)=>s+r.tAppt, 0);
+  const fbPPTotals = {};
+  persons.forEach(p=>{
+    fbPPTotals[p]={inq:0,appt:0,visit:0};
+    ['fbline','fb2','fb3','fbdm'].forEach(k=>{
+      const d=pData[p][brand][k]||{inq:0,appt:0,visit:0};
+      fbPPTotals[p].appt  += d.appt||0;
+      fbPPTotals[p].visit += d.visit||0;
+    });
+  });
+
   // Body rows
   tbody.innerHTML = srcRows.map(r => {
     const pCells = persons.map(p => {
       const d = r.pp[p]||{inq:0,appt:0,visit:0};
       return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
     }).join('');
+    // Inject FB合計 row after FB私訊 (fbdm)
+    let extra = '';
+    if(r.src.key === 'fbdm'){
+      const fbPPCells = persons.map(p=>{
+        const d=fbPPTotals[p];
+        return `<td>${dcmpFb>0?N(dcmpFb):'—'}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
+      }).join('');
+      extra = `<tr style="background:#fed7aa;font-weight:700">
+        <td class="src-cell" style="font-size:11px;color:#9a3412">FB合計<br><span style="font-weight:400;font-size:10px;color:#c2410c">廣告來源</span></td>
+        <td style="color:#9a3412">${dcmpFb>0?N(dcmpFb):'—'}</td><td>${N(fbApptTotal)}</td><td>${N(fbVisitTotal)}</td>
+        <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
+        ${fbPPCells}
+      </tr>`;
+    }
     return `<tr style="background:${r.src.bg}">
       <td class="src-cell">${r.src.label}</td>
       <td>${N(r.tInq)}</td><td>${N(r.tAppt)}</td><td>${N(r.tVisit)}</td>
       <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
       ${pCells}
-    </tr>`;
+    </tr>${extra}`;
   }).join('') + `
     <tr class="total-row">
       <td class="src-cell">總數</td>
