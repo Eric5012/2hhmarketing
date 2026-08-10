@@ -554,6 +554,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         <button class="cs-sum-brand-btn chip" data-brand="hh" onclick="setCsSumBrand('hh',this)">醫髮</button>
       </div>
       <select id="cs-sum-month-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderCSSummary()"></select>
+      <button id="gs-sync-btn" onclick="syncFromSheet()" style="padding:5px 14px;border-radius:8px;background:#4f46e5;color:#fff;font-size:12px;font-weight:700;border:none;cursor:pointer;display:flex;align-items:center;gap:6px">
+        ↻ 同步試算表
+      </button>
+      <span id="gs-sync-status" style="font-size:11px;color:#94a3b8"></span>
     </div>
     <!-- CON數表 -->
     <div class="text-sm font-bold text-slate-600 mt-2">CON數表</div>
@@ -974,6 +978,77 @@ function showRptPanel(id, el){
   document.getElementById('rpt-'+id).classList.remove('hidden');
   el.classList.add('active');
   if(id==='cs') renderCSSummary();
+}
+
+// ──────────────────────────────────────────────────────────────
+// GOOGLE SHEETS 同步
+// ──────────────────────────────────────────────────────────────
+const GS_URL = 'https://script.google.com/macros/s/AKfycbwyvj_Pfw6hEN2U9IrNnvswZv_QEL9vsTh-gW_rBZsDo3KJ6obx01--zUWPZfri65Oy/exec';
+
+function toRocMonth(month){
+  // '2026-08' → '11508'
+  const [y, m] = month.split('-').map(Number);
+  return String(y - 1911) + String(m).padStart(2,'0');
+}
+
+async function syncFromSheet(){
+  const month = document.getElementById('cs-sum-month-sel')?.value || getCurrentMonth();
+  const brand = csSumBrand;
+  const rocMonth = toRocMonth(month);
+  const btn = document.getElementById('gs-sync-btn');
+  const status = document.getElementById('gs-sync-status');
+
+  if(btn){ btn.textContent = '↻ 同步中...'; btn.disabled = true; }
+  if(status) status.textContent = '';
+
+  try {
+    // ── CON數表 ──
+    const conRes  = await fetch(`${GS_URL}?type=con&month=${rocMonth}`);
+    const conData = await conRes.json();
+
+    if(!conData.error){
+      const persons = CS_PERSONS.filter(p => CS_PERSON_BRANDS[p].includes(brand));
+      persons.forEach(p => {
+        const rec = loadCSRec(month, p);
+        Object.entries(conData.sources).forEach(([key, src]) => {
+          const pd = src[p] || {inq:0, con:0};
+          rec[brand][key] = { inq: pd.inq||0, appt: pd.con||0, visit: pd.con||0 };
+        });
+        saveCSRec(rec);
+      });
+
+      // Branch SO/HC/TC
+      const branchRec = loadBranchRec(month, brand);
+      if(!branchRec.sources) branchRec.sources = {};
+      Object.entries(conData.sources).forEach(([key, src]) => {
+        branchRec.sources[key] = { so: src.so||0, hc: src.hc||0, tc: src.tc||0 };
+      });
+      saveBranchRec(branchRec);
+    }
+
+    // ── 詢問總表 ──
+    const inqRes  = await fetch(`${GS_URL}?type=inq&month=${rocMonth}`);
+    const inqData = await inqRes.json();
+
+    if(!inqData.error){
+      const inqRec = loadInqRec(month, brand);
+      Object.entries(inqData.sources).forEach(([key, src]) => {
+        if(!inqRec.sources[key]) inqRec.sources[key] = {};
+        inqRec.sources[key].female = src.female || {};
+        if(!inqRec.sources[key].male) inqRec.sources[key].male = {};
+      });
+      saveInqRec(inqRec);
+    }
+
+    if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
+    if(status){ status.textContent = '✓ 已同步 '+ new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color='#16a34a'; }
+    renderCSSummary();
+
+  } catch(e) {
+    console.error('GS sync error:', e);
+    if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
+    if(status){ status.textContent = '✗ 同步失敗，請稍後再試'; status.style.color='#dc2626'; }
+  }
 }
 
 // ── 客服總表 ──
