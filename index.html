@@ -885,13 +885,20 @@ function renderInqTable(month, brand){
   const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
   const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
 
-  // 總計 block
-  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">當月總計</td>`;
+  // 總計 block（來源欄只顯示「總計」，日期欄顯示「當月總計」）
+  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">總計</td>`;
+
+  // 日期欄：「當月總計」跨越全部來源行
+  // cats: gt(3)+9simpleBlocks(27)+fb(3)+dcon(3) = 36 rows
+  // flat: gt(5)+...(27)+fb(3)+dcon(3) = 38 rows
+  const N_SRC_ROWS = cats ? 36 : 38;
+  const dateTd = `<td class="src-cell" rowspan="${N_SRC_ROWS}" style="writing-mode:vertical-rl;transform:rotate(180deg);text-align:center;font-weight:700;background:#fef9c3;color:#78350f;padding:8px 4px;white-space:nowrap;min-width:28px">當月總計</td>`;
 
   // Header rows — cats mode: 2 rows (category + services, female-only); flat mode: 2 rows (gender + services)
   const hdrRowSpan = 2;
-  const hdrSrcCell = `<th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
-        <th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3">來源</th>`;
+  const hdrSrcCell = `<th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:32px">日期</th>
+        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
+        <th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3">客服</th>`;
   let theadHtml = '';
   if(cats){
     theadHtml = `<tr>
@@ -925,7 +932,7 @@ function renderInqTable(month, brand){
   <table class="cs-sum-tbl" style="min-width:520px">
     <thead>${dateRow}${theadHtml}</thead>
     <tbody>
-      ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
+      ${(()=>{ let s=threeRows(gtCell,gt.male,gt.female,'#fef9c3'); return s.replace(/^(<tr[^>]*>)/,`$1${dateTd}`); })()}
       ${simpleBlock('080',    '#bbf7d0', '080')}
       ${simpleBlock('GLINE',  '#bfdbfe', 'gline', '#dbeafe')}
       ${threeRows(fbCell, fbSum.m, fbSum.f, '#ffedd5')}
