@@ -708,7 +708,7 @@ function renderInqTable(month, brand){
   const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
   // Build 3 rows for one source (詢問/到訪/轉換率)
-  function srcBlock(key, label, bg, male, female){
+  function srcBlock(key, label, bg, male, female, tc='#1e293b'){
     const totInq   = services.reduce((s,k)=>s+(male[k]?.inq||0)+(female[k]?.inq||0),0);
     const totVisit = services.reduce((s,k)=>s+(male[k]?.visit||0)+(female[k]?.visit||0),0);
     const mInq  = services.map(s=>`<td>${N(male[s]?.inq)}</td>`).join('');
@@ -719,7 +719,7 @@ function renderInqTable(month, brand){
     const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(female[s]?.visit,female[s]?.inq)}</td>`).join('');
     return `
       <tr style="background:${bg}">
-        <td class="src-cell" rowspan="3" style="text-align:center">${label}</td>
+        <td class="src-cell" rowspan="3" style="text-align:center;color:${tc};font-weight:700">${label}</td>
         <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
       </tr>
       <tr style="background:${bg}">
@@ -731,13 +731,13 @@ function renderInqTable(month, brand){
   }
 
   const srcDefs = [
-    {key:'080',    label:'080',     bg:'#fef9c3'},
-    {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
-    {key:'fbline', label:'FB LINE', bg:'#fee2e2'},
-    {key:'fbdm',   label:'FB 私訊', bg:'#ede9fe'},
-    {key:'kol',    label:'KOL',     bg:'#fef3c7'},
-    {key:'other',  label:'其他',    bg:'#f1f5f9'},
-    {key:'mgm',    label:'MGM',     bg:'#fce7f3'},
+    {key:'080',    label:'080',     bg:'#fce4b0', tc:'#7c3a00'},
+    {key:'gline',  label:'GLINE',   bg:'#c6e0b4', tc:'#1a4d00'},
+    {key:'fbline', label:'FB LINE', bg:'#ffb3b3', tc:'#7c0000'},
+    {key:'fbdm',   label:'FB 私訊', bg:'#ffe0b2', tc:'#7c3d00'},
+    {key:'kol',    label:'KOL',     bg:'#d9b3ff', tc:'#3d0073'},
+    {key:'other',  label:'其他',    bg:'#b3e6ff', tc:'#003d66'},
+    {key:'mgm',    label:'MGM',     bg:'#ffcce5', tc:'#7c0040'},
   ];
 
   const srcRows = srcDefs.map(d=>{
@@ -747,7 +747,7 @@ function renderInqTable(month, brand){
       m[s] = sd.male?.[s]  ||{inq:0,visit:0};
       f[s] = sd.female?.[s]||{inq:0,visit:0};
     });
-    return srcBlock(d.key, d.label, d.bg, m, f);
+    return srcBlock(d.key, d.label, d.bg, m, f, d.tc);
   }).join('');
 
   // Estimates / bottom summary
@@ -782,14 +782,14 @@ function renderInqTable(month, brand){
       <tr>
         <th rowspan="2" class="grp-hd">來源</th>
         <th rowspan="2" class="grp-hd">指標</th>
-        <th colspan="${nSvc}" class="grp-hd" style="background:#bfdbfe;color:#1e40af">男</th>
-        <th colspan="${nSvc}" class="grp-hd" style="background:#fce7f3;color:#9d174d">女</th>
+        <th colspan="${nSvc}" class="grp-hd" style="background:#4472c4;color:#fff">男</th>
+        <th colspan="${nSvc}" class="grp-hd" style="background:#ff6699;color:#fff">女</th>
         <th rowspan="2" class="grp-hd">總計</th>
       </tr>
-      <tr>${services.map(s=>`<th style="background:#dbeafe">${s}</th>`).join('')}${services.map(s=>`<th style="background:#fce7f3">${s}</th>`).join('')}</tr>
+      <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#ffb3cc;color:#7c0040">${s}</th>`).join('')}</tr>
     </thead>
     <tbody>
-      ${srcBlock('_gt_','總計','#e2e8f0',gt.male,gt.female)}
+      ${srcBlock('_gt_','總計','#ffd966',gt.male,gt.female,'#5a3e00')}
       ${srcRows}
       <tr><td colspan="${2+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#fef9c3">
