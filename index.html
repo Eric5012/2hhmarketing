@@ -724,7 +724,7 @@ function renderInqTable(month, brand){
   const gtTotalInq   = services.reduce((s,k)=>s+(gt.male[k].inq||0)+(gt.female[k].inq||0),0);
   const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
-  // Build 3 sub-rows (詢問/到訪/轉換率) for given male/female data
+  // Build 3 sub-rows (詢問/到店/轉換率) for given male/female data
   // srcCell: deep-colored label cell(s); data rows use light bg
   const ROW_BG = '#ffffff';
   function threeRows(srcCell, m, f){
@@ -737,7 +737,7 @@ function renderInqTable(month, brand){
     const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
     const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
     return `<tr style="background:${ROW_BG}">${srcCell}<td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td></tr>
-      <tr style="background:${ROW_BG}"><td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
+      <tr style="background:${ROW_BG}"><td class="inq-metric">到店</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
       <tr style="background:${ROW_BG}"><td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
   }
 
