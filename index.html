@@ -2274,43 +2274,53 @@ function renderOverviewStats(){
   setGap('ov-hh-gap',    hEst, hPrev);
   setGap('ov-total-gap', totEst, totPrev);
 
-  // Row 2: Google / FB 廣告詢問 + 到店數
-  let dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
-  let sGg=0, sFb=0, hGg=0, hFb=0;
-  dcmpRecs.forEach(r=>{
-    sGg += r.seoul?.actual?.gg||0;
-    sFb += r.seoul?.actual?.fb||0;
-    hGg += r.hh?.actual?.gg||0;
-    hFb += r.hh?.actual?.fb||0;
-  });
-  // 廣告詢問（各自）
-  setText('ov-seoul-gg', N(sGg));
-  setText('ov-hh-gg',    N(hGg));
-  setText('ov-seoul-fb', N(sFb));
-  setText('ov-hh-fb',    N(hFb));
-
+  // Row 2: Google / FB 詢問 + 到店數 — 從客服總表 CS 資料拉取
+  // Google = GLINE；FB = FB LINE (fbline) + FB 私訊 (fbdm)
+  let sGgInq=0, sGgV=0, sFbInq=0, sFbV=0;
+  let hGgInq=0, hGgV=0, hFbInq=0, hFbV=0;
   let sv=0, hv=0, si=0, hi=0, sa=0, ha=0;
   CS_PERSONS.forEach(p=>{
     const r = loadCSRec(month, p);
+    // Seoul
+    const sg = r.seoul['gline']  || {inq:0,visit:0};
+    const sf1= r.seoul['fbline'] || {inq:0,visit:0};
+    const sf2= r.seoul['fbdm']   || {inq:0,visit:0};
+    sGgInq += sg.inq||0;  sGgV += sg.visit||0;
+    sFbInq += (sf1.inq||0)+(sf2.inq||0);
+    sFbV   += (sf1.visit||0)+(sf2.visit||0);
+    // HH
+    const hg = r.hh['gline']  || {inq:0,visit:0};
+    const hf1= r.hh['fbline'] || {inq:0,visit:0};
+    const hf2= r.hh['fbdm']   || {inq:0,visit:0};
+    hGgInq += hg.inq||0;  hGgV += hg.visit||0;
+    hFbInq += (hf1.inq||0)+(hf2.inq||0);
+    hFbV   += (hf1.visit||0)+(hf2.visit||0);
+    // 全來源合計（用於總詢問/總到店）
     CS_SOURCES.forEach(k=>{
       si += r.seoul[k]?.inq||0;  sa += r.seoul[k]?.appt||0;  sv += r.seoul[k]?.visit||0;
       hi += r.hh[k]?.inq||0;    ha += r.hh[k]?.appt||0;     hv += r.hh[k]?.visit||0;
     });
   });
-  // 到店數（顯示在每張廣告卡的副標）
-  setText('ov-seoul-gg-visit', N(sv));
-  setText('ov-hh-gg-visit',    N(hv));
-  setText('ov-seoul-fb-visit', N(sv));
-  setText('ov-hh-fb-visit',    N(hv));
+
+  // 廣告詢問（從 CS 客服總表）
+  setText('ov-seoul-gg', N(sGgInq));
+  setText('ov-hh-gg',    N(hGgInq));
+  setText('ov-seoul-fb', N(sFbInq));
+  setText('ov-hh-fb',    N(hFbInq));
+  // 到店數（各自對應來源）
+  setText('ov-seoul-gg-visit', N(sGgV));
+  setText('ov-hh-gg-visit',    N(hGgV));
+  setText('ov-seoul-fb-visit', N(sFbV));
+  setText('ov-hh-fb-visit',    N(hFbV));
 
   setText('ov-seoul-inq',  N(si));  setText('ov-hh-inq',  N(hi));
   setText('ov-seoul-appt', N(sa));  setText('ov-hh-appt', N(ha));
   setText('ov-seoul-visit',    N(sv));
-  setText('ov-seoul-visitpct', P(sv, sGg+sFb));
-  setText('ov-seoul-cvr',      P(sv, sGg+sFb));
+  setText('ov-seoul-visitpct', P(sv, sGgInq+sFbInq));
+  setText('ov-seoul-cvr',      P(sv, sGgInq+sFbInq));
   setText('ov-hh-visit',      N(hv));
-  setText('ov-hh-visitpct',   P(hv, hGg+hFb));
-  setText('ov-hh-cvr',        P(hv, hGg+hFb));
+  setText('ov-hh-visitpct',   P(hv, hGgInq+hFbInq));
+  setText('ov-hh-cvr',        P(hv, hGgInq+hFbInq));
 }
 
 function renderDcmp(){
