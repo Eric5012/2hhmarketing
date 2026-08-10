@@ -81,11 +81,11 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .rpt-panel{display:block}
 .rpt-panel.hidden{display:none}
 /* CS Summary Table */
-.cs-sum-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px}
-.cs-sum-tbl th{background:#f8fafc;padding:7px 10px;text-align:center;font-weight:700;font-size:11px;color:#475569;white-space:nowrap;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
-.cs-sum-tbl th:first-child{border-left:1px solid #e2e8f0}
+.cs-sum-tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:12px;table-layout:fixed}
+.cs-sum-tbl th{background:#f8fafc;padding:7px 6px;text-align:center;font-weight:700;font-size:11px;color:#475569;white-space:nowrap;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;width:64px}
+.cs-sum-tbl th:first-child{border-left:1px solid #e2e8f0;width:72px}
 .cs-sum-tbl thead tr:first-child th{border-top:1px solid #e2e8f0}
-.cs-sum-tbl td{padding:7px 10px;text-align:center;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;white-nowrap:nowrap}
+.cs-sum-tbl td{padding:7px 6px;text-align:center;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cs-sum-tbl tr td:first-child{border-left:1px solid #e2e8f0}
 .cs-sum-tbl .src-cell{font-weight:600;font-size:12px;position:sticky;left:0;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.06)}
 .cs-sum-tbl thead .grp-hd:first-child,.cs-sum-tbl thead .grp-hd[colspan="2"]:first-child{position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)}
