@@ -669,7 +669,7 @@ function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d))
 // ──────────────────────────────────────────────────────────────
 const STORAGE_INQ = 'dash_inq_v1';
 const BRAND_SERVICES = {
-  hh:    ['生髮','護髮','養髮'],
+  hh:    ['生髮','植髮','美型'],
   seoul: []   // 醫美 service types TBD
 };
 function loadInqAll(){ return JSON.parse(localStorage.getItem(STORAGE_INQ)||'[]'); }
@@ -1281,21 +1281,21 @@ function seedYrIfEmpty(){
 }
 
 function seedInqIfEmpty(){
-  const Z = {生髮:{inq:0,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}};
+  const Z = {生髮:{inq:0,visit:0},植髮:{inq:0,visit:0},美型:{inq:0,visit:0}};
   const zSrc = ()=>({male:{...Z},female:{...Z}});
   // 醫髮 2026-08
   if(!loadInqAll().find(r=>r.month==='2026-08'&&r.brand==='hh')){
     saveInqRec({month:'2026-08', brand:'hh',
-      estimates:{male:{生髮:180,護髮:50,養髮:0}, female:{生髮:70,護髮:20,養髮:1}},
+      estimates:{male:{生髮:180,植髮:50,美型:0}, female:{生髮:70,植髮:20,美型:1}},
       sources:{
-        '080':   {male:{生髮:{inq:4,  visit:7}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:3, visit:3},護髮:{inq:1,visit:1},養髮:{inq:0,visit:0}}},
-        'gline': {male:{生髮:{inq:38, visit:19},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:16,visit:8}, 護髮:{inq:3,visit:0},養髮:{inq:0,visit:0}}},
-        'fbline':{male:{生髮:{inq:46, visit:15},護髮:{inq:15,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:69,visit:10},護髮:{inq:17,visit:0},養髮:{inq:1,visit:0}}},
+        '080':   {male:{生髮:{inq:4,  visit:7}, 植髮:{inq:0,visit:0},美型:{inq:0,visit:0}}, female:{生髮:{inq:3, visit:3},植髮:{inq:1,visit:1},美型:{inq:0,visit:0}}},
+        'gline': {male:{生髮:{inq:38, visit:19},植髮:{inq:0,visit:0},美型:{inq:0,visit:0}}, female:{生髮:{inq:16,visit:8}, 植髮:{inq:3,visit:0},美型:{inq:0,visit:0}}},
+        'fbline':{male:{生髮:{inq:46, visit:15},植髮:{inq:15,visit:0},美型:{inq:0,visit:0}}, female:{生髮:{inq:69,visit:10},植髮:{inq:17,visit:0},美型:{inq:1,visit:0}}},
         'fb2':   zSrc(),
         'fb3':   zSrc(),
         'fbdm':  zSrc(),
         'kol':   zSrc(),
-        'other': {male:{生髮:{inq:2,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'other': {male:{生髮:{inq:2,visit:0},植髮:{inq:0,visit:0},美型:{inq:0,visit:0}}, female:{生髮:{inq:0,visit:0},植髮:{inq:0,visit:0},美型:{inq:0,visit:0}}},
         'mgm':   zSrc(),
         'dcon':  {fs:zSrc(), hc:zSrc(), tc:zSrc()},
       }
