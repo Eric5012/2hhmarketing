@@ -886,7 +886,7 @@ function renderInqTable(month, brand){
   const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
 
   // 總計 block
-  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">總計</td>`;
+  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">當月總計</td>`;
 
   // Header rows — cats mode: 2 rows (category + services, female-only); flat mode: 2 rows (gender + services)
   const hdrRowSpan = 2;
@@ -912,10 +912,18 @@ function renderInqTable(month, brand){
       <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${SL(s)}</th>`).join('')}${services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${SL(s)}</th>`).join('')}</tr>`;
   }
 
+  // 日期列：跨全部欄
+  const totalCols = 2 + nDataCols + 1; // 來源(2) + 資料 + 總計
+  const dateRow = `<tr style="background:#334155">
+    <td colspan="${totalCols}" style="text-align:center;color:#fff;font-weight:700;font-size:13px;padding:6px 10px;border:none">
+      ${month}
+    </td>
+  </tr>`;
+
   return `
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
   <table class="cs-sum-tbl" style="min-width:520px">
-    <thead>${theadHtml}</thead>
+    <thead>${dateRow}${theadHtml}</thead>
     <tbody>
       ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
       ${simpleBlock('080',    '#bbf7d0', '080')}
