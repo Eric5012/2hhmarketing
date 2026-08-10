@@ -779,9 +779,9 @@ function renderInqTable(month, brand){
       const ld = dcon[loc]||{};
       const m={}; const f={};
       services.forEach(s=>{ m[s]=ld.male?.[s]||{inq:0,visit:0}; f[s]=ld.female?.[s]||{inq:0,visit:0}; });
-      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#f0fdf4">地區CON</td>` : '';
-      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#dcfce7">${DCON_LOC_LABELS[loc]}</td>`;
-      html += threeRows('#dcfce7', outerCell+innerCell, m, f);
+      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#f1f5f9">地區CON</td>` : '';
+      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#e2e8f0">${DCON_LOC_LABELS[loc]}</td>`;
+      html += threeRows('#f1f5f9', outerCell+innerCell, m, f);
     });
     return html;
   }
@@ -813,7 +813,7 @@ function renderInqTable(month, brand){
 
   // FB合計 = fb1(fbline) + fb2 + fb3 + fbdm
   const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
-  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fee2e2">FB</td>`;
+  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#ffedd5">FB</td>`;
 
   // 總計 block (colspan=2 for both 來源 columns)
   const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef9c3">總計</td>`;
@@ -833,38 +833,39 @@ function renderInqTable(month, brand){
     </thead>
     <tbody>
       ${threeRows('#fef9c3', gtCell, gt.male, gt.female)}
-      ${simpleBlock('080',   '#fef9c3', '080')}
-      ${simpleBlock('GLINE', '#dcfce7', 'gline')}
-      ${threeRows('#fee2e2', fbCell, fbSum.m, fbSum.f)}
-      ${simpleBlock('KOL',   '#ede9fe', 'kol')}
-      ${simpleBlock('其他',  '#f1f5f9', 'other')}
-      ${simpleBlock('FB1',   '#fee2e2', 'fbline')}
-      ${simpleBlock('FB2',   '#ffedd5', 'fb2')}
-      ${simpleBlock('FB3',   '#fef3c7', 'fb3')}
-      ${simpleBlock('FB私訊','#ede9fe', 'fbdm')}
+      ${simpleBlock('080',    '#dcfce7', '080')}
+      ${simpleBlock('GLINE',  '#dbeafe', 'gline')}
+      ${threeRows('#ffedd5', fbCell, fbSum.m, fbSum.f)}
+      ${simpleBlock('KOL',    '#ede9fe', 'kol')}
+      ${simpleBlock('其他',   '#dcfce7', 'other')}
+      ${simpleBlock('MGM',    '#dcfce7', 'mgm')}
+      ${simpleBlock('FB1',    '#f1f5f9', 'fbline')}
+      ${simpleBlock('FB2',    '#f1f5f9', 'fb2')}
+      ${simpleBlock('FB3',    '#f1f5f9', 'fb3')}
+      ${simpleBlock('FB私訊', '#f1f5f9', 'fbdm')}
       ${dconSection()}
       <tr><td colspan="${3+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
-      <tr style="background:#fef9c3">
-        <td class="src-cell" colspan="2" rowspan="5" style="text-align:center;font-weight:700">目標</td>
-        <td class="inq-metric" style="font-weight:700">預估</td>${mEstCells}${fEstCells}<td class="inq-tot">${N(estTotal)}</td>
+      <tr style="background:#f1f5f9">
+        <td class="src-cell" colspan="2" rowspan="5" style="text-align:center;font-weight:700;background:#fce7f3">目標</td>
+        <td class="inq-metric" style="font-weight:700">理想</td>${mEstCells}${fEstCells}<td class="inq-tot">${N(estTotal)}</td>
       </tr>
-      <tr style="background:#dcfce7">
+      <tr style="background:#f1f5f9">
         <td class="inq-metric" style="font-weight:700">實際</td>${mActCells}${fActCells}<td class="inq-tot">${N(gtTotalVisit)}</td>
       </tr>
-      <tr style="background:#fee2e2">
-        <td class="inq-metric" style="font-weight:700">差異</td>${mDifCells}${fDifCells}
+      <tr style="background:#f1f5f9">
+        <td class="inq-metric" style="font-weight:700">落差</td>${mDifCells}${fDifCells}
         <td class="inq-dif" style="font-weight:700;color:${difTotal>=0?'#16a34a':'#dc2626'}">${difTotal}</td>
       </tr>
       <tr style="background:#f1f5f9">
-        <td class="inq-metric">佔女性%</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e40af">男 ${malePct}</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#9d174d">女 ${femPct}</td>
+        <td class="inq-metric">男女%</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">女 ${femPct}</td>
         <td></td>
       </tr>
       <tr style="background:#f1f5f9">
-        <td class="inq-metric">生機%</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e40af">生 ${mShengPct}</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#9d174d">生 ${fShengPct}</td>
+        <td class="inq-metric">生植%</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${mShengPct}</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${fShengPct}</td>
         <td></td>
       </tr>
     </tbody>
