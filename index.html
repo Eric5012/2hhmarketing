@@ -826,10 +826,10 @@ function renderInqTable(month, brand){
         <th rowspan="2" class="grp-hd" colspan="2">來源</th>
         <th rowspan="2" class="grp-hd">指標</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#4472c4;color:#fff">男</th>
-        <th colspan="${nSvc}" class="grp-hd" style="background:#ff6699;color:#fff">女</th>
+        <th colspan="${nSvc}" class="grp-hd" style="background:#d4789a;color:#fff">女</th>
         <th rowspan="2" class="grp-hd">總計</th>
       </tr>
-      <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#ffb3cc;color:#7c0040">${s}</th>`).join('')}</tr>
+      <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${s}</th>`).join('')}</tr>
     </thead>
     <tbody>
       ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
