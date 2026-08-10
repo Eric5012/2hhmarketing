@@ -1000,14 +1000,15 @@ function renderCSSummary(){
   const P = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '—';
 
   // Simplified source list (no FB2/FB3)
+  // labelBg = 來源欄底色（同詢問總表）; dataBg = 數據欄底色（白）
   const sources = [
-    {key:'080',    label:'080',      bg:'#fef9c3'},
-    {key:'gline',  label:'GLINE',    bg:'#dcfce7'},
-    {key:'fbline', label:'FB LINE',  bg:'#fee2e2'},
-    {key:'fbdm',   label:'FB 私訊',  bg:'#ede9fe'},
-    {key:'kol',    label:'KOL',      bg:'#fef3c7'},
-    {key:'other',  label:'其他',     bg:'#f1f5f9'},
-    {key:'mgm',    label:'MGM',      bg:'#fce7f3'},
+    {key:'080',    label:'080',      labelBg:'#bbf7d0'},
+    {key:'gline',  label:'GLINE',    labelBg:'#bfdbfe'},
+    {key:'fbline', label:'FB LINE',  labelBg:'#fed7aa'},
+    {key:'fbdm',   label:'FB 私訊',  labelBg:'#fed7aa'},
+    {key:'kol',    label:'KOL',      labelBg:'#ddd6fe'},
+    {key:'other',  label:'其他',     labelBg:'#bbf7d0'},
+    {key:'mgm',    label:'MGM',      labelBg:'#bbf7d0'},
   ];
 
   // Persons visible for this brand
@@ -1063,46 +1064,55 @@ function renderCSSummary(){
   const tbody  = document.getElementById('cs-sum-tbody');
   if(!thead||!tbody) return;
 
+  // Group header bg colours
+  const GH_TOTAL  = 'background:#e2e8f0;color:#334155';  // 合計 — light grey
+  const GH_REV    = 'background:#d1d5db;color:#1e293b';  // 業績 — grey
+  const GH_BRANCH = 'background:#d1d5db;color:#1e293b';  // 各店到診 — grey
+  const GH_PERSON = 'background:#e0e7ff;color:#3730a3';  // 個人 — indigo
+  const SUB_TOTAL  = 'background:#f1f5f9';
+  const SUB_REV    = 'background:#e2e8f0';
+  const SUB_BRANCH = 'background:#e2e8f0';
+
   // Header:
   // Row1: 來源 | 合計(3) | 業績(2) | 各店到診(3) | IVAN(4) | JESSIE(4)
   // Row2:      | 詢問|CON|轉換率 | 總業績|PerCon | SO|HC|TC | 詢問|CON|核對|轉換率 | ...
-  const pCols = persons.map(p=>`<th colspan="4" class="grp-hd" style="background:#e0e7ff;color:#3730a3">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
+  const pCols = persons.map(p=>`<th colspan="4" class="grp-hd" style="${GH_PERSON}">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
   thead.innerHTML = `
     <tr>
       <th class="grp-hd" rowspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
-      <th colspan="3" class="grp-hd">合計</th>
-      <th colspan="2" class="grp-hd" style="background:#fef3c7;color:#92400e">業績</th>
-      <th colspan="3" class="grp-hd" style="background:#e0f2fe;color:#0c4a6e">各店到診</th>
+      <th colspan="3" class="grp-hd" style="${GH_TOTAL}">合計</th>
+      <th colspan="2" class="grp-hd" style="${GH_REV}">業績</th>
+      <th colspan="3" class="grp-hd" style="${GH_BRANCH}">各店到診</th>
       ${pCols}
     </tr>
     <tr>
-      <th>詢問</th><th>CON</th><th>轉換率</th>
-      <th style="background:#fef9c3">總業績(萬)</th><th style="background:#fef9c3">PerCon</th>
-      <th style="background:#bae6fd">SO</th><th style="background:#bae6fd">HC</th><th style="background:#bae6fd">TC</th>
+      <th style="${SUB_TOTAL}">詢問</th><th style="${SUB_TOTAL}">CON</th><th style="${SUB_TOTAL}">轉換率</th>
+      <th style="${SUB_REV}">總業績(萬)</th><th style="${SUB_REV}">PerCon</th>
+      <th style="${SUB_BRANCH}">SO</th><th style="${SUB_BRANCH}">HC</th><th style="${SUB_BRANCH}">TC</th>
       ${persons.map(()=>'<th>詢問</th><th>CON</th><th>核對</th><th>轉換率</th>').join('')}
     </tr>`;
 
-  // Body rows
+  // Body rows — 來源欄有顏色，數據欄白底
   tbody.innerHTML = srcRows.map(r => {
     const pCells = persons.map(p => {
       const d = r.pp[p]||{inq:0,appt:0,visit:0};
       const cvr = P(d.visit, d.inq);
-      return `<td>${N(d.inq)}</td><td>${N(d.visit)}</td><td>${N(d.visit)}</td><td style="color:${d.visit>0?'#1e293b':'#94a3b8'}">${cvr}</td>`;
+      return `<td style="background:#fff">${N(d.inq)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff;color:${d.visit>0?'#1e293b':'#94a3b8'}">${cvr}</td>`;
     }).join('');
-    return `<tr style="background:${r.src.bg}">
-      <td class="src-cell">${r.src.label}</td>
-      <td>${N(r.tInq)}</td><td>${N(r.tVisit)}</td><td>${P(r.tVisit,r.tInq)}</td>
-      <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
-      <td style="background:#e0f2fe">${N(r.so)}</td><td style="background:#e0f2fe">${N(r.hc)}</td><td style="background:#e0f2fe">${N(r.tc)}</td>
+    return `<tr>
+      <td class="src-cell" style="background:${r.src.labelBg};font-weight:600">${r.src.label}</td>
+      <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc">${P(r.tVisit,r.tInq)}</td>
+      <td style="${SUB_REV}">—</td><td style="${SUB_REV}">—</td>
+      <td style="${SUB_BRANCH}">${N(r.so)}</td><td style="${SUB_BRANCH}">${N(r.hc)}</td><td style="${SUB_BRANCH}">${N(r.tc)}</td>
       ${pCells}
     </tr>`;
   }).join('') + `
     <tr class="total-row">
-      <td class="src-cell">總數</td>
-      <td>${N(gtInq)}</td><td>${N(gtVisit)}</td><td>${P(gtVisit,gtInq)}</td>
-      <td style="background:#fef9c3;font-weight:700">${totalRev?Math.floor(totalRev/10000).toLocaleString('zh-TW'):'—'}</td>
-      <td style="background:#fef9c3;font-weight:700">${perCon?perCon.toLocaleString('zh-TW'):'—'}</td>
-      <td style="background:#bae6fd;font-weight:700">${N(gtSO)}</td><td style="background:#bae6fd;font-weight:700">${N(gtHC)}</td><td style="background:#bae6fd;font-weight:700">${N(gtTC)}</td>
+      <td class="src-cell" style="background:#94a3b8;color:#fff;font-weight:700">總數</td>
+      <td style="background:#e2e8f0">${N(gtInq)}</td><td style="background:#e2e8f0">${N(gtVisit)}</td><td style="background:#e2e8f0">${P(gtVisit,gtInq)}</td>
+      <td style="${SUB_REV};font-weight:700">${totalRev?Math.floor(totalRev/10000).toLocaleString('zh-TW'):'—'}</td>
+      <td style="${SUB_REV};font-weight:700">${perCon?perCon.toLocaleString('zh-TW'):'—'}</td>
+      <td style="${SUB_BRANCH};font-weight:700">${N(gtSO)}</td><td style="${SUB_BRANCH};font-weight:700">${N(gtHC)}</td><td style="${SUB_BRANCH};font-weight:700">${N(gtTC)}</td>
       ${persons.map(p=>{
         const d = gtPP[p];
         return `<td>${N(d.inq)}</td><td>${N(d.visit)}</td><td>${N(d.visit)}</td><td>${P(d.visit,d.inq)}</td>`;
