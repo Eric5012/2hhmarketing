@@ -725,9 +725,8 @@ function renderInqTable(month, brand){
   const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
   // Build 3 sub-rows (詢問/到店/轉換率) for given male/female data
-  // srcCell: deep-colored label cell(s); data rows use light bg
-  const ROW_BG = '#ffffff';
-  function threeRows(srcCell, m, f){
+  // srcCell: label cell(s); rowBg: optional row background (defaults to white)
+  function threeRows(srcCell, m, f, rowBg='#ffffff'){
     const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
     const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
     const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
@@ -736,9 +735,9 @@ function renderInqTable(month, brand){
     const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
     const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
     const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
-    return `<tr style="background:${ROW_BG}">${srcCell}<td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td></tr>
-      <tr style="background:${ROW_BG}"><td class="inq-metric">到店</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
-      <tr style="background:${ROW_BG}"><td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
+    return `<tr style="background:${rowBg}">${srcCell}<td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td></tr>
+      <tr style="background:${rowBg}"><td class="inq-metric">到店</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
+      <tr style="background:${rowBg}"><td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
   }
 
   // Helper: get male/female data for a storage key
@@ -766,10 +765,10 @@ function renderInqTable(month, brand){
   }
 
   // Build a simple colspan=2 source block (no nested sub-label)
-  function simpleBlock(label, srcBg, key){
+  function simpleBlock(label, srcBg, key, rowBg='#ffffff'){
     const {m,f} = srcMF(key);
     const cell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:${srcBg}">${label}</td>`;
-    return threeRows(cell, m, f);
+    return threeRows(cell, m, f, rowBg);
   }
 
   // Build 地區CON section: 地區CON (outer, spans 9 rows) + FS/HC/TC inner (each 3 rows)
@@ -833,11 +832,11 @@ function renderInqTable(month, brand){
       <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#ffb3cc;color:#7c0040">${s}</th>`).join('')}</tr>
     </thead>
     <tbody>
-      ${threeRows(gtCell, gt.male, gt.female)}
+      ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
       ${simpleBlock('080',    '#dcfce7', '080')}
-      ${simpleBlock('GLINE',  '#dbeafe', 'gline')}
-      ${threeRows(fbCell, fbSum.m, fbSum.f)}
-      ${simpleBlock('KOL',    '#ede9fe', 'kol')}
+      ${simpleBlock('GLINE',  '#dbeafe', 'gline', '#dbeafe')}
+      ${threeRows(fbCell, fbSum.m, fbSum.f, '#ffedd5')}
+      ${simpleBlock('KOL',    '#ede9fe', 'kol', '#ede9fe')}
       ${simpleBlock('其他',   '#dcfce7', 'other')}
       ${simpleBlock('MGM',    '#dcfce7', 'mgm')}
       ${simpleBlock('FB1',    '#f1f5f9', 'fbline')}
