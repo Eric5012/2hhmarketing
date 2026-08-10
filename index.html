@@ -930,6 +930,12 @@ function renderInqTable(month, brand){
   return `
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
   <table class="cs-sum-tbl" style="min-width:520px">
+    <colgroup>
+      <col style="width:36px;min-width:36px">
+      <col style="width:52px;min-width:52px">
+      <col style="width:52px;min-width:52px">
+      <col style="width:52px;min-width:52px">
+    </colgroup>
     <thead>${dateRow}${theadHtml}</thead>
     <tbody>
       ${(()=>{ let s=threeRows(gtCell,gt.male,gt.female,'#fef9c3'); return s.replace(/^(<tr[^>]*>)/,`$1${dateTd}`); })()}
