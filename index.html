@@ -669,6 +669,21 @@ function loadSeoulAds(){ return JSON.parse(localStorage.getItem(STORAGE_SEOUL)||
 function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d)); }
 
 // ──────────────────────────────────────────────────────────────
+// 分店到診 BRANCH VISITS (SO / HC / TC) — Google Form will populate
+// ──────────────────────────────────────────────────────────────
+const STORAGE_BRANCH = 'dash_branch_v1';
+function loadBranchAll(){ return JSON.parse(localStorage.getItem(STORAGE_BRANCH)||'[]'); }
+function saveBranchAll(d){ localStorage.setItem(STORAGE_BRANCH, JSON.stringify(d)); }
+function loadBranchRec(month, brand){
+  return loadBranchAll().find(r=>r.month===month&&r.brand===brand) ||
+    {month, brand, sources:{}};
+}
+function saveBranchRec(rec){
+  const all = loadBranchAll().filter(r=>!(r.month===rec.month&&r.brand===rec.brand));
+  all.push(rec); saveBranchAll(all);
+}
+
+// ──────────────────────────────────────────────────────────────
 // 詢問總表 (INQ TABLE)
 // ──────────────────────────────────────────────────────────────
 const STORAGE_INQ = 'dash_inq_v1';
@@ -984,55 +999,56 @@ function renderCSSummary(){
   const N = v => (v||0) > 0 ? (v).toLocaleString('zh-TW') : '—';
   const P = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '—';
 
+  // Simplified source list (no FB2/FB3)
   const sources = [
-    {key:'080',    label:'080',     bg:'#fef9c3'},
-    {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
-    {key:'fbline', label:'FB1',    bg:'#fee2e2'},
-    {key:'fb2',    label:'FB2',    bg:'#ffedd5'},
-    {key:'fb3',    label:'FB3',    bg:'#fef3c7'},
-    {key:'fbdm',   label:'FB私訊', bg:'#ede9fe'},
-    {key:'kol',    label:'KOL',     bg:'#fef3c7'},
-    {key:'other',  label:'其他',    bg:'#f1f5f9'},
-    {key:'mgm',    label:'MGM',     bg:'#fce7f3'},
+    {key:'080',    label:'080',      bg:'#fef9c3'},
+    {key:'gline',  label:'GLINE',    bg:'#dcfce7'},
+    {key:'fbline', label:'FB LINE',  bg:'#fee2e2'},
+    {key:'fbdm',   label:'FB 私訊',  bg:'#ede9fe'},
+    {key:'kol',    label:'KOL',      bg:'#fef3c7'},
+    {key:'other',  label:'其他',     bg:'#f1f5f9'},
+    {key:'mgm',    label:'MGM',      bg:'#fce7f3'},
   ];
 
   // Persons visible for this brand
   const persons = CS_PERSONS.filter(p => CS_PERSON_BRANDS[p].includes(brand));
 
-  // Load all person data
+  // Load all person data + branch visit data
   const pData = {};
   CS_PERSONS.forEach(p => { pData[p] = loadCSRec(month, p); });
+  const branchRec = loadBranchRec(month, brand);
 
-  // Pull 廣告成效 (dcmp) totals for this month/brand
+  // Pull 廣告成效 (dcmp) totals for GLINE 詢問 override
   const dcmpRecs = loadDcmpAll().filter(r => r.date.startsWith(month));
-  const dcmpGg = dcmpRecs.reduce((s,r)=>s+(r[brand]?.actual?.gg||0),0); // Google 詢問
-  const dcmpFb = dcmpRecs.reduce((s,r)=>s+(r[brand]?.actual?.fb||0),0); // FB 詢問 (合計)
+  const dcmpGg = dcmpRecs.reduce((s,r)=>s+(r[brand]?.actual?.gg||0),0);
 
   // Aggregate by source
   const srcRows = sources.map(src => {
-    let tInq=0, tAppt=0, tVisit=0;
+    let tInq=0, tVisit=0;
     const pp = {};
     persons.forEach(p => {
       const d = pData[p][brand][src.key] || {inq:0,appt:0,visit:0};
       pp[p] = d;
       tInq   += d.inq||0;
-      tAppt  += d.appt||0;
       tVisit += d.visit||0;
     });
     // GLINE 詢問 → 廣告成效 Google 詢問 (if dcmp data exists)
     if(src.key === 'gline' && dcmpGg > 0) tInq = dcmpGg;
-    return {src, tInq, tAppt, tVisit, pp};
+    // Branch visits (SO/HC/TC) from branchRec
+    const br = branchRec.sources[src.key] || {so:0,hc:0,tc:0};
+    return {src, tInq, tVisit, pp, so:br.so||0, hc:br.hc||0, tc:br.tc||0};
   });
 
   // Grand totals
   const gtInq   = srcRows.reduce((s,r)=>s+r.tInq,0);
-  const gtAppt  = srcRows.reduce((s,r)=>s+r.tAppt,0);
   const gtVisit = srcRows.reduce((s,r)=>s+r.tVisit,0);
+  const gtSO    = srcRows.reduce((s,r)=>s+r.so,0);
+  const gtHC    = srcRows.reduce((s,r)=>s+r.hc,0);
+  const gtTC    = srcRows.reduce((s,r)=>s+r.tc,0);
   const gtPP = {};
   persons.forEach(p => {
     gtPP[p] = {
       inq:   srcRows.reduce((s,r)=>s+(r.pp[p]?.inq||0),0),
-      appt:  srcRows.reduce((s,r)=>s+(r.pp[p]?.appt||0),0),
       visit: srcRows.reduce((s,r)=>s+(r.pp[p]?.visit||0),0),
     };
   });
@@ -1047,73 +1063,49 @@ function renderCSSummary(){
   const tbody  = document.getElementById('cs-sum-tbody');
   if(!thead||!tbody) return;
 
-  // Header: row1 = group labels, row2 = sub-columns
-  const pCols = persons.map(p=>`<th colspan="3" class="grp-hd" style="background:#e0e7ff;color:#3730a3">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
+  // Header:
+  // Row1: 來源 | 合計(3) | 業績(2) | 各店到診(3) | IVAN(4) | JESSIE(4)
+  // Row2:      | 詢問|CON|轉換率 | 總業績|PerCon | SO|HC|TC | 詢問|CON|核對|轉換率 | ...
+  const pCols = persons.map(p=>`<th colspan="4" class="grp-hd" style="background:#e0e7ff;color:#3730a3">${CS_PERSON_LABELS[p].toUpperCase()}</th>`).join('');
   thead.innerHTML = `
     <tr>
       <th class="grp-hd" rowspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
       <th colspan="3" class="grp-hd">合計</th>
       <th colspan="2" class="grp-hd" style="background:#fef3c7;color:#92400e">業績</th>
+      <th colspan="3" class="grp-hd" style="background:#e0f2fe;color:#0c4a6e">各店到診</th>
       ${pCols}
     </tr>
     <tr>
-      <th>詢問</th><th>預約</th><th>到店</th>
+      <th>詢問</th><th>CON</th><th>轉換率</th>
       <th style="background:#fef9c3">總業績(萬)</th><th style="background:#fef9c3">PerCon</th>
-      ${persons.map(()=>'<th>詢問</th><th>預約</th><th>到店</th>').join('')}
+      <th style="background:#bae6fd">SO</th><th style="background:#bae6fd">HC</th><th style="background:#bae6fd">TC</th>
+      ${persons.map(()=>'<th>詢問</th><th>CON</th><th>核對</th><th>轉換率</th>').join('')}
     </tr>`;
-
-  // FB合計 (廣告): sum of fbline+fb2+fb3+fbdm visits from CS, inq from dcmp.fb
-  const fbVisitTotal = srcRows
-    .filter(r=>['fbline','fb2','fb3','fbdm'].includes(r.src.key))
-    .reduce((s,r)=>s+r.tVisit, 0);
-  const fbApptTotal = srcRows
-    .filter(r=>['fbline','fb2','fb3','fbdm'].includes(r.src.key))
-    .reduce((s,r)=>s+r.tAppt, 0);
-  const fbPPTotals = {};
-  persons.forEach(p=>{
-    fbPPTotals[p]={inq:0,appt:0,visit:0};
-    ['fbline','fb2','fb3','fbdm'].forEach(k=>{
-      const d=pData[p][brand][k]||{inq:0,appt:0,visit:0};
-      fbPPTotals[p].appt  += d.appt||0;
-      fbPPTotals[p].visit += d.visit||0;
-    });
-  });
 
   // Body rows
   tbody.innerHTML = srcRows.map(r => {
     const pCells = persons.map(p => {
       const d = r.pp[p]||{inq:0,appt:0,visit:0};
-      return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
+      const cvr = P(d.visit, d.inq);
+      return `<td>${N(d.inq)}</td><td>${N(d.visit)}</td><td>${N(d.visit)}</td><td style="color:${d.visit>0?'#1e293b':'#94a3b8'}">${cvr}</td>`;
     }).join('');
-    // Inject FB合計 row after FB私訊 (fbdm)
-    let extra = '';
-    if(r.src.key === 'fbdm'){
-      const fbPPCells = persons.map(p=>{
-        const d=fbPPTotals[p];
-        return `<td>${dcmpFb>0?N(dcmpFb):'—'}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
-      }).join('');
-      extra = `<tr style="background:#fed7aa;font-weight:700">
-        <td class="src-cell" style="font-size:11px;color:#9a3412">FB合計<br><span style="font-weight:400;font-size:10px;color:#c2410c">廣告來源</span></td>
-        <td style="color:#9a3412">${dcmpFb>0?N(dcmpFb):'—'}</td><td>${N(fbApptTotal)}</td><td>${N(fbVisitTotal)}</td>
-        <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
-        ${fbPPCells}
-      </tr>`;
-    }
     return `<tr style="background:${r.src.bg}">
       <td class="src-cell">${r.src.label}</td>
-      <td>${N(r.tInq)}</td><td>${N(r.tAppt)}</td><td>${N(r.tVisit)}</td>
+      <td>${N(r.tInq)}</td><td>${N(r.tVisit)}</td><td>${P(r.tVisit,r.tInq)}</td>
       <td style="background:#fef9c3">—</td><td style="background:#fef9c3">—</td>
+      <td style="background:#e0f2fe">${N(r.so)}</td><td style="background:#e0f2fe">${N(r.hc)}</td><td style="background:#e0f2fe">${N(r.tc)}</td>
       ${pCells}
-    </tr>${extra}`;
+    </tr>`;
   }).join('') + `
     <tr class="total-row">
       <td class="src-cell">總數</td>
-      <td>${N(gtInq)}</td><td>${N(gtAppt)}</td><td>${N(gtVisit)}</td>
+      <td>${N(gtInq)}</td><td>${N(gtVisit)}</td><td>${P(gtVisit,gtInq)}</td>
       <td style="background:#fef9c3;font-weight:700">${totalRev?Math.floor(totalRev/10000).toLocaleString('zh-TW'):'—'}</td>
       <td style="background:#fef9c3;font-weight:700">${perCon?perCon.toLocaleString('zh-TW'):'—'}</td>
+      <td style="background:#bae6fd;font-weight:700">${N(gtSO)}</td><td style="background:#bae6fd;font-weight:700">${N(gtHC)}</td><td style="background:#bae6fd;font-weight:700">${N(gtTC)}</td>
       ${persons.map(p=>{
         const d = gtPP[p];
-        return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
+        return `<td>${N(d.inq)}</td><td>${N(d.visit)}</td><td>${N(d.visit)}</td><td>${P(d.visit,d.inq)}</td>`;
       }).join('')}
     </tr>`;
 
@@ -1507,6 +1499,23 @@ function seedCSIfEmpty(){
     jessie8.seoul['other'] = {inq:0,  appt:0, visit:0};
     jessie8.seoul['mgm']   = {inq:0,  appt:0, visit:0};
     saveCSRec(jessie8);
+  }
+}
+
+function seedBranchIfEmpty(){
+  // 醫美 2026-08 — SO/HC/TC branch visit data from CON數表 image
+  const rec = loadBranchRec('2026-08', 'seoul');
+  if(!rec.sources?.gline?.so){
+    rec.sources = {
+      '080':    {so:6,  hc:2, tc:6},
+      'gline':  {so:24, hc:3, tc:6},
+      'fbline': {so:8,  hc:1, tc:4},
+      'fbdm':   {so:8,  hc:3, tc:6},
+      'kol':    {so:0,  hc:0, tc:0},
+      'other':  {so:0,  hc:0, tc:0},
+      'mgm':    {so:2,  hc:0, tc:3},
+    };
+    saveBranchRec(rec);
   }
 }
 
@@ -2708,6 +2717,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   seedYrIfEmpty();
   seedInqIfEmpty();
   seedCSIfEmpty();
+  seedBranchIfEmpty();
   startClock();
   populateMonthSelects();
   populateSeoulYears();
