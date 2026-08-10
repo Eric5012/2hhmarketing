@@ -1672,12 +1672,22 @@ function renderCSPersonCard(person, month){
     `<span class="cs-inp-disp">${(val&&val>0)?val:'—'}</span>`;
 
   // build one brand's source table
+  // Individual card shows simplified source list (no FB2/FB3)
+  const CARD_SOURCES = [
+    {key:'080',    label:'080'},
+    {key:'gline',  label:'GLINE'},
+    {key:'fbline', label:'FB LINE'},
+    {key:'fbdm',   label:'FB 私訊'},
+    {key:'kol',    label:'KOL'},
+    {key:'other',  label:'其他'},
+    {key:'mgm',    label:'MGM'},
+  ];
   const brandTable = (brand, color, brandLabel) => {
-    const rows = CS_SOURCES.map(src => {
+    const rows = CARD_SOURCES.map(({key:src, label:srcLabel}) => {
       const d = r[brand][src] || {inq:0,appt:0,visit:0};
       const cvr = P(d.visit, d.inq);
       return `<tr>
-        <td class="cs-label">${CS_SOURCE_LABELS[src]}</td>
+        <td class="cs-label">${srcLabel}</td>
         <td class="cs-num">${inp(brand,src,'inq',d.inq)}</td>
         <td class="cs-num">${inp(brand,src,'appt',d.appt)}</td>
         <td class="cs-num">${inp(brand,src,'visit',d.visit)}</td>
