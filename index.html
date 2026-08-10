@@ -783,7 +783,7 @@ function renderInqTable(month, brand){
       const mVis = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
       const fVis = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
       const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
-      const locCell = `<td class="src-cell" colspan="2" style="text-align:center;color:#1e293b;font-weight:700;background:#e5e7eb">${DCON_LOC_LABELS[loc]}</td>`;
+      const locCell = `<td class="src-cell" colspan="2" style="text-align:center;color:#1e293b;font-weight:700;background:#ffffff">${DCON_LOC_LABELS[loc]}</td>`;
       html += `<tr style="background:#ffffff">${outerCell}${locCell}${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>`;
     });
     return html;
@@ -842,10 +842,10 @@ function renderInqTable(month, brand){
       ${simpleBlock('KOL',    '#ddd6fe', 'kol', '#ede9fe')}
       ${simpleBlock('其他',   '#bbf7d0', 'other')}
       ${simpleBlock('MGM',    '#bbf7d0', 'mgm')}
-      ${simpleBlock('FB1',    '#e5e7eb', 'fbline')}
-      ${simpleBlock('FB2',    '#e5e7eb', 'fb2')}
-      ${simpleBlock('FB3',    '#e5e7eb', 'fb3')}
-      ${simpleBlock('FB私訊', '#e5e7eb', 'fbdm')}
+      ${simpleBlock('FB1',    '#d1d5db', 'fbline')}
+      ${simpleBlock('FB2',    '#d1d5db', 'fb2')}
+      ${simpleBlock('FB3',    '#d1d5db', 'fb3')}
+      ${simpleBlock('FB私訊', '#d1d5db', 'fbdm')}
       ${dconSection()}
       <tr><td colspan="${3+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#ffffff">
