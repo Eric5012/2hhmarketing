@@ -771,7 +771,7 @@ function renderInqTable(month, brand){
     return threeRows(cell, m, f, rowBg);
   }
 
-  // Build 地區CON section: 地區CON (outer, spans 9 rows) + FS/HC/TC inner (each 3 rows)
+  // Build 地區CON section: 地區CON (outer, spans nLocs rows) + FS/HC/TC as single rows (no sub-indicators)
   function dconSection(){
     const nLocs = DCON_LOCS.length;
     let html = '';
@@ -779,9 +779,12 @@ function renderInqTable(month, brand){
       const ld = dcon[loc]||{};
       const m={}; const f={};
       services.forEach(s=>{ m[s]=ld.male?.[s]||{inq:0,visit:0}; f[s]=ld.female?.[s]||{inq:0,visit:0}; });
-      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
-      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#e5e7eb">${DCON_LOC_LABELS[loc]}</td>`;
-      html += threeRows(outerCell+innerCell, m, f);
+      const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
+      const mVis = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
+      const fVis = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
+      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
+      const locCell = `<td class="src-cell" colspan="2" style="text-align:center;color:#1e293b;font-weight:700;background:#e5e7eb">${DCON_LOC_LABELS[loc]}</td>`;
+      html += `<tr style="background:#ffffff">${outerCell}${locCell}${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>`;
     });
     return html;
   }
@@ -824,7 +827,7 @@ function renderInqTable(month, brand){
     <thead>
       <tr>
         <th rowspan="2" class="grp-hd" colspan="2">來源</th>
-        <th rowspan="2" class="grp-hd">指標</th>
+        <th rowspan="2" class="grp-hd">來源</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#4472c4;color:#fff">男</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#d4789a;color:#fff">女</th>
         <th rowspan="2" class="grp-hd">總計</th>
