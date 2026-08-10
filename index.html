@@ -688,32 +688,21 @@ function renderInqTable(month, brand){
   if(!services.length) return '<p style="color:#94a3b8;padding:20px;text-align:center">此品牌服務項目待設定</p>';
 
   const rec  = loadInqRec(month, brand);
-  const N    = v => (v||0) > 0 ? v : (v===0 ? '0' : '—');
+  const N    = v => (v||0) > 0 ? v : '—';
   const Pct  = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '#DIV/0!';
   const nSvc = services.length;
 
-  // Helper: sum two source data objects per service
-  function mergeSD(a, b){
-    const out={male:{},female:{}};
-    services.forEach(s=>{
-      out.male[s]  ={inq:(a.male?.[s]?.inq||0)+(b.male?.[s]?.inq||0),  visit:(a.male?.[s]?.visit||0)+(b.male?.[s]?.visit||0)};
-      out.female[s]={inq:(a.female?.[s]?.inq||0)+(b.female?.[s]?.inq||0),visit:(a.female?.[s]?.visit||0)+(b.female?.[s]?.visit||0)};
-    });
-    return out;
-  }
-
-  // Combine FB LINE + FB 私訊 → single "FB" source
-  const fbMerged = mergeSD(rec.sources['fbline']||{}, rec.sources['fbdm']||{});
-
-  // 地推CON locations
+  // 地區CON locations
   const DCON_LOCS = ['fs','hc','tc'];
-  const DCON_LABELS = {fs:'FS', hc:'HC', tc:'TC'};
+  const DCON_LOC_LABELS = {fs:'FS', hc:'HC', tc:'TC'};
   const dcon = rec.sources['dcon']||{};
 
-  // Compute grand total from all sources (080,gline,fb-merged,kol,other,mgm,dcon-all)
+  // All source keys that roll into grand total (FB1=fbline, FB2=fb2, FB3=fb3, FB私訊=fbdm)
+  const allSrcKeys = ['080','gline','fbline','fb2','fb3','fbdm','kol','other','mgm'];
+
+  // Compute grand total from all sources + dcon sub-locations
   const gt = {male:{}, female:{}};
   services.forEach(s=>{ gt.male[s]={inq:0,visit:0}; gt.female[s]={inq:0,visit:0}; });
-  const allSrcKeys = ['080','gline','fbline','fbdm','kol','other','mgm'];
   allSrcKeys.forEach(k=>{
     const d = rec.sources[k]||{};
     services.forEach(s=>{
@@ -723,7 +712,6 @@ function renderInqTable(month, brand){
       gt.female[s].visit += d.female?.[s]?.visit||0;
     });
   });
-  // Include dcon sub-locations in grand total
   DCON_LOCS.forEach(loc=>{
     const d = dcon[loc]||{};
     services.forEach(s=>{
@@ -736,45 +724,68 @@ function renderInqTable(month, brand){
   const gtTotalInq   = services.reduce((s,k)=>s+(gt.male[k].inq||0)+(gt.female[k].inq||0),0);
   const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
-  // Build 地推CON section: outer label spans 9 rows (3 locs × 3 rows each)
-  function dconBlock(){
-    const bg = '#e2efda'; const tc = '#1a4d00';
-    const locBg = '#c6e0b4';
-    const nLocs = DCON_LOCS.length; // 3
-    const totalRows = nLocs * 3;
+  // Build 3 sub-rows (詢問/到訪/轉換率) for given male/female data
+  // srcCell: the HTML for the leftmost cell(s) — only included in row0
+  function threeRows(bg, srcCell, m, f){
+    const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
+    const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
+    const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
+    const fInq  = services.map(s=>`<td>${N(f[s]?.inq)}</td>`).join('');
+    const mVis  = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
+    const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
+    const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
+    const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
+    return `<tr style="background:${bg}">${srcCell}<td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td></tr>
+      <tr style="background:${bg}"><td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
+      <tr style="background:${bg}"><td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
+  }
+
+  // Helper: get male/female data for a storage key
+  function srcMF(key){
+    const sd = rec.sources[key]||{};
+    const m={}; const f={};
+    services.forEach(s=>{ m[s]=sd.male?.[s]||{inq:0,visit:0}; f[s]=sd.female?.[s]||{inq:0,visit:0}; });
+    return {m,f};
+  }
+
+  // Helper: sum multiple source keys
+  function sumMF(keys){
+    const m={}; const f={};
+    services.forEach(s=>{ m[s]={inq:0,visit:0}; f[s]={inq:0,visit:0}; });
+    keys.forEach(k=>{
+      const sd=rec.sources[k]||{};
+      services.forEach(s=>{
+        m[s].inq   += sd.male?.[s]?.inq  ||0;
+        m[s].visit += sd.male?.[s]?.visit||0;
+        f[s].inq   += sd.female?.[s]?.inq  ||0;
+        f[s].visit += sd.female?.[s]?.visit||0;
+      });
+    });
+    return {m,f};
+  }
+
+  // Build a simple colspan=2 source block (no nested sub-label)
+  function simpleBlock(label, bg, key){
+    const {m,f} = srcMF(key);
+    const cell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:${bg}">${label}</td>`;
+    return threeRows(bg, cell, m, f);
+  }
+
+  // Build 地區CON section: 地區CON (outer, spans 9 rows) + FS/HC/TC inner (each 3 rows)
+  function dconSection(){
+    const nLocs = DCON_LOCS.length;
     let html = '';
     DCON_LOCS.forEach((loc, idx)=>{
-      const ld = (dcon[loc])||{};
+      const ld = dcon[loc]||{};
       const m={}; const f={};
-      services.forEach(s=>{
-        m[s] = ld.male?.[s]  ||{inq:0,visit:0};
-        f[s] = ld.female?.[s]||{inq:0,visit:0};
-      });
-      const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
-      const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
-      const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
-      const fInq  = services.map(s=>`<td>${N(f[s]?.inq)}</td>`).join('');
-      const mVis  = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
-      const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
-      const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
-      const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
-      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${totalRows}" style="text-align:center;color:#1a4d00;font-weight:700;background:${bg}">地推CON</td>` : '';
-      html += `
-        <tr style="background:${locBg}">
-          ${outerCell}<td class="src-cell" rowspan="3" style="text-align:center;color:#1a4d00;font-weight:700">${DCON_LABELS[loc]}</td>
-          <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
-        </tr>
-        <tr style="background:${locBg}">
-          <td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td>
-        </tr>
-        <tr style="background:${locBg}">
-          <td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td>
-        </tr>`;
+      services.forEach(s=>{ m[s]=ld.male?.[s]||{inq:0,visit:0}; f[s]=ld.female?.[s]||{inq:0,visit:0}; });
+      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#f0fdf4">地區CON</td>` : '';
+      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#dcfce7">${DCON_LOC_LABELS[loc]}</td>`;
+      html += threeRows('#dcfce7', outerCell+innerCell, m, f);
     });
     return html;
   }
 
-  // Build FB merged block
   // Estimates / bottom summary
   const est = rec.estimates || {male:{}, female:{}};
   const mEstCells = services.map(s=>`<td class="inq-est">${N(est.male[s])}</td>`).join('');
@@ -784,11 +795,11 @@ function renderInqTable(month, brand){
   const fActCells = services.map(s=>`<td class="inq-act">${N(gt.female[s].visit)}</td>`).join('');
   const mDifCells = services.map(s=>{
     const d=(gt.male[s].visit||0)-(est.male[s]||0);
-    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d!==0?d:0}</td>`;
+    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
   }).join('');
   const fDifCells = services.map(s=>{
     const d=(gt.female[s].visit||0)-(est.female[s]||0);
-    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d!==0?d:0}</td>`;
+    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
   }).join('');
   const difTotal = gtTotalVisit - estTotal;
 
@@ -800,7 +811,13 @@ function renderInqTable(month, brand){
   const mShengPct = totalMInq>0 ? ((gt.male['生髮']?.inq||0)/totalMInq*100).toFixed(2)+'%' : '—';
   const fShengPct = totalFInq>0 ? ((gt.female['生髮']?.inq||0)/totalFInq*100).toFixed(2)+'%' : '—';
 
-  // 總計 block
+  // FB合計 = fb1(fbline) + fb2 + fb3 + fbdm
+  const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
+  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fee2e2">FB</td>`;
+
+  // 總計 block (colspan=2 for both 來源 columns)
+  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef9c3">總計</td>`;
+
   return `
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
   <table class="cs-sum-tbl" style="min-width:520px">
@@ -815,92 +832,17 @@ function renderInqTable(month, brand){
       <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#ffb3cc;color:#7c0040">${s}</th>`).join('')}</tr>
     </thead>
     <tbody>
-      ${/* 總計 spans 2 columns for 來源 */''}
-      ${(()=>{
-        const totInq   = services.reduce((s,k)=>s+(gt.male[k].inq||0)+(gt.female[k].inq||0),0);
-        const totVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
-        const mInq  = services.map(s=>`<td>${N(gt.male[s]?.inq)}</td>`).join('');
-        const fInq  = services.map(s=>`<td>${N(gt.female[s]?.inq)}</td>`).join('');
-        const mVis  = services.map(s=>`<td>${N(gt.male[s]?.visit)}</td>`).join('');
-        const fVis  = services.map(s=>`<td>${N(gt.female[s]?.visit)}</td>`).join('');
-        const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(gt.male[s]?.visit,gt.male[s]?.inq)}</td>`).join('');
-        const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(gt.female[s]?.visit,gt.female[s]?.inq)}</td>`).join('');
-        return `<tr style="background:#ffd966">
-          <td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#5a3e00;font-weight:700">總計</td>
-          <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
-        </tr>
-        <tr style="background:#ffd966">
-          <td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td>
-        </tr>
-        <tr style="background:#ffd966">
-          <td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td>
-        </tr>`;
-      })()}
-      ${/* Regular single-column sources */''}
-      ${(()=>{
-        const defs = [
-          {key:'080',   label:'080',   bg:'#fce4b0', tc:'#7c3a00'},
-          {key:'gline', label:'GLINE', bg:'#c6e0b4', tc:'#1a4d00'},
-          {key:'kol',   label:'KOL',   bg:'#d9b3ff', tc:'#3d0073'},
-          {key:'other', label:'其他',  bg:'#b3e6ff', tc:'#003d66'},
-          {key:'mgm',   label:'MGM',   bg:'#ffcce5', tc:'#7c0040'},
-        ];
-        // Build rows — each source cell needs colspan=2 for the 2 來源 columns
-        return defs.map(d=>{
-          const sd = rec.sources[d.key]||{};
-          const m={}; const f={};
-          services.forEach(s=>{
-            m[s] = sd.male?.[s]  ||{inq:0,visit:0};
-            f[s] = sd.female?.[s]||{inq:0,visit:0};
-          });
-          const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
-          const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
-          const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
-          const fInq  = services.map(s=>`<td>${N(f[s]?.inq)}</td>`).join('');
-          const mVis  = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
-          const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
-          const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
-          const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
-          return `<tr style="background:${d.bg}">
-            <td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:${d.tc};font-weight:700">${d.label}</td>
-            <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
-          </tr>
-          <tr style="background:${d.bg}">
-            <td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td>
-          </tr>
-          <tr style="background:${d.bg}">
-            <td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td>
-          </tr>`;
-        }).join('');
-      })()}
-      ${/* FB (combined FBLINE + FBDM) */''}
-      ${(()=>{
-        const m={}; const f={};
-        services.forEach(s=>{
-          m[s] = fbMerged.male[s]  ||{inq:0,visit:0};
-          f[s] = fbMerged.female[s]||{inq:0,visit:0};
-        });
-        const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
-        const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
-        const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
-        const fInq  = services.map(s=>`<td>${N(f[s]?.inq)}</td>`).join('');
-        const mVis  = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
-        const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
-        const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
-        const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
-        return `<tr style="background:#ffb3b3">
-          <td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#7c0000;font-weight:700">FB</td>
-          <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
-        </tr>
-        <tr style="background:#ffb3b3">
-          <td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td>
-        </tr>
-        <tr style="background:#ffb3b3">
-          <td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td>
-        </tr>`;
-      })()}
-      ${/* 地推CON with FS/HC/TC sub-rows */''}
-      ${dconBlock()}
+      ${threeRows('#fef9c3', gtCell, gt.male, gt.female)}
+      ${simpleBlock('080',   '#fef9c3', '080')}
+      ${simpleBlock('GLINE', '#dcfce7', 'gline')}
+      ${threeRows('#fee2e2', fbCell, fbSum.m, fbSum.f)}
+      ${simpleBlock('KOL',   '#ede9fe', 'kol')}
+      ${simpleBlock('其他',  '#f1f5f9', 'other')}
+      ${simpleBlock('FB1',   '#fee2e2', 'fbline')}
+      ${simpleBlock('FB2',   '#ffedd5', 'fb2')}
+      ${simpleBlock('FB3',   '#fef3c7', 'fb3')}
+      ${simpleBlock('FB私訊','#ede9fe', 'fbdm')}
+      ${dconSection()}
       <tr><td colspan="${3+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#fef9c3">
         <td class="src-cell" colspan="2" rowspan="5" style="text-align:center;font-weight:700">目標</td>
@@ -993,8 +935,10 @@ function renderCSSummary(){
   const sources = [
     {key:'080',    label:'080',     bg:'#fef9c3'},
     {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
-    {key:'fbline', label:'FB LINE', bg:'#fee2e2'},
-    {key:'fbdm',   label:'FB 私訊', bg:'#ede9fe'},
+    {key:'fbline', label:'FB1',    bg:'#fee2e2'},
+    {key:'fb2',    label:'FB2',    bg:'#ffedd5'},
+    {key:'fb3',    label:'FB3',    bg:'#fef3c7'},
+    {key:'fbdm',   label:'FB私訊', bg:'#ede9fe'},
     {key:'kol',    label:'KOL',     bg:'#fef3c7'},
     {key:'other',  label:'其他',    bg:'#f1f5f9'},
     {key:'mgm',    label:'MGM',     bg:'#fce7f3'},
@@ -1336,6 +1280,8 @@ function seedYrIfEmpty(){
 }
 
 function seedInqIfEmpty(){
+  const Z = {生髮:{inq:0,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}};
+  const zSrc = ()=>({male:{...Z},female:{...Z}});
   // 醫髮 2026-08
   if(!loadInqAll().find(r=>r.month==='2026-08'&&r.brand==='hh')){
     saveInqRec({month:'2026-08', brand:'hh',
@@ -1344,10 +1290,13 @@ function seedInqIfEmpty(){
         '080':   {male:{生髮:{inq:4,  visit:7}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:3, visit:3},護髮:{inq:1,visit:1},養髮:{inq:0,visit:0}}},
         'gline': {male:{生髮:{inq:38, visit:19},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:16,visit:8}, 護髮:{inq:3,visit:0},養髮:{inq:0,visit:0}}},
         'fbline':{male:{生髮:{inq:46, visit:15},護髮:{inq:15,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:69,visit:10},護髮:{inq:17,visit:0},養髮:{inq:1,visit:0}}},
-        'fbdm':  {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
-        'kol':   {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
-        'other': {male:{生髮:{inq:2,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
-        'mgm':   {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'fb2':   zSrc(),
+        'fb3':   zSrc(),
+        'fbdm':  zSrc(),
+        'kol':   zSrc(),
+        'other': {male:{生髮:{inq:2,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0,visit:0},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'mgm':   zSrc(),
+        'dcon':  {fs:zSrc(), hc:zSrc(), tc:zSrc()},
       }
     });
   }
@@ -1504,8 +1453,8 @@ const STORAGE_CS = 'dash_cs_v2';
 const CS_PERSONS = ['ivan','jessie','eline'];
 const CS_PERSON_LABELS = {ivan:'Ivan', jessie:'Jessie', eline:'Eline'};
 const CS_PERSON_BRANDS = {ivan:['seoul'], jessie:['seoul','hh'], eline:['hh']};
-const CS_SOURCES = ['080','gline','fbline','fbdm','kol','other','mgm'];
-const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB LINE','fbdm':'FB 私訊','kol':'KOL','other':'其他','mgm':'MGM'};
+const CS_SOURCES = ['080','gline','fbline','fb2','fb3','fbdm','kol','other','mgm'];
+const CS_SOURCE_LABELS = {'080':'080','gline':'GLINE','fbline':'FB1','fb2':'FB2','fb3':'FB3','fbdm':'FB私訊','kol':'KOL','other':'其他','mgm':'MGM'};
 
 function emptyBrandSrc(){
   const s={};
