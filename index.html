@@ -891,7 +891,7 @@ function renderInqTable(month, brand){
   // 日期欄：「當月總計」跨越全部來源行
   // cats: gt(3)+9simpleBlocks(27)+fb(3)+dcon(3) = 36 rows
   // flat: gt(5)+...(27)+fb(3)+dcon(3) = 38 rows
-  const N_SRC_ROWS = cats ? 36 : 38;
+  const N_SRC_ROWS = 36; // 11 source blocks × 3 + dcon 3 rows = 36（cats/flat 相同）
   const dateTd = `<td class="src-cell" rowspan="${N_SRC_ROWS}" style="writing-mode:vertical-lr;text-align:center;font-weight:700;background:#fef9c3;color:#78350f;padding:8px 4px;white-space:nowrap;min-width:28px">當月總計</td>`;
 
   // Header rows — cats mode: 2 rows (category + services, female-only); flat mode: 2 rows (gender + services)
