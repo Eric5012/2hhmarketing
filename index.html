@@ -779,8 +779,8 @@ function renderInqTable(month, brand){
       const ld = dcon[loc]||{};
       const m={}; const f={};
       services.forEach(s=>{ m[s]=ld.male?.[s]||{inq:0,visit:0}; f[s]=ld.female?.[s]||{inq:0,visit:0}; });
-      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#e2e8f0">地區CON</td>` : '';
-      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#f1f5f9">${DCON_LOC_LABELS[loc]}</td>`;
+      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs*3}" style="text-align:center;color:#1e293b;font-weight:700;background:#9ca3af">地區CON</td>` : '';
+      const innerCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">${DCON_LOC_LABELS[loc]}</td>`;
       html += threeRows(outerCell+innerCell, m, f);
     });
     return html;
@@ -813,10 +813,10 @@ function renderInqTable(month, brand){
 
   // FB合計 = fb1(fbline) + fb2 + fb3 + fbdm
   const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
-  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#ffedd5">FB</td>`;
+  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fcd9a0">FB</td>`;
 
   // 總計 block (colspan=2 for both 來源 columns)
-  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef9c3">總計</td>`;
+  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde68a">總計</td>`;
 
   return `
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
@@ -833,16 +833,16 @@ function renderInqTable(month, brand){
     </thead>
     <tbody>
       ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
-      ${simpleBlock('080',    '#dcfce7', '080')}
-      ${simpleBlock('GLINE',  '#dbeafe', 'gline', '#dbeafe')}
+      ${simpleBlock('080',    '#a7f3d0', '080')}
+      ${simpleBlock('GLINE',  '#93c5fd', 'gline', '#dbeafe')}
       ${threeRows(fbCell, fbSum.m, fbSum.f, '#ffedd5')}
-      ${simpleBlock('KOL',    '#ede9fe', 'kol', '#ede9fe')}
-      ${simpleBlock('其他',   '#dcfce7', 'other')}
-      ${simpleBlock('MGM',    '#dcfce7', 'mgm')}
-      ${simpleBlock('FB1',    '#f1f5f9', 'fbline')}
-      ${simpleBlock('FB2',    '#f1f5f9', 'fb2')}
-      ${simpleBlock('FB3',    '#f1f5f9', 'fb3')}
-      ${simpleBlock('FB私訊', '#f1f5f9', 'fbdm')}
+      ${simpleBlock('KOL',    '#c4b5fd', 'kol', '#ede9fe')}
+      ${simpleBlock('其他',   '#a7f3d0', 'other')}
+      ${simpleBlock('MGM',    '#a7f3d0', 'mgm')}
+      ${simpleBlock('FB1',    '#d1d5db', 'fbline')}
+      ${simpleBlock('FB2',    '#d1d5db', 'fb2')}
+      ${simpleBlock('FB3',    '#d1d5db', 'fb3')}
+      ${simpleBlock('FB私訊', '#d1d5db', 'fbdm')}
       ${dconSection()}
       <tr><td colspan="${3+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#ffffff">
