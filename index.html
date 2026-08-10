@@ -673,8 +673,14 @@ function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d))
 // ──────────────────────────────────────────────────────────────
 const STORAGE_INQ = 'dash_inq_v1';
 const BRAND_SERVICES = {
-  hh:    ['生髮','植髮','美型'],
-  seoul: []   // 醫美 service types TBD
+  hh: { services: ['生髮','植髮','美型'] },
+  seoul: {
+    cats: [
+      {label:'手術', services:['拉皮','抽補脂','隆乳','眼袋','雙眼皮','隆鼻','s_其他','s_備用1','s_備用2']},
+      {label:'微整', services:['肉毒','玻尿酸熊貓針','舒顏萃Ellanse','消脂針瘦瘦筆','埋線','音波','電波','水光針','a_其他']},
+    ],
+    svcLabels: {'s_其他':'其他','s_備用1':'備用','s_備用2':'備用','a_其他':'其他'},
+  }
 };
 function loadInqAll(){ return JSON.parse(localStorage.getItem(STORAGE_INQ)||'[]'); }
 function saveInqAll(d){ localStorage.setItem(STORAGE_INQ, JSON.stringify(d)); }
@@ -688,23 +694,30 @@ function saveInqRec(rec){
 }
 
 function renderInqTable(month, brand){
-  const services = BRAND_SERVICES[brand] || [];
+  const brandConf = BRAND_SERVICES[brand] || {};
+  const cats = brandConf.cats || null;
+  const svcLabels = brandConf.svcLabels || {};
+  const services = cats ? cats.flatMap(c=>c.services) : (brandConf.services || []);
+  const SL = s => svcLabels[s] || s;  // display label for a service key
+
   if(!services.length) return '<p style="color:#94a3b8;padding:20px;text-align:center">此品牌服務項目待設定</p>';
 
   const rec  = loadInqRec(month, brand);
   const N    = v => (v||0) > 0 ? v : '—';
   const Pct  = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '#DIV/0!';
   const nSvc = services.length;
+  // Total data columns = if cats: each cat contributes cat.services.length*2 (male+female); else nSvc*2
+  const nDataCols = cats ? cats.reduce((t,c)=>t+c.services.length*2,0) : nSvc*2;
 
   // 地區CON locations
   const DCON_LOCS = ['fs','hc','tc'];
   const DCON_LOC_LABELS = {fs:'FS', hc:'HC', tc:'TC'};
   const dcon = rec.sources['dcon']||{};
 
-  // All source keys that roll into grand total (FB1=fbline, FB2=fb2, FB3=fb3, FB私訊=fbdm)
+  // All source keys that roll into grand total
   const allSrcKeys = ['080','gline','fbline','fb2','fb3','fbdm','kol','other','mgm'];
 
-  // Compute grand total from all sources + dcon sub-locations
+  // Grand total from all sources + dcon sub-locations
   const gt = {male:{}, female:{}};
   services.forEach(s=>{ gt.male[s]={inq:0,visit:0}; gt.female[s]={inq:0,visit:0}; });
   allSrcKeys.forEach(k=>{
@@ -728,20 +741,25 @@ function renderInqTable(month, brand){
   const gtTotalInq   = services.reduce((s,k)=>s+(gt.male[k].inq||0)+(gt.female[k].inq||0),0);
   const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
-  // Build 3 sub-rows (詢問/到店/轉換率) for given male/female data
-  // srcCell: label cell(s); rowBg: optional row background (defaults to white)
+  // Build data columns in correct order for a row.
+  // cats mode: [cat1_male_svcs | cat1_female_svcs | cat2_male_svcs | cat2_female_svcs ...]
+  // flat mode: [all_male_svcs | all_female_svcs]
+  function dataCols(m, f, type){
+    function cell(obj, s){
+      if(type==='cvr') return `<td class="inq-cvr">${Pct(obj[s]?.visit, obj[s]?.inq)}</td>`;
+      return `<td>${N(type==='inq' ? obj[s]?.inq : obj[s]?.visit)}</td>`;
+    }
+    if(cats) return cats.flatMap(c=>[...c.services.map(s=>cell(m,s)),...c.services.map(s=>cell(f,s))]).join('');
+    return [...services.map(s=>cell(m,s)),...services.map(s=>cell(f,s))].join('');
+  }
+
+  // Build 3 sub-rows (詢問/到店/轉換率)
   function threeRows(srcCell, m, f, rowBg='#ffffff'){
     const totInq   = services.reduce((s,k)=>s+(m[k]?.inq||0)+(f[k]?.inq||0),0);
     const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
-    const mInq  = services.map(s=>`<td>${N(m[s]?.inq)}</td>`).join('');
-    const fInq  = services.map(s=>`<td>${N(f[s]?.inq)}</td>`).join('');
-    const mVis  = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
-    const fVis  = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
-    const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(m[s]?.visit,m[s]?.inq)}</td>`).join('');
-    const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(f[s]?.visit,f[s]?.inq)}</td>`).join('');
-    return `<tr style="background:${rowBg}">${srcCell}<td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td></tr>
-      <tr style="background:${rowBg}"><td class="inq-metric">到店</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>
-      <tr style="background:${rowBg}"><td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
+    return `<tr style="background:${rowBg}">${srcCell}<td class="inq-metric">詢問</td>${dataCols(m,f,'inq')}<td class="inq-tot">${N(totInq)}</td></tr>
+      <tr style="background:${rowBg}"><td class="inq-metric">到店</td>${dataCols(m,f,'visit')}<td class="inq-tot">${N(totVisit)}</td></tr>
+      <tr style="background:${rowBg}"><td class="inq-metric">轉換率</td>${dataCols(m,f,'cvr')}<td class="inq-cvr">${Pct(totVisit,totInq)}</td></tr>`;
   }
 
   // Helper: get male/female data for a storage key
@@ -768,14 +786,14 @@ function renderInqTable(month, brand){
     return {m,f};
   }
 
-  // Build a simple colspan=2 source block (no nested sub-label)
+  // Simple colspan=2 source block
   function simpleBlock(label, srcBg, key, rowBg='#ffffff'){
     const {m,f} = srcMF(key);
     const cell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:${srcBg}">${label}</td>`;
     return threeRows(cell, m, f, rowBg);
   }
 
-  // Build 地區CON section: 地區CON (outer, spans nLocs rows) + FS/HC/TC as single rows (no sub-indicators)
+  // 地區CON section: single row per location (visit only, no sub-indicators)
   function dconSection(){
     const nLocs = DCON_LOCS.length;
     let html = '';
@@ -784,33 +802,54 @@ function renderInqTable(month, brand){
       const m={}; const f={};
       services.forEach(s=>{ m[s]=ld.male?.[s]||{inq:0,visit:0}; f[s]=ld.female?.[s]||{inq:0,visit:0}; });
       const totVisit = services.reduce((s,k)=>s+(m[k]?.visit||0)+(f[k]?.visit||0),0);
-      const mVis = services.map(s=>`<td>${N(m[s]?.visit)}</td>`).join('');
-      const fVis = services.map(s=>`<td>${N(f[s]?.visit)}</td>`).join('');
+      // Visit columns in same cat-interleaved order as data rows
+      const visCols = cats
+        ? cats.flatMap(c=>[...c.services.map(s=>`<td>${N(m[s]?.visit)}</td>`),...c.services.map(s=>`<td>${N(f[s]?.visit)}</td>`)]).join('')
+        : [...services.map(s=>`<td>${N(m[s]?.visit)}</td>`),...services.map(s=>`<td>${N(f[s]?.visit)}</td>`)].join('');
       const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
       const locCell = `<td colspan="2" style="text-align:center;color:#1e293b;font-weight:600;font-size:12px;background:#ffffff;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0">${DCON_LOC_LABELS[loc]}</td>`;
-      html += `<tr style="background:#ffffff">${outerCell}${locCell}${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td></tr>`;
+      html += `<tr style="background:#ffffff">${outerCell}${locCell}${visCols}<td class="inq-tot">${N(totVisit)}</td></tr>`;
     });
     return html;
   }
 
   // Estimates / bottom summary
   const est = rec.estimates || {male:{}, female:{}};
-  const mEstCells = services.map(s=>`<td class="inq-est">${N(est.male[s])}</td>`).join('');
-  const fEstCells = services.map(s=>`<td class="inq-est">${N(est.female[s])}</td>`).join('');
-  const estTotal  = services.reduce((s,k)=>s+(est.male[k]||0)+(est.female[k]||0),0);
-  const mActCells = services.map(s=>`<td class="inq-act">${N(gt.male[s].visit)}</td>`).join('');
-  const fActCells = services.map(s=>`<td class="inq-act">${N(gt.female[s].visit)}</td>`).join('');
-  const mDifCells = services.map(s=>{
-    const d=(gt.male[s].visit||0)-(est.male[s]||0);
-    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
-  }).join('');
-  const fDifCells = services.map(s=>{
-    const d=(gt.female[s].visit||0)-(est.female[s]||0);
-    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
-  }).join('');
-  const difTotal = gtTotalVisit - estTotal;
+  // Build estimate/actual/diff cols in same cat-interleaved order
+  // Per-col estimate builder (handles both flat and cat-grouped modes)
+  function buildEstRow(type){
+    if(cats){
+      return cats.flatMap(c=>{
+        const mcols = c.services.map(s=>{
+          if(type==='est') return `<td class="inq-est">${N(est.male[s])}</td>`;
+          if(type==='act') return `<td class="inq-act">${N(gt.male[s].visit)}</td>`;
+          const d=(gt.male[s].visit||0)-(est.male[s]||0); return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
+        });
+        const fcols = c.services.map(s=>{
+          if(type==='est') return `<td class="inq-est">${N(est.female[s])}</td>`;
+          if(type==='act') return `<td class="inq-act">${N(gt.female[s].visit)}</td>`;
+          const d=(gt.female[s].visit||0)-(est.female[s]||0); return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
+        });
+        return [...mcols,...fcols];
+      }).join('');
+    }
+    const mcols = services.map(s=>{
+      if(type==='est') return `<td class="inq-est">${N(est.male[s])}</td>`;
+      if(type==='act') return `<td class="inq-act">${N(gt.male[s].visit)}</td>`;
+      const d=(gt.male[s].visit||0)-(est.male[s]||0); return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
+    }).join('');
+    const fcols = services.map(s=>{
+      if(type==='est') return `<td class="inq-est">${N(est.female[s])}</td>`;
+      if(type==='act') return `<td class="inq-act">${N(gt.female[s].visit)}</td>`;
+      const d=(gt.female[s].visit||0)-(est.female[s]||0); return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d}</td>`;
+    }).join('');
+    return mcols+fcols;
+  }
 
-  // 佔女性% and 生機%
+  const estTotal  = services.reduce((s,k)=>s+(est.male[k]||0)+(est.female[k]||0),0);
+  const difTotal  = gtTotalVisit - estTotal;
+
+  // 男女% and 生植%
   const totalFInq = services.reduce((s,k)=>s+(gt.female[k].inq||0),0);
   const totalMInq = services.reduce((s,k)=>s+(gt.male[k].inq||0),0);
   const femPct  = gtTotalInq>0 ? (totalFInq/gtTotalInq*100).toFixed(2)+'%' : '—';
@@ -818,26 +857,53 @@ function renderInqTable(month, brand){
   const mShengPct = totalMInq>0 ? ((gt.male['生髮']?.inq||0)/totalMInq*100).toFixed(2)+'%' : '—';
   const fShengPct = totalFInq>0 ? ((gt.female['生髮']?.inq||0)/totalFInq*100).toFixed(2)+'%' : '—';
 
+  // For %rows in cat mode: span all data cols as two halves isn't possible (cols interleaved).
+  // Use a single merged cell spanning all data cols instead.
+  const mfPctRow = cats
+    ? `<td colspan="${nDataCols}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}　　女 ${femPct}</td><td></td>`
+    : `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">女 ${femPct}</td><td></td>`;
+  const shengPctRow = cats
+    ? `<td colspan="${nDataCols}" style="text-align:center;font-size:12px;color:#1e293b">男 ${mShengPct}　　女 ${fShengPct}</td><td></td>`
+    : `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${mShengPct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${fShengPct}</td><td></td>`;
+
   // FB合計 = fb1(fbline) + fb2 + fb3 + fbdm
   const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
   const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
 
-  // 總計 block (colspan=2 for both 來源 columns)
+  // 總計 block
   const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">總計</td>`;
 
-  return `
-  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
-  <table class="cs-sum-tbl" style="min-width:520px">
-    <thead>
+  // Header rows — flat mode: 2 rows; cat mode: 3 rows
+  const hdrRowSpan = cats ? 3 : 2;
+  const hdrSrcCell = `<th rowspan="${hdrRowSpan}" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
+        <th rowspan="${hdrRowSpan}" class="grp-hd" style="position:sticky;left:0;z-index:3">來源</th>`;
+  let theadHtml = '';
+  if(cats){
+    theadHtml = `<tr>
+        ${hdrSrcCell}
+        ${cats.map(c=>`<th colspan="${c.services.length*2}" class="grp-hd" style="background:#334155;color:#fff">${c.label}</th>`).join('')}
+        <th rowspan="3" class="grp-hd">總計</th>
+      </tr>
       <tr>
-        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)">來源</th>
-        <th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3">來源</th>
+        ${cats.map(c=>`<th colspan="${c.services.length}" class="grp-hd" style="background:#4472c4;color:#fff">男</th><th colspan="${c.services.length}" class="grp-hd" style="background:#d4789a;color:#fff">女</th>`).join('')}
+      </tr>
+      <tr>
+        ${cats.map(c=>[...c.services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${SL(s)}</th>`),...c.services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${SL(s)}</th>`)].join('')).join('')}
+      </tr>`;
+  } else {
+    theadHtml = `<tr>
+        ${hdrSrcCell}
         <th colspan="${nSvc}" class="grp-hd" style="background:#4472c4;color:#fff">男</th>
         <th colspan="${nSvc}" class="grp-hd" style="background:#d4789a;color:#fff">女</th>
         <th rowspan="2" class="grp-hd">總計</th>
       </tr>
-      <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${s}</th>`).join('')}${services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${s}</th>`).join('')}</tr>
-    </thead>
+      <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${SL(s)}</th>`).join('')}${services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${SL(s)}</th>`).join('')}</tr>`;
+  }
+
+  return `
+  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+  <table class="cs-sum-tbl" style="min-width:520px">
+    <thead>${theadHtml}</thead>
     <tbody>
       ${threeRows(gtCell, gt.male, gt.female, '#fef9c3')}
       ${simpleBlock('080',    '#bbf7d0', '080')}
@@ -851,30 +917,20 @@ function renderInqTable(month, brand){
       ${simpleBlock('FB3',    '#d1d5db', 'fb3')}
       ${simpleBlock('FB私訊', '#d1d5db', 'fbdm')}
       ${dconSection()}
-      <tr><td colspan="${3+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
+      <tr><td colspan="${3+nDataCols+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#ffffff">
         <td class="src-cell" colspan="2" rowspan="5" style="text-align:center;font-weight:700;background:#fce7f3">目標</td>
-        <td class="inq-metric" style="font-weight:700">理想</td>${mEstCells}${fEstCells}<td class="inq-tot">${N(estTotal)}</td>
+        <td class="inq-metric" style="font-weight:700">理想</td>${buildEstRow('est')}<td class="inq-tot">${N(estTotal)}</td>
       </tr>
       <tr style="background:#f8fafc">
-        <td class="inq-metric" style="font-weight:700">實際</td>${mActCells}${fActCells}<td class="inq-tot">${N(gtTotalVisit)}</td>
+        <td class="inq-metric" style="font-weight:700">實際</td>${buildEstRow('act')}<td class="inq-tot">${N(gtTotalVisit)}</td>
       </tr>
       <tr style="background:#f8fafc">
-        <td class="inq-metric" style="font-weight:700">落差</td>${mDifCells}${fDifCells}
+        <td class="inq-metric" style="font-weight:700">落差</td>${buildEstRow('dif')}
         <td class="inq-dif" style="font-weight:700;color:${difTotal>=0?'#16a34a':'#dc2626'}">${difTotal}</td>
       </tr>
-      <tr style="background:#f8fafc">
-        <td class="inq-metric">男女%</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">女 ${femPct}</td>
-        <td></td>
-      </tr>
-      <tr style="background:#f8fafc">
-        <td class="inq-metric">生植%</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${mShengPct}</td>
-        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${fShengPct}</td>
-        <td></td>
-      </tr>
+      <tr style="background:#f8fafc"><td class="inq-metric">男女%</td>${mfPctRow}</tr>
+      <tr style="background:#f8fafc"><td class="inq-metric">生植%</td>${shengPctRow}</tr>
     </tbody>
   </table>
   </div>`;
@@ -1290,6 +1346,20 @@ function seedYrIfEmpty(){
 function seedInqIfEmpty(){
   const Z = {生髮:{inq:0,visit:0},植髮:{inq:0,visit:0},美型:{inq:0,visit:0}};
   const zSrc = ()=>({male:{...Z},female:{...Z}});
+  // 醫美 (seoul) 2026-08 — empty seed so table renders
+  if(!loadInqAll().find(r=>r.month==='2026-08'&&r.brand==='seoul')){
+    const seoulSvcs = BRAND_SERVICES.seoul.cats.flatMap(c=>c.services);
+    const ZS = Object.fromEntries(seoulSvcs.map(s=>[s,{inq:0,visit:0}]));
+    const zSeoul = ()=>({male:{...JSON.parse(JSON.stringify(ZS))},female:{...JSON.parse(JSON.stringify(ZS))}});
+    saveInqRec({month:'2026-08', brand:'seoul',
+      estimates:{male:Object.fromEntries(seoulSvcs.map(s=>[s,0])), female:Object.fromEntries(seoulSvcs.map(s=>[s,0]))},
+      sources:{
+        '080': zSeoul(), 'gline': zSeoul(), 'fbline': zSeoul(), 'fb2': zSeoul(),
+        'fb3': zSeoul(), 'fbdm': zSeoul(), 'kol': zSeoul(), 'other': zSeoul(), 'mgm': zSeoul(),
+        'dcon': {fs:zSeoul(), hc:zSeoul(), tc:zSeoul()},
+      }
+    });
+  }
   // 醫髮 2026-08
   if(!loadInqAll().find(r=>r.month==='2026-08'&&r.brand==='hh')){
     saveInqRec({month:'2026-08', brand:'hh',
