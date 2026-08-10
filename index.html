@@ -67,6 +67,13 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .main-tab-btn{padding:10px 20px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
 .main-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
 .main-tab-btn:hover:not(.active){color:#4f60f5}
+/* ── 詢問總表 ── */
+.inq-metric{font-size:11px;color:#64748b;padding:5px 8px;white-space:nowrap;border:1px solid #e2e8f0}
+.inq-cvr{font-size:11px;color:#94a3b8;text-align:center;border:1px solid #e2e8f0}
+.inq-tot{font-weight:700;text-align:center;border:1px solid #e2e8f0}
+.inq-est{background:#fef9c3;text-align:center;border:1px solid #e2e8f0}
+.inq-act{background:#dcfce7;text-align:center;border:1px solid #e2e8f0}
+.inq-dif{text-align:center;font-weight:600;border:1px solid #e2e8f0}
 /* ── Report sub-tabs ── */
 .rpt-tab-btn{padding:8px 18px;font-size:13px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:transparent;color:#64748b;transition:color .15s,border-color .15s}
 .rpt-tab-btn.active{color:#4f60f5;border-bottom-color:#4f60f5;font-weight:700}
@@ -539,13 +546,18 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
       <select id="cs-sum-month-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderCSSummary()"></select>
     </div>
-    <!-- table -->
+    <!-- CON數表 -->
+    <div class="text-sm font-bold text-slate-600 mt-2">CON數表</div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
       <table class="cs-sum-tbl" id="cs-sum-table">
         <thead id="cs-sum-thead"></thead>
         <tbody id="cs-sum-tbody"></tbody>
       </table>
     </div>
+
+    <!-- 詢問總表 -->
+    <div class="text-sm font-bold text-slate-600 mt-4">詢問總表</div>
+    <div id="cs-inq-wrap"></div>
   </div>
 
 </div>
@@ -651,6 +663,162 @@ function loadDaily(){ return JSON.parse(localStorage.getItem(STORAGE_DAILY)||'[]
 function saveDaily(d){ localStorage.setItem(STORAGE_DAILY, JSON.stringify(d)); }
 function loadSeoulAds(){ return JSON.parse(localStorage.getItem(STORAGE_SEOUL)||'[]'); }
 function saveSeoulAds(d){ localStorage.setItem(STORAGE_SEOUL, JSON.stringify(d)); }
+
+// ──────────────────────────────────────────────────────────────
+// 詢問總表 (INQ TABLE)
+// ──────────────────────────────────────────────────────────────
+const STORAGE_INQ = 'dash_inq_v1';
+const BRAND_SERVICES = {
+  hh:    ['生髮','護髮','養髮'],
+  seoul: []   // 醫美 service types TBD
+};
+function loadInqAll(){ return JSON.parse(localStorage.getItem(STORAGE_INQ)||'[]'); }
+function saveInqAll(d){ localStorage.setItem(STORAGE_INQ, JSON.stringify(d)); }
+function loadInqRec(month, brand){
+  return loadInqAll().find(r=>r.month===month&&r.brand===brand) ||
+    {month, brand, sources:{}, estimates:{male:{}, female:{}}};
+}
+function saveInqRec(rec){
+  const all = loadInqAll().filter(r=>!(r.month===rec.month&&r.brand===rec.brand));
+  all.push(rec); saveInqAll(all);
+}
+
+function renderInqTable(month, brand){
+  const services = BRAND_SERVICES[brand] || [];
+  if(!services.length) return '<p style="color:#94a3b8;padding:20px;text-align:center">此品牌服務項目待設定</p>';
+
+  const rec  = loadInqRec(month, brand);
+  const N    = v => (v||0) > 0 ? v : (v===0 ? '0' : '—');
+  const Pct  = (a,b) => b>0 ? Math.round(a/b*100)+'%' : '#DIV/0!';
+  const nSvc = services.length;
+
+  // Compute grand total from all sources
+  const gt = {male:{}, female:{}};
+  services.forEach(s=>{ gt.male[s]={inq:0,visit:0}; gt.female[s]={inq:0,visit:0}; });
+  CS_SOURCES.forEach(k=>{
+    const d = rec.sources[k]||{};
+    services.forEach(s=>{
+      gt.male[s].inq   += d.male?.[s]?.inq  ||0;
+      gt.male[s].visit += d.male?.[s]?.visit||0;
+      gt.female[s].inq   += d.female?.[s]?.inq  ||0;
+      gt.female[s].visit += d.female?.[s]?.visit||0;
+    });
+  });
+  const gtTotalInq   = services.reduce((s,k)=>s+(gt.male[k].inq||0)+(gt.female[k].inq||0),0);
+  const gtTotalVisit = services.reduce((s,k)=>s+(gt.male[k].visit||0)+(gt.female[k].visit||0),0);
+
+  // Build 3 rows for one source (詢問/到訪/轉換率)
+  function srcBlock(key, label, bg, male, female){
+    const totInq   = services.reduce((s,k)=>s+(male[k]?.inq||0)+(female[k]?.inq||0),0);
+    const totVisit = services.reduce((s,k)=>s+(male[k]?.visit||0)+(female[k]?.visit||0),0);
+    const mInq  = services.map(s=>`<td>${N(male[s]?.inq)}</td>`).join('');
+    const fInq  = services.map(s=>`<td>${N(female[s]?.inq)}</td>`).join('');
+    const mVis  = services.map(s=>`<td>${N(male[s]?.visit)}</td>`).join('');
+    const fVis  = services.map(s=>`<td>${N(female[s]?.visit)}</td>`).join('');
+    const mCvr  = services.map(s=>`<td class="inq-cvr">${Pct(male[s]?.visit,male[s]?.inq)}</td>`).join('');
+    const fCvr  = services.map(s=>`<td class="inq-cvr">${Pct(female[s]?.visit,female[s]?.inq)}</td>`).join('');
+    return `
+      <tr style="background:${bg}">
+        <td class="src-cell" rowspan="3" style="text-align:center">${label}</td>
+        <td class="inq-metric">詢問</td>${mInq}${fInq}<td class="inq-tot">${N(totInq)}</td>
+      </tr>
+      <tr style="background:${bg}">
+        <td class="inq-metric">到訪</td>${mVis}${fVis}<td class="inq-tot">${N(totVisit)}</td>
+      </tr>
+      <tr style="background:${bg}">
+        <td class="inq-metric">轉換率</td>${mCvr}${fCvr}<td class="inq-cvr">${Pct(totVisit,totInq)}</td>
+      </tr>`;
+  }
+
+  const srcDefs = [
+    {key:'080',    label:'080',     bg:'#fef9c3'},
+    {key:'gline',  label:'GLINE',   bg:'#dcfce7'},
+    {key:'fbline', label:'FB LINE', bg:'#fee2e2'},
+    {key:'fbdm',   label:'FB 私訊', bg:'#ede9fe'},
+    {key:'kol',    label:'KOL',     bg:'#fef3c7'},
+    {key:'other',  label:'其他',    bg:'#f1f5f9'},
+    {key:'mgm',    label:'MGM',     bg:'#fce7f3'},
+  ];
+
+  const srcRows = srcDefs.map(d=>{
+    const sd = rec.sources[d.key]||{};
+    const m={}; const f={};
+    services.forEach(s=>{
+      m[s] = sd.male?.[s]  ||{inq:0,visit:0};
+      f[s] = sd.female?.[s]||{inq:0,visit:0};
+    });
+    return srcBlock(d.key, d.label, d.bg, m, f);
+  }).join('');
+
+  // Estimates / bottom summary
+  const est = rec.estimates || {male:{}, female:{}};
+  const mEstCells = services.map(s=>`<td class="inq-est">${N(est.male[s])}</td>`).join('');
+  const fEstCells = services.map(s=>`<td class="inq-est">${N(est.female[s])}</td>`).join('');
+  const estTotal  = services.reduce((s,k)=>s+(est.male[k]||0)+(est.female[k]||0),0);
+  const mActCells = services.map(s=>`<td class="inq-act">${N(gt.male[s].visit)}</td>`).join('');
+  const fActCells = services.map(s=>`<td class="inq-act">${N(gt.female[s].visit)}</td>`).join('');
+  const mDifCells = services.map(s=>{
+    const d=(gt.male[s].visit||0)-(est.male[s]||0);
+    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d!==0?d:0}</td>`;
+  }).join('');
+  const fDifCells = services.map(s=>{
+    const d=(gt.female[s].visit||0)-(est.female[s]||0);
+    return `<td class="inq-dif" style="color:${d>=0?'#16a34a':'#dc2626'}">${d!==0?d:0}</td>`;
+  }).join('');
+  const difTotal = gtTotalVisit - estTotal;
+
+  // 佔女性% and 生機%
+  const totalFInq = services.reduce((s,k)=>s+(gt.female[k].inq||0),0);
+  const totalMInq = services.reduce((s,k)=>s+(gt.male[k].inq||0),0);
+  const femPct  = gtTotalInq>0 ? (totalFInq/gtTotalInq*100).toFixed(2)+'%' : '—';
+  const malePct = gtTotalInq>0 ? (totalMInq/gtTotalInq*100).toFixed(2)+'%' : '—';
+  const mShengPct = totalMInq>0 ? ((gt.male['生髮']?.inq||0)/totalMInq*100).toFixed(2)+'%' : '—';
+  const fShengPct = totalFInq>0 ? ((gt.female['生髮']?.inq||0)/totalFInq*100).toFixed(2)+'%' : '—';
+
+  return `
+  <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
+  <table class="cs-sum-tbl" style="min-width:520px">
+    <thead>
+      <tr>
+        <th rowspan="2" class="grp-hd">來源</th>
+        <th rowspan="2" class="grp-hd">指標</th>
+        <th colspan="${nSvc}" class="grp-hd" style="background:#bfdbfe;color:#1e40af">男</th>
+        <th colspan="${nSvc}" class="grp-hd" style="background:#fce7f3;color:#9d174d">女</th>
+        <th rowspan="2" class="grp-hd">總計</th>
+      </tr>
+      <tr>${services.map(s=>`<th style="background:#dbeafe">${s}</th>`).join('')}${services.map(s=>`<th style="background:#fce7f3">${s}</th>`).join('')}</tr>
+    </thead>
+    <tbody>
+      ${srcBlock('_gt_','總計','#e2e8f0',gt.male,gt.female)}
+      ${srcRows}
+      <tr><td colspan="${2+nSvc*2+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
+      <tr style="background:#fef9c3">
+        <td class="src-cell" rowspan="5" style="text-align:center;font-weight:700">目標</td>
+        <td class="inq-metric" style="font-weight:700">預估</td>${mEstCells}${fEstCells}<td class="inq-tot">${N(estTotal)}</td>
+      </tr>
+      <tr style="background:#dcfce7">
+        <td class="inq-metric" style="font-weight:700">實際</td>${mActCells}${fActCells}<td class="inq-tot">${N(gtTotalVisit)}</td>
+      </tr>
+      <tr style="background:#fee2e2">
+        <td class="inq-metric" style="font-weight:700">差異</td>${mDifCells}${fDifCells}
+        <td class="inq-dif" style="font-weight:700;color:${difTotal>=0?'#16a34a':'#dc2626'}">${difTotal}</td>
+      </tr>
+      <tr style="background:#f1f5f9">
+        <td class="inq-metric">佔女性%</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e40af">男 ${malePct}</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#9d174d">女 ${femPct}</td>
+        <td></td>
+      </tr>
+      <tr style="background:#f1f5f9">
+        <td class="inq-metric">生機%</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e40af">生 ${mShengPct}</td>
+        <td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#9d174d">生 ${fShengPct}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>`;
+}
 
 // ──────────────────────────────────────────────────────────────
 // YEARLY REPORT  (年報表)
@@ -804,6 +972,10 @@ function renderCSSummary(){
         return `<td>${N(d.inq)}</td><td>${N(d.appt)}</td><td>${N(d.visit)}</td>`;
       }).join('')}
     </tr>`;
+
+  // 詢問總表
+  const inqWrap = document.getElementById('cs-inq-wrap');
+  if(inqWrap) inqWrap.innerHTML = renderInqTable(month, brand);
 }
 
 let yrBrand = 'seoul';
@@ -1050,6 +1222,24 @@ function seedYrIfEmpty(){
       {gg_cost:510962,gg_rev:3572169,gg_con:116, fb_cost:568189,fb_rev:1830787,fb_con:84,  total_rev:18673639,total_con:248},
       {gg_cost:574760,gg_rev:3106582,gg_con:116, fb_cost:587479,fb_rev:1568501,fb_con:84,  total_rev:18066509,total_con:252},
     ]});
+  }
+}
+
+function seedInqIfEmpty(){
+  // 醫髮 2026-08
+  if(!loadInqAll().find(r=>r.month==='2026-08'&&r.brand==='hh')){
+    saveInqRec({month:'2026-08', brand:'hh',
+      estimates:{male:{生髮:180,護髮:50,養髮:0}, female:{生髮:70,護髮:20,養髮:1}},
+      sources:{
+        '080':   {male:{生髮:{inq:4,  visit:7}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:3, visit:3},護髮:{inq:1,visit:1},養髮:{inq:0,visit:0}}},
+        'gline': {male:{生髮:{inq:38, visit:19},護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:16,visit:8}, 護髮:{inq:3,visit:0},養髮:{inq:0,visit:0}}},
+        'fbline':{male:{生髮:{inq:46, visit:15},護髮:{inq:15,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:69,visit:10},護髮:{inq:17,visit:0},養髮:{inq:1,visit:0}}},
+        'fbdm':  {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'kol':   {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'other': {male:{生髮:{inq:2,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+        'mgm':   {male:{生髮:{inq:0,  visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}, female:{生髮:{inq:0, visit:0}, 護髮:{inq:0,visit:0},養髮:{inq:0,visit:0}}},
+      }
+    });
   }
 }
 
@@ -2339,6 +2529,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   seedIfEmpty();
   seedOvIfEmpty();
   seedYrIfEmpty();
+  seedInqIfEmpty();
   seedCSIfEmpty();
   startClock();
   populateMonthSelects();
