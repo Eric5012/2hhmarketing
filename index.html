@@ -1004,7 +1004,8 @@ function showRptPanel(id, el){
 // ──────────────────────────────────────────────────────────────
 // GOOGLE SHEETS 同步
 // ──────────────────────────────────────────────────────────────
-const GS_URL = 'https://script.google.com/macros/s/AKfycbwyvj_Pfw6hEN2U9IrNnvswZv_QEL9vsTh-gW_rBZsDo3KJ6obx01--zUWPZfri65Oy/exec';
+const GS_URL    = 'https://script.google.com/macros/s/AKfycbwyvj_Pfw6hEN2U9IrNnvswZv_QEL9vsTh-gW_rBZsDo3KJ6obx01--zUWPZfri65Oy/exec'; // 醫美
+const GS_URL_HH = 'https://script.google.com/macros/s/AKfycbwFRwQuuHUx-reEA9gyUxZT0-e_KfnyLrsdQTsi0JfQZaBMqJ812mX7Cm0-0btHTVqb/exec'; // 醫髮
 
 function toRocMonth(month){
   // '2026-08' → '11508'
@@ -1015,6 +1016,7 @@ function toRocMonth(month){
 async function syncFromSheet(){
   const month = document.getElementById('cs-sum-month-sel')?.value || getCurrentMonth();
   const brand = csSumBrand;
+  const url = brand === 'hh' ? GS_URL_HH : GS_URL;
   const rocMonth = toRocMonth(month);
   const btn = document.getElementById('gs-sync-btn');
   const status = document.getElementById('gs-sync-status');
@@ -1024,7 +1026,7 @@ async function syncFromSheet(){
 
   try {
     // ── CON數表 ──
-    const conRes  = await fetch(`${GS_URL}?type=con&month=${rocMonth}`);
+    const conRes  = await fetch(`${url}?type=con&month=${rocMonth}`);
     const conData = await conRes.json();
 
     if(!conData.error){
@@ -1048,7 +1050,7 @@ async function syncFromSheet(){
     }
 
     // ── 詢問總表 ──
-    const inqRes  = await fetch(`${GS_URL}?type=inq&month=${rocMonth}`);
+    const inqRes  = await fetch(`${url}?type=inq&month=${rocMonth}`);
     const inqData = await inqRes.json();
 
     if(!inqData.error){
