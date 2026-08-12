@@ -87,7 +87,9 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 .cs-sum-tbl thead tr:first-child th{border-top:1px solid #e2e8f0}
 .cs-sum-tbl td{padding:7px 10px;text-align:center;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;white-space:nowrap}
 .cs-sum-tbl tr td:first-child{border-left:1px solid #e2e8f0}
-.cs-sum-tbl .src-cell{font-weight:600;font-size:12px;position:sticky;left:0;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.06)}
+.cs-sum-tbl .src-cell{font-weight:600;font-size:12px;position:sticky;left:36px;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.06)}
+.cs-sum-tbl .date-cell{font-weight:600;font-size:12px;position:sticky;left:0;z-index:2}
+.cs-sum-tbl .inq-metric{position:sticky;left:140px;z-index:2;background:#fff}
 .cs-sum-tbl thead .grp-hd:first-child,.cs-sum-tbl thead .grp-hd[colspan="2"]:first-child{position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06)}
 .cs-sum-tbl .grp-hd{background:#f1f5f9;font-weight:800;font-size:11px;color:#334155;text-align:center;padding:5px 8px;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
 .cs-sum-tbl .total-row{background:#f8fafc;font-weight:700}
@@ -883,13 +885,13 @@ function renderInqTable(month, brand){
   // cats: gt(3)+9simpleBlocks(27)+fb(3)+dcon(3) = 36 rows
   // flat: gt(5)+...(27)+fb(3)+dcon(3) = 38 rows
   const N_SRC_ROWS = 36; // 11 source blocks × 3 + dcon 3 rows = 36（cats/flat 相同）
-  const dateTd = `<td class="src-cell" rowspan="${N_SRC_ROWS}" style="writing-mode:vertical-lr;text-align:center;font-weight:700;background:#fef9c3;color:#78350f;padding:8px 4px;white-space:nowrap;min-width:28px">當月總計</td>`;
+  const dateTd = `<td class="date-cell" rowspan="${N_SRC_ROWS}" style="writing-mode:vertical-lr;text-align:center;font-weight:700;background:#fef9c3;color:#78350f;padding:8px 4px;white-space:nowrap;min-width:36px;width:36px">當月總計</td>`;
 
   // Header rows — cats mode: 2 rows (category + services, female-only); flat mode: 2 rows (gender + services)
   const hdrRowSpan = 2;
-  const hdrSrcCell = `<th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">日期</th>
-        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px">來源</th>
-        <th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3;min-width:52px;width:52px">客服</th>`;
+  const hdrSrcCell = `<th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:36px;width:36px">日期</th>
+        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:36px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:104px">來源</th>
+        <th rowspan="2" class="grp-hd" style="position:sticky;left:140px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">客服</th>`;
   let theadHtml = '';
   if(cats){
     theadHtml = `<tr>
@@ -925,7 +927,7 @@ function renderInqTable(month, brand){
       <col style="width:36px;min-width:36px">
       <col style="width:52px;min-width:52px">
       <col style="width:52px;min-width:52px">
-      <col style="width:52px;min-width:52px">
+      <col style="width:52px;min-width:52px;position:sticky;left:140px">
     </colgroup>
     <thead>${dateRow}${theadHtml}</thead>
     <tbody>
