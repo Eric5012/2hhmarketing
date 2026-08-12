@@ -1077,7 +1077,8 @@ async function syncFromSheet(){
   if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
   if(conOk || inqOk){
     const parts = [conOk?'CON✓':'CON✗', inqOk?'詢問✓':'詢問✗'].join(' ');
-    if(status){ status.textContent = parts+' '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color= (conOk&&inqOk)?'#16a34a':'#d97706'; }
+    const detail = errMsg ? ' ('+errMsg.trim()+')' : '';
+    if(status){ status.textContent = parts+detail+' '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color= (conOk&&inqOk)?'#16a34a':'#d97706'; }
   } else {
     if(status){ status.textContent = '✗ 同步失敗'+errMsg; status.style.color='#dc2626'; }
   }
