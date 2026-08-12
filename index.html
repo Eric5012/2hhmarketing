@@ -1032,7 +1032,11 @@ async function syncFromSheet(){
       const branchRec = loadBranchRec(month, brand);
       if(!branchRec.sources) branchRec.sources = {};
       Object.entries(conData.sources||{}).forEach(([key, src]) => {
-        branchRec.sources[key] = { so: src.so||0, hc: src.hc||0, tc: src.tc||0 };
+        branchRec.sources[key] = {
+          so: src.so||0, hc: src.hc||0, tc: src.tc||0,
+          total_inq: src.total_inq||0, total_con: src.total_con||0,
+          total_rev: src.total_rev||0, per_con: src.per_con||0
+        };
       });
       saveBranchRec(branchRec);
       conOk = true;
@@ -1139,19 +1143,23 @@ function renderCSSummary(){
 
   // Aggregate by source
   const srcRows = sources.map(src => {
-    let tInq=0, tVisit=0;
+    let pInq=0, pVisit=0;
     const pp = {};
     persons.forEach(p => {
       const d = pData[p][brand][src.key] || {inq:0,appt:0,visit:0};
       pp[p] = d;
-      tInq   += d.inq||0;
-      tVisit += d.visit||0;
+      pInq   += d.inq||0;
+      pVisit += d.visit||0;
     });
+    // Branch visits (SO/HC/TC) + sheet totals from branchRec
+    const br = branchRec.sources[src.key] || {so:0,hc:0,tc:0,total_inq:0,total_con:0,total_rev:0,per_con:0};
+    // Use sheet 合計 if synced (non-zero), else fall back to person sum
+    let tInq   = (br.total_inq > 0 || br.total_con > 0) ? (br.total_inq||0) : pInq;
+    let tVisit = (br.total_inq > 0 || br.total_con > 0) ? (br.total_con||0) : pVisit;
     // GLINE 詢問 → 廣告成效 Google 詢問 (if dcmp data exists)
     if(src.key === 'gline' && dcmpGg > 0) tInq = dcmpGg;
-    // Branch visits (SO/HC/TC) from branchRec
-    const br = branchRec.sources[src.key] || {so:0,hc:0,tc:0};
-    return {src, tInq, tVisit, pp, so:br.so||0, hc:br.hc||0, tc:br.tc||0};
+    return {src, tInq, tVisit, pp, so:br.so||0, hc:br.hc||0, tc:br.tc||0,
+            total_rev:br.total_rev||0, per_con:br.per_con||0};
   });
 
   // Grand totals
@@ -1216,7 +1224,7 @@ function renderCSSummary(){
     return `<tr>
       <td class="src-cell" style="background:${r.src.labelBg};font-weight:600">${r.src.label}</td>
       <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc">${P(r.tVisit,r.tInq)}</td>
-      <td style="${SUB_REV}">—</td><td style="${SUB_REV}">—</td>
+      <td style="${SUB_REV}">${r.total_rev>0?Math.floor(r.total_rev/10000).toLocaleString('zh-TW'):'—'}</td><td style="${SUB_REV}">${r.per_con>0?r.per_con.toLocaleString('zh-TW'):'—'}</td>
       <td style="${SUB_BRANCH}">${N(r.so)}</td><td style="${SUB_BRANCH}">${N(r.hc)}</td><td style="${SUB_BRANCH}">${N(r.tc)}</td>
       ${pCells}
     </tr>`;
