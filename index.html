@@ -1011,54 +1011,67 @@ async function syncFromSheet(){
   if(btn){ btn.textContent = '↻ 同步中...'; btn.disabled = true; }
   if(status) status.textContent = '';
 
+  let conOk = false, inqOk = false, errMsg = '';
+
+  // ── CON數表 ──
   try {
-    // ── CON數表 ──
     const conRes  = await fetch(`${url}?type=con&month=${rocMonth}`);
     const conData = await conRes.json();
-
-    if(!conData.error){
+    if(conData.error){ errMsg += ' CON:'+conData.error; }
+    else {
       const persons = CS_PERSONS.filter(p => CS_PERSON_BRANDS[p].includes(brand));
       persons.forEach(p => {
         const rec = loadCSRec(month, p);
-        Object.entries(conData.sources).forEach(([key, src]) => {
+        if(!rec[brand]) rec[brand] = {};
+        Object.entries(conData.sources||{}).forEach(([key, src]) => {
           const pd = src[p] || {inq:0, con:0};
           rec[brand][key] = { inq: pd.inq||0, appt: pd.con||0, visit: pd.con||0 };
         });
         saveCSRec(rec);
       });
-
-      // Branch SO/HC/TC
       const branchRec = loadBranchRec(month, brand);
       if(!branchRec.sources) branchRec.sources = {};
-      Object.entries(conData.sources).forEach(([key, src]) => {
+      Object.entries(conData.sources||{}).forEach(([key, src]) => {
         branchRec.sources[key] = { so: src.so||0, hc: src.hc||0, tc: src.tc||0 };
       });
       saveBranchRec(branchRec);
+      conOk = true;
     }
+  } catch(e) {
+    console.error('CON sync error:', e);
+    errMsg += ' CON:'+e.message;
+  }
 
-    // ── 詢問總表 ──
+  // ── 詢問總表 ──
+  try {
     const inqRes  = await fetch(`${url}?type=inq&month=${rocMonth}`);
     const inqData = await inqRes.json();
-
-    if(!inqData.error){
-      const inqRec = loadInqRec(month, brand);
-      Object.entries(inqData.sources).forEach(([key, src]) => {
-        if(!inqRec.sources[key]) inqRec.sources[key] = {};
-        inqRec.sources[key].female = src.female || {};
-        if(!inqRec.sources[key].male) inqRec.sources[key].male = {};
+    if(inqData.error){ errMsg += ' INQ:'+inqData.error; }
+    else {
+      // 先清掉這個月的舊詢問資料，避免跟舊手動資料疊加
+      const freshRec = { month, brand, sources:{}, estimates: loadInqRec(month, brand).estimates||{} };
+      Object.entries(inqData.sources||{}).forEach(([key, src]) => {
+        freshRec.sources[key] = {
+          female: src.female || {},
+          male:   src.male   || {}
+        };
       });
-      saveInqRec(inqRec);
+      saveInqRec(freshRec);
+      inqOk = true;
     }
-
-    if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
-    if(status){ status.textContent = '✓ 已同步 '+ new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color='#16a34a'; }
-    renderCSSummary();
-
   } catch(e) {
-    console.error('GS sync error:', e);
-    if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
-    if(status){ status.textContent = '✗ 同步失敗，請稍後再試'; status.style.color='#dc2626'; }
+    console.error('INQ sync error:', e);
+    errMsg += ' INQ:'+e.message;
   }
+
+  if(btn){ btn.textContent = '↻ 同步試算表'; btn.disabled = false; }
+  if(conOk || inqOk){
+    const parts = [conOk?'CON✓':'CON✗', inqOk?'詢問✓':'詢問✗'].join(' ');
+    if(status){ status.textContent = parts+' '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color= (conOk&&inqOk)?'#16a34a':'#d97706'; }
+  } else {
+    if(status){ status.textContent = '✗ 同步失敗'+errMsg; status.style.color='#dc2626'; }
+  }
+  renderCSSummary();
 }
 
 // ── 客服總表 ──
