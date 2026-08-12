@@ -899,11 +899,11 @@ function renderInqTable(month, brand){
   if(cats){
     theadHtml = `<tr>
         ${hdrSrcCell}
-        ${cats.map(c=>`<th colspan="${c.services.length}" class="grp-hd" style="background:#334155;color:#fff">${c.label}</th>`).join('')}
+        ${cats.map((c,i)=>`<th colspan="${c.services.length}" class="grp-hd" style="background:${i===0?'#d4789a':'#4472c4'};color:#fff">${c.label}</th>`).join('')}
         <th rowspan="2" class="grp-hd">總計</th>
       </tr>
       <tr>
-        ${cats.map(c=>c.services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${SL(s)}</th>`).join('')).join('')}
+        ${cats.map((c,i)=>c.services.map(s=>`<th style="background:${i===0?'#e8a8bc':'#9dc3e6'};color:${i===0?'#5a2a3a':'#1e3a5f'}">${SL(s)}</th>`).join('')).join('')}
       </tr>`;
   } else {
     theadHtml = `<tr>
