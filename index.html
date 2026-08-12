@@ -915,14 +915,6 @@ function renderInqTable(month, brand){
       <tr>${services.map(s=>`<th style="background:#9dc3e6;color:#1e3a5f">${SL(s)}</th>`).join('')}${services.map(s=>`<th style="background:#e8a8bc;color:#5a2a3a">${SL(s)}</th>`).join('')}</tr>`;
   }
 
-  // 日期列：跨全部欄
-  const totalCols = 3 + nDataCols + 1; // 日期(1) + 來源(1) + 客服(1) + 資料 + 總計
-  const dateRow = `<tr style="background:#334155">
-    <td colspan="${totalCols}" style="text-align:center;color:#fff;font-weight:700;font-size:13px;padding:6px 10px;border:none">
-      ${month}
-    </td>
-  </tr>`;
-
   return `
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
   <table class="cs-sum-tbl inq-sum-tbl" style="min-width:520px">
@@ -931,7 +923,7 @@ function renderInqTable(month, brand){
       <col style="width:52px;min-width:52px">
       <col style="width:52px;min-width:52px">
     </colgroup>
-    <thead>${dateRow}${theadHtml}</thead>
+    <thead>${theadHtml}</thead>
     <tbody>
       ${(()=>{ let s=threeRows(gtCell,gt.male,gt.female,'#fef9c3'); return s.replace(/^(<tr[^>]*>)/,`$1${dateTd}`); })()}
       ${simpleBlock('080',    '#bbf7d0', '080')}
