@@ -92,7 +92,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 /* 詢問總表專用 sticky（有日期欄，偏移量不同） */
 .inq-sum-tbl .date-cell{font-weight:700;position:sticky;left:0;z-index:2;background:#fef9c3}
 .inq-sum-tbl .src-cell{font-weight:600;font-size:12px;position:sticky;left:52px;z-index:2;box-shadow:2px 0 4px rgba(0,0,0,.06)}
-.inq-sum-tbl .inq-metric{position:sticky;left:156px;z-index:2;background:#fff}
+.inq-sum-tbl .inq-metric{position:sticky;left:104px;z-index:2;background:#fff}
 .cs-sum-tbl .grp-hd{background:#f1f5f9;font-weight:800;font-size:11px;color:#334155;text-align:center;padding:5px 8px;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0}
 .cs-sum-tbl .total-row{background:#f8fafc;font-weight:700}
 /* ── CS person cards ── */
@@ -807,7 +807,7 @@ function renderInqTable(month, brand){
   // Simple colspan=2 source block
   function simpleBlock(label, srcBg, key, rowBg='#ffffff'){
     const {m,f} = srcMF(key);
-    const cell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:${srcBg}">${label}</td>`;
+    const cell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:${srcBg}">${label}</td>`;
     return threeRows(cell, m, f, rowBg);
   }
 
@@ -824,8 +824,8 @@ function renderInqTable(month, brand){
       const visCols = cats
         ? cats.flatMap(c=>c.services.map(s=>`<td>${N(f[s]?.visit)}</td>`)).join('')
         : [...services.map(s=>`<td>${N(m[s]?.visit)}</td>`),...services.map(s=>`<td>${N(f[s]?.visit)}</td>`)].join('');
-      const outerCell = idx===0 ? `<td class="src-cell" colspan="2" rowspan="${nLocs}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
-      const locCell = `<td style="text-align:center;color:#1e293b;font-weight:600;font-size:12px;background:#ffffff;border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0">${DCON_LOC_LABELS[loc]}</td>`;
+      const outerCell = idx===0 ? `<td class="src-cell" rowspan="${nLocs}" style="text-align:center;color:#1e293b;font-weight:700;background:#d1d5db">地區CON</td>` : '';
+      const locCell = `<td class="inq-metric" style="color:#1e293b;font-weight:600;font-size:12px;background:#ffffff">${DCON_LOC_LABELS[loc]}</td>`;
       html += `<tr style="background:#ffffff">${outerCell}${locCell}${visCols}<td class="inq-tot">${N(totVisit)}</td></tr>`;
     });
     return html;
@@ -878,10 +878,10 @@ function renderInqTable(month, brand){
 
   // FB合計 = fb1(fbline) + fb2 + fb3 + fbdm
   const fbSum = sumMF(['fbline','fb2','fb3','fbdm']);
-  const fbCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
+  const fbCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
 
   // 總計 block（來源欄只顯示「總計」，日期欄顯示「當月總計」）
-  const gtCell = `<td class="src-cell" colspan="2" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">總計</td>`;
+  const gtCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fef08a">總計</td>`;
 
   // 日期欄：「當月總計」跨越全部來源行
   // cats: gt(3)+9simpleBlocks(27)+fb(3)+dcon(3) = 36 rows
@@ -892,8 +892,8 @@ function renderInqTable(month, brand){
   // Header rows — cats mode: 2 rows (category + services, female-only); flat mode: 2 rows (gender + services)
   const hdrRowSpan = 2;
   const hdrSrcCell = `<th rowspan="2" class="grp-hd" style="position:sticky;left:0;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">日期</th>
-        <th rowspan="2" class="grp-hd" colspan="2" style="position:sticky;left:52px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:104px">來源</th>
-        <th rowspan="2" class="grp-hd" style="position:sticky;left:156px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">客服</th>`;
+        <th rowspan="2" class="grp-hd" style="position:sticky;left:52px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">來源</th>
+        <th rowspan="2" class="grp-hd" style="position:sticky;left:104px;z-index:3;box-shadow:2px 0 4px rgba(0,0,0,.06);min-width:52px;width:52px">客服</th>`;
   let theadHtml = '';
   if(cats){
     theadHtml = `<tr>
@@ -915,7 +915,7 @@ function renderInqTable(month, brand){
   }
 
   // 日期列：跨全部欄
-  const totalCols = 4 + nDataCols + 1; // 日期(1) + 來源(2) + 客服(1) + 資料 + 總計
+  const totalCols = 3 + nDataCols + 1; // 日期(1) + 來源(1) + 客服(1) + 資料 + 總計
   const dateRow = `<tr style="background:#334155">
     <td colspan="${totalCols}" style="text-align:center;color:#fff;font-weight:700;font-size:13px;padding:6px 10px;border:none">
       ${month}
@@ -926,7 +926,6 @@ function renderInqTable(month, brand){
   <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
   <table class="cs-sum-tbl inq-sum-tbl" style="min-width:520px">
     <colgroup>
-      <col style="width:52px;min-width:52px">
       <col style="width:52px;min-width:52px">
       <col style="width:52px;min-width:52px">
       <col style="width:52px;min-width:52px">
@@ -945,9 +944,9 @@ function renderInqTable(month, brand){
       ${simpleBlock('FB3',    '#d1d5db', 'fb3')}
       ${simpleBlock('FB私訊', '#d1d5db', 'fbdm')}
       ${dconSection()}
-      <tr><td colspan="${4+nDataCols+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
+      <tr><td colspan="${3+nDataCols+1}" style="height:6px;background:#f8fafc;border:none"></td></tr>
       <tr style="background:#ffffff">
-        <td class="src-cell" colspan="3" rowspan="${cats?3:5}" style="text-align:center;font-weight:700;background:#fce7f3;left:0">目標</td>
+        <td class="src-cell" colspan="2" rowspan="${cats?3:5}" style="text-align:center;font-weight:700;background:#fce7f3;left:0">目標</td>
         <td class="inq-metric" style="font-weight:700">理想</td>${buildEstRow('est')}<td class="inq-tot">${N(estTotal)}</td>
       </tr>
       <tr style="background:#f8fafc">
