@@ -1056,6 +1056,16 @@ async function syncFromSheet(){
           male:   src.male   || {}
         };
       });
+      // 地區CON
+      if(inqData.dcon){
+        freshRec.sources['dcon'] = {
+          fs: inqData.dcon.fs || {female:{}, male:{}},
+          hc: inqData.dcon.hc || {female:{}, male:{}},
+          tc: inqData.dcon.tc || {female:{}, male:{}}
+        };
+      }
+      // 目標理想
+      if(inqData.estimates) freshRec.estimates = inqData.estimates;
       saveInqRec(freshRec);
       inqOk = true;
     }
