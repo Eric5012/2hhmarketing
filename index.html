@@ -1017,7 +1017,7 @@ async function syncFromSheet(){
   try {
     const conRes  = await fetch(`${url}?type=con&month=${rocMonth}`);
     const conData = await conRes.json();
-    console.log('CON debug_labels:', conData.debug_labels, 'keys:', Object.keys(conData.sources||{}));
+    console.log('CON debug_labels:', conData.debug_labels, 'keys:', Object.keys(conData.sources||{}), '080 data:', conData.sources?.['080']);
     if(conData.error){ errMsg += ' CON:'+conData.error; }
     else {
       const persons = CS_PERSONS.filter(p => CS_PERSON_BRANDS[p].includes(brand));
