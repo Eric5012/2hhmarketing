@@ -749,14 +749,7 @@ function renderInqTable(month, brand){
       gt.female[s].visit += d.female?.[s]?.visit||0;
     });
   });
-  DCON_LOCS.forEach(loc=>{
-    const d = dcon[loc]||{};
-    services.forEach(s=>{
-      if(!cats){ gt.male[s].inq += d.male?.[s]?.inq||0; gt.male[s].visit += d.male?.[s]?.visit||0; }
-      gt.female[s].inq   += d.female?.[s]?.inq  ||0;
-      gt.female[s].visit += d.female?.[s]?.visit||0;
-    });
-  });
+  // 地區CON（FS/HC/TC）只用來顯示分店明細，不加入總計（已含在各來源合計中）
   const gtTotalInq   = services.reduce((s,k)=>s+(cats?0:gt.male[k].inq||0)+(gt.female[k].inq||0),0);
   const gtTotalVisit = services.reduce((s,k)=>s+(cats?0:gt.male[k].visit||0)+(gt.female[k].visit||0),0);
 
