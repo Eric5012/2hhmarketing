@@ -1115,9 +1115,9 @@ function renderCSSummary(){
   // labelBg = 來源欄底色（同詢問總表）; dataBg = 數據欄底色（白）
   const sources = [
     {key:'080',    label:'080',      labelBg:'#bbf7d0'},
-    {key:'gline',  label:'GLINE',    labelBg:'#bfdbfe'},
-    {key:'fbline', label:'FB LINE',  labelBg:'#fed7aa'},
-    {key:'fbdm',   label:'FB 私訊',  labelBg:'#fed7aa'},
+    {key:'gline',  label:'GLINE',    labelBg:'#bfdbfe', targetCvr:0.45},
+    {key:'fbline', label:'FB LINE',  labelBg:'#fed7aa', targetCvr:0.22},
+    {key:'fbdm',   label:'FB 私訊',  labelBg:'#fed7aa', targetCvr:0.12},
     {key:'kol',    label:'KOL',      labelBg:'#ddd6fe'},
     {key:'other',  label:'其他',     labelBg:'#bbf7d0'},
     {key:'mgm',    label:'MGM',      labelBg:'#bbf7d0'},
@@ -1216,7 +1216,7 @@ function renderCSSummary(){
     }).join('');
     return `<tr>
       <td class="src-cell" style="background:${r.src.labelBg};font-weight:600">${r.src.label}</td>
-      <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc">${P(r.tVisit,r.tInq)}</td>
+      <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc;${(()=>{const tc=r.src.targetCvr;const cvr=r.tInq>0?r.tVisit/r.tInq:0;return(tc&&cvr>=tc)?'color:#16a34a;font-weight:700':'';})()}">${P(r.tVisit,r.tInq)}</td>
       <td style="${SUB_REV}">${r.total_rev>0?r.total_rev.toLocaleString('zh-TW'):'—'}</td><td style="${SUB_REV}">${r.per_con>0?Math.round(r.per_con).toLocaleString('zh-TW'):'—'}</td>
       <td style="${SUB_BRANCH}">${N(r.so)}</td><td style="${SUB_BRANCH}">${N(r.hc)}</td><td style="${SUB_BRANCH}">${N(r.tc)}</td>
       ${pCells}
