@@ -1216,7 +1216,7 @@ function renderCSSummary(){
     }).join('');
     return `<tr>
       <td class="src-cell" style="background:${r.src.labelBg};font-weight:600">${r.src.label}</td>
-      <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc;${(()=>{const tc=r.src.targetCvr;const cvr=r.tInq>0?r.tVisit/r.tInq:0;return(tc&&cvr>=tc)?'color:#16a34a;font-weight:700':'';})()}">${P(r.tVisit,r.tInq)}</td>
+      <td style="background:#f8fafc">${N(r.tInq)}</td><td style="background:#f8fafc">${N(r.tVisit)}</td><td style="background:#f8fafc;${(()=>{const tc=r.src.targetCvr;const cvr=r.tInq>0?r.tVisit/r.tInq:0;return tc?(cvr>=tc?'color:#16a34a;font-weight:700':'color:#dc2626;font-weight:700'):'';})()}">${P(r.tVisit,r.tInq)}</td>
       <td style="${SUB_REV}">${r.total_rev>0?r.total_rev.toLocaleString('zh-TW'):'—'}</td><td style="${SUB_REV}">${r.per_con>0?Math.round(r.per_con).toLocaleString('zh-TW'):'—'}</td>
       <td style="${SUB_BRANCH}">${N(r.so)}</td><td style="${SUB_BRANCH}">${N(r.hc)}</td><td style="${SUB_BRANCH}">${N(r.tc)}</td>
       ${pCells}
