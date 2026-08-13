@@ -1170,9 +1170,8 @@ function renderCSSummary(){
     };
   });
 
-  // 總業績 from OV
-  const ov = loadOvRec(month);
-  const totalRev = ov[brand]?.rev || 0;
+  // 總業績 = 各來源業績加總（從 Sheet 同步）
+  const totalRev = srcRows.reduce((s,r)=>s+(r.total_rev||0), 0);
   const perCon   = gtVisit>0 ? Math.round(totalRev/gtVisit) : 0;
 
   // Build thead
