@@ -864,14 +864,19 @@ function renderInqTable(month, brand){
     const totalMInq = services.reduce((s,k)=>s+(gt.male[k].inq||0),0);
     const femPct  = gtTotalInq>0 ? (totalFInq/gtTotalInq*100).toFixed(2)+'%' : '—';
     const malePct = gtTotalInq>0 ? (totalMInq/gtTotalInq*100).toFixed(2)+'%' : '—';
-    const mShengPct = totalMInq>0 ? ((gt.male['生髮']?.inq||0)/totalMInq*100).toFixed(2)+'%' : '—';
-    const fShengPct = totalFInq>0 ? ((gt.female['生髮']?.inq||0)/totalFInq*100).toFixed(2)+'%' : '—';
+    // 生植% per gender: each service as % of that gender's total
+    function svcPct(gObj, total){
+      return services.map(s=>{
+        const pct = total>0 ? ((gObj[s]?.inq||0)/total*100).toFixed(1)+'%' : '—';
+        return `${SL(s)} ${pct}`;
+      }).join('　');
+    }
     mfPctRow    = `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">女 ${femPct}</td><td></td>`;
-    shengPctRow = `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${mShengPct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${fShengPct}</td><td></td>`;
+    shengPctRow = `<td colspan="${nSvc}" style="text-align:center;font-size:11px;color:#1e293b">${svcPct(gt.male,totalMInq)}</td><td colspan="${nSvc}" style="text-align:center;font-size:11px;color:#1e293b">${svcPct(gt.female,totalFInq)}</td><td></td>`;
   }
 
-  // FB合計 = fb1 + fb2 + fb3 + fbdm（Sheet 第13列已是總計，不重複加）
-  const fbSum = sumMF(['fb1','fb2','fb3','fbdm']);
+  // FB合計 = fbline（醫髮FB LINE row13）+ fb1+fb2+fb3+fbdm
+  const fbSum = sumMF(['fbline','fb1','fb2','fb3','fbdm']);
   const fbCell = `<td class="src-cell" rowspan="3" style="text-align:center;color:#1e293b;font-weight:700;background:#fde8be">FB</td>`;
 
   // 總計 block（來源欄只顯示「總計」，日期欄顯示「當月總計」）
