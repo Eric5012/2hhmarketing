@@ -862,17 +862,16 @@ function renderInqTable(month, brand){
   if(!cats){
     const totalFInq = services.reduce((s,k)=>s+(gt.female[k].inq||0),0);
     const totalMInq = services.reduce((s,k)=>s+(gt.male[k].inq||0),0);
+    // 男女% = 男生所有療程詢問 / 總詢問
     const femPct  = gtTotalInq>0 ? (totalFInq/gtTotalInq*100).toFixed(2)+'%' : '—';
     const malePct = gtTotalInq>0 ? (totalMInq/gtTotalInq*100).toFixed(2)+'%' : '—';
-    // 生植% per gender: each service as % of that gender's total
-    function svcPct(gObj, total){
-      return services.map(s=>{
-        const pct = total>0 ? ((gObj[s]?.inq||0)/total*100).toFixed(1)+'%' : '—';
-        return `${SL(s)} ${pct}`;
-      }).join('　');
-    }
+    // 生植% = 生髮詢問 / 總詢問 vs (植髮+美型)詢問 / 總詢問
+    const totalShengInq = (gt.male['生髮']?.inq||0) + (gt.female['生髮']?.inq||0);
+    const totalZhiInq   = services.filter(s=>s!=='生髮').reduce((a,s)=>(gt.male[s]?.inq||0)+(gt.female[s]?.inq||0)+a, 0);
+    const shengPct = gtTotalInq>0 ? (totalShengInq/gtTotalInq*100).toFixed(2)+'%' : '—';
+    const zhiPct   = gtTotalInq>0 ? (totalZhiInq  /gtTotalInq*100).toFixed(2)+'%' : '—';
     mfPctRow    = `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">男 ${malePct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">女 ${femPct}</td><td></td>`;
-    shengPctRow = `<td colspan="${nSvc}" style="text-align:center;font-size:11px;color:#1e293b">${svcPct(gt.male,totalMInq)}</td><td colspan="${nSvc}" style="text-align:center;font-size:11px;color:#1e293b">${svcPct(gt.female,totalFInq)}</td><td></td>`;
+    shengPctRow = `<td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">生 ${shengPct}</td><td colspan="${nSvc}" style="text-align:center;font-size:12px;color:#1e293b">植 ${zhiPct}</td><td></td>`;
   }
 
   // FB合計 = fbline（醫髮FB LINE row13）+ fb1+fb2+fb3+fbdm
