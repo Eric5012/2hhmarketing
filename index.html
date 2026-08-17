@@ -1212,7 +1212,10 @@ function renderCSSummary(){
     const pCells = persons.map(p => {
       const d = r.pp[p]||{inq:0,appt:0,visit:0};
       const cvr = P(d.visit, d.inq);
-      return `<td style="background:#fff">${N(d.inq)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff;color:${d.visit>0?'#1e293b':'#94a3b8'}">${cvr}</td>`;
+      const tc = r.src.targetCvr;
+      const pCvr = d.inq>0 ? d.visit/d.inq : 0;
+      const cvrColor = tc ? (pCvr>=tc ? '#16a34a' : '#dc2626') : (d.visit>0?'#1e293b':'#94a3b8');
+      return `<td style="background:#fff">${N(d.inq)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff">${N(d.visit)}</td><td style="background:#fff;color:${cvrColor};font-weight:${tc?'700':'400'}">${cvr}</td>`;
     }).join('');
     return `<tr>
       <td class="src-cell" style="background:${r.src.labelBg};font-weight:600">${r.src.label}</td>
