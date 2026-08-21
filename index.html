@@ -461,6 +461,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   </div>
 
+  <!-- 品項目標達成表 -->
+  <hr style="border:none;border-top:2px solid #e2e8f0;margin:8px 0 4px">
+  <div id="ov-goal-table"></div>
+
 </div><!-- /main-tab-overview -->
 
 <!-- ═══════════════════════════════════════
@@ -2441,6 +2445,91 @@ function renderOverviewStats(){
   setText('ov-hh-visit',      N(hv));
   setText('ov-hh-visitpct',   P(hv, hGgInq+hFbInq));
   setText('ov-hh-cvr',        P(hv, hGgInq+hFbInq));
+
+  renderGoalTable(month);
+}
+
+function renderGoalTable(month){
+  const el = document.getElementById('ov-goal-table');
+  if(!el) return;
+
+  const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
+
+  // Helper: sum visit/inq for all sources in an INQ rec
+  function sumVisit(rec, gender, svc){
+    return INQ_SRC_KEYS.reduce((a,k)=>{
+      const sd = rec.sources[k]||{};
+      return a + (sd[gender]?.[svc]?.visit||0);
+    }, 0);
+  }
+
+  // 醫美 (seoul) — female only (cats mode)
+  const seoulRec = loadInqRec(month, 'seoul');
+  const seoulItems = [
+    {label:'拉皮',    svc:'拉皮'},
+    {label:'抽補脂',  svc:'抽補脂'},
+    {label:'眼袋',    svc:'眼袋'},
+    {label:'雙眼皮',  svc:'雙眼皮'},
+    {label:'隆鼻',    svc:'隆鼻'},
+    {label:'玻尿酸',  svc:'玻尿酸熊貓針'},
+    {label:'埋線',    svc:'埋線'},
+    {label:'音波',    svc:'音波'},
+    {label:'電波',    svc:'電波'},
+  ].map(({label, svc})=>{
+    const actual = sumVisit(seoulRec, 'female', svc);
+    const target = seoulRec.estimates?.female?.[svc] || 0;
+    return {label, actual, target, diff: actual - target};
+  });
+
+  // 醫髮 (hh) — male + female
+  const hhRec = loadInqRec(month, 'hh');
+  const hhItems = [
+    {label:'生髮(男)', svc:'生髮', gender:'male'},
+    {label:'生髮(女)', svc:'生髮', gender:'female'},
+    {label:'植髮(男)', svc:'植髮', gender:'male'},
+    {label:'植髮(女)', svc:'植髮', gender:'female'},
+  ].map(({label, svc, gender})=>{
+    const actual = sumVisit(hhRec, gender, svc);
+    const target = hhRec.estimates?.[gender]?.[svc] || 0;
+    return {label, actual, target, diff: actual - target};
+  });
+
+  const thStyle = 'padding:6px 12px;font-size:13px;font-weight:700;color:#fff;text-align:center';
+  const tdStyle = 'padding:5px 12px;font-size:13px;text-align:center;border-bottom:1px solid #f1f5f9';
+  const tdL     = 'padding:5px 12px;font-size:13px;font-weight:600;border-bottom:1px solid #f1f5f9';
+
+  function rows(items, bg){
+    return items.map(({label, actual, target, diff})=>{
+      const diffColor = diff >= 0 ? '#16a34a' : '#dc2626';
+      const diffBg    = diff >= 0 ? '#dcfce7' : '#fee2e2';
+      const diffTxt   = diff >= 0 ? `+${diff}` : `${diff}`;
+      const noData    = actual===0 && target===0;
+      return `<tr>
+        <td style="${tdL};background:${bg};color:#fff">${label}</td>
+        <td style="${tdStyle}">${target||'—'}</td>
+        <td style="${tdStyle}">${noData?'—':actual}</td>
+        <td style="${tdStyle};font-weight:700;background:${noData?'transparent':diffBg};color:${noData?'#94a3b8':diffColor}">${noData?'—':diffTxt}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  el.innerHTML = `
+  <div style="overflow-x:auto;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-top:8px">
+  <table style="width:100%;border-collapse:collapse;min-width:280px">
+    <thead>
+      <tr>
+        <th style="${thStyle};background:#6d6b9e;border-radius:12px 0 0 0">品項</th>
+        <th style="${thStyle};background:#6d6b9e">目標</th>
+        <th style="${thStyle};background:#6d6b9e">實際</th>
+        <th style="${thStyle};background:#6d6b9e;border-radius:0 12px 0 0">落差</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${rows(seoulItems, '#7c77b9')}
+      ${rows(hhItems,    '#1e3a5f')}
+    </tbody>
+  </table>
+  </div>`;
 }
 
 function renderDcmp(){
