@@ -388,10 +388,11 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   <div class="text-sm font-bold text-slate-600 mt-2">總CON數</div>
 
-  <!-- CON數 第一層：醫美 Google | 醫美 FB -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px" data-con-row="seoul">
+  <!-- CON數：單一 grid，order 由 JS 控制 -->
+  <!-- 全部：醫美Gg|醫髮Gg / 醫美FB|醫髮FB；單品牌：Gg|FB 並排 -->
+  <div id="ov-con-grid" class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
-    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
+    <div class="scard ov-brand-card" id="ov-card-seoul-gg" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
         <span class="brand-tag brand-tag-seoul">醫美</span>
         <span style="color:#7c3aed;font-weight:700">GOOGLE CON數</span>
@@ -404,25 +405,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
     </div>
 
-    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
-      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
-        <span class="brand-tag brand-tag-seoul">醫美</span>
-        <span style="color:#7c3aed;font-weight:700">FB CON數</span>
-      </div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-seoul-fb-visit" style="font-size:26px">—</span></div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-seoul-fb-est">—</span></div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-seoul-fb-prev">—</span></div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-seoul-fb-gap">—</span></div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- CON數 第二層：醫髮 Google | 醫髮 FB -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px" data-con-row="hh">
-
-    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
+    <div class="scard ov-brand-card" id="ov-card-hh-gg" data-brand="hh" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
         <span class="brand-tag brand-tag-hh">醫髮</span>
         <span style="color:#2563eb;font-weight:700">GOOGLE CON數</span>
@@ -435,7 +418,20 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
       </div>
     </div>
 
-    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
+    <div class="scard ov-brand-card" id="ov-card-seoul-fb" data-brand="seoul" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span style="color:#7c3aed;font-weight:700">FB CON數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-seoul-fb-visit" style="font-size:26px">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-seoul-fb-est">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-seoul-fb-prev">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-seoul-fb-gap">—</span></div>
+      </div>
+    </div>
+
+    <div class="scard ov-brand-card" id="ov-card-hh-fb" data-brand="hh" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
         <span class="brand-tag brand-tag-hh">醫髮</span>
         <span style="color:#2563eb;font-weight:700">FB CON數</span>
@@ -450,8 +446,8 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   </div>
 
-  <!-- CON數 第三層：醫美 廣告% | 醫髮 廣告% -->
-  <div class="grid fade-up ov-con-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
+  <!-- CON數 廣告%：醫美 | 醫髮 -->
+  <div id="ov-ad-pct-grid" class="grid fade-up ov-con-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
@@ -1969,11 +1965,27 @@ function applyBrandVisibility(){
   // brand cards grid: 全部 → 2-col (both cards side by side); single brand → 1-col (full width)
   const grid1 = document.querySelector('.ov-grid-1');
   if(grid1){ grid1.style.gridTemplateColumns = isAll ? 'repeat(3,1fr)' : '1fr'; grid1.classList.toggle('ov-single', !isAll); }
-  // CON數 rows: hide entire row when that brand is not shown
-  document.querySelectorAll('[data-con-row]').forEach(g => {
-    const br = g.dataset.conRow;
-    g.style.display = (br==='seoul' ? showS : showH) ? '' : 'none';
-  });
+  // CON數 grid: 全部 → Gg|Gg / FB|FB (order 1,2,3,4)
+  //             單品牌 → Gg|FB (order changes so same brand shows side by side)
+  const sGg = document.getElementById('ov-card-seoul-gg');
+  const hGg = document.getElementById('ov-card-hh-gg');
+  const sFb = document.getElementById('ov-card-seoul-fb');
+  const hFb = document.getElementById('ov-card-hh-fb');
+  if(sGg && hGg && sFb && hFb){
+    if(isAll){
+      // 全部：醫美Gg(1) 醫髮Gg(2) / 醫美FB(3) 醫髮FB(4)
+      sGg.style.order='1'; hGg.style.order='2'; sFb.style.order='3'; hFb.style.order='4';
+    } else if(activeBrand==='seoul'){
+      // 醫美：醫美Gg(1) 醫美FB(2) — 醫髮隱藏
+      sGg.style.order='1'; sFb.style.order='2';
+    } else {
+      // 醫髮：醫髮Gg(1) 醫髮FB(2) — 醫美隱藏
+      hGg.style.order='1'; hFb.style.order='2';
+    }
+  }
+  // 廣告% grid: 單品牌 → 滿版
+  const adGrid = document.getElementById('ov-ad-pct-grid');
+  if(adGrid) adGrid.style.gridTemplateColumns = isAll ? 'repeat(2,1fr)' : '1fr';
   document.querySelectorAll('.ov-brand-card').forEach(el => {
     el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
   });
