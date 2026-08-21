@@ -387,48 +387,122 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div style="padding:8px 0"><div style="border-top:2px solid #e2e8f0"></div></div>
 
   <div class="text-sm font-bold text-slate-600 mt-2">總CON數</div>
-  <!-- 第二行：廣告來源 -->
-  <div class="grid ov-grid-2 fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
-    <!-- Google 廣告詢問 / 到店數 -->
-    <div class="scard" style="border-left:4px solid #16a34a">
-      <div class="scard-title">Google 詢問 / 到店數</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul">
+  <!-- CON數 第一層：醫美 Google + FB -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+
+    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
         <span class="brand-tag brand-tag-seoul">醫美</span>
-        <div class="scard-nums">
-          <span class="scard-val" style="color:#94a3b8" id="ov-seoul-gg">—</span>
-          <span class="scard-val" style="color:#0f172a" id="ov-seoul-gg-visit">—</span>
-        </div>
+        <span style="color:#7c3aed;font-weight:700">GOOGLE CON數</span>
       </div>
-      <div class="scard-row ov-brand-row" data-brand="hh">
-        <span class="brand-tag brand-tag-hh">醫髮</span>
-        <div class="scard-nums">
-          <span class="scard-val" style="color:#94a3b8" id="ov-hh-gg">—</span>
-          <span class="scard-val" style="color:#0f172a" id="ov-hh-gg-visit">—</span>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <span class="scard-val" id="ov-seoul-gg-visit" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <span class="scard-rate" id="ov-seoul-gg-est">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <span class="scard-rate" id="ov-seoul-gg-prev">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-seoul-gg-gap">—</span>
         </div>
       </div>
     </div>
 
-    <!-- FB 廣告詢問 / 到店數 -->
-    <div class="scard" style="border-left:4px solid #3b82f6">
-      <div class="scard-title">FB 詢問 / 到店數</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul">
+    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
         <span class="brand-tag brand-tag-seoul">醫美</span>
-        <div class="scard-nums">
-          <span class="scard-val" style="color:#94a3b8" id="ov-seoul-fb">—</span>
-          <span class="scard-val" style="color:#0f172a" id="ov-seoul-fb-visit">—</span>
-        </div>
+        <span style="color:#7c3aed;font-weight:700">FB CON數</span>
       </div>
-      <div class="scard-row ov-brand-row" data-brand="hh">
-        <span class="brand-tag brand-tag-hh">醫髮</span>
-        <div class="scard-nums">
-          <span class="scard-val" style="color:#94a3b8" id="ov-hh-fb">—</span>
-          <span class="scard-val" style="color:#0f172a" id="ov-hh-fb-visit">—</span>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <span class="scard-val" id="ov-seoul-fb-visit" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <span class="scard-rate" id="ov-seoul-fb-est">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <span class="scard-rate" id="ov-seoul-fb-prev">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-seoul-fb-gap">—</span>
         </div>
       </div>
     </div>
 
   </div>
+
+  <!-- CON數 第二層：醫髮 Google + FB -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+
+    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span style="color:#2563eb;font-weight:700">GOOGLE CON數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <span class="scard-val" id="ov-hh-gg-visit" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <span class="scard-rate" id="ov-hh-gg-est">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <span class="scard-rate" id="ov-hh-gg-prev">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-hh-gg-gap">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span style="color:#2563eb;font-weight:700">FB CON數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
+          <span class="scard-val" id="ov-hh-fb-visit" style="font-size:26px">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
+          <span class="scard-rate" id="ov-hh-fb-est">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
+          <span class="scard-rate" id="ov-hh-fb-prev">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
+          <span class="scard-rate" id="ov-hh-fb-gap">—</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- hidden placeholders to keep existing ID references intact -->
+  <span id="ov-seoul-gg" style="display:none"></span>
+  <span id="ov-hh-gg" style="display:none"></span>
+  <span id="ov-seoul-fb" style="display:none"></span>
+  <span id="ov-hh-fb" style="display:none"></span>
 
   <!-- 第三行：漏斗指標 -->
   <div class="grid ov-grid-3 fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
@@ -2429,16 +2503,41 @@ function renderOverviewStats(){
     });
   });
 
-  // 廣告詢問（從 CS 客服總表）
+  // 廣告詢問（備用 hidden span）
   setText('ov-seoul-gg', N(sGgInq));
   setText('ov-hh-gg',    N(hGgInq));
   setText('ov-seoul-fb', N(sFbInq));
   setText('ov-hh-fb',    N(hFbInq));
-  // 到店數（各自對應來源）
+
+  // CON數卡片：實際 / 估值 / 同期 / 落差
+  const prevYrSGg  = loadYrRec(curY-1,'seoul').months[curMi-1]?.gg_con  || 0;
+  const prevYrSFb  = loadYrRec(curY-1,'seoul').months[curMi-1]?.fb_con  || 0;
+  const prevYrHGg  = loadYrRec(curY-1,'hh'   ).months[curMi-1]?.gg_con  || 0;
+  const prevYrHFb  = loadYrRec(curY-1,'hh'   ).months[curMi-1]?.fb_con  || 0;
+  const sGgEst = sGgV ? calcEst(sGgV, month) : 0;
+  const sFbEst = sFbV ? calcEst(sFbV, month) : 0;
+  const hGgEst = hGgV ? calcEst(hGgV, month) : 0;
+  const hFbEst = hFbV ? calcEst(hFbV, month) : 0;
+
   setText('ov-seoul-gg-visit', N(sGgV));
-  setText('ov-hh-gg-visit',    N(hGgV));
+  setText('ov-seoul-gg-est',   sGgEst ? N(sGgEst) : '—');
+  setText('ov-seoul-gg-prev',  prevYrSGg ? N(prevYrSGg) : '—');
+  setGap('ov-seoul-gg-gap', sGgEst, prevYrSGg);
+
   setText('ov-seoul-fb-visit', N(sFbV));
-  setText('ov-hh-fb-visit',    N(hFbV));
+  setText('ov-seoul-fb-est',   sFbEst ? N(sFbEst) : '—');
+  setText('ov-seoul-fb-prev',  prevYrSFb ? N(prevYrSFb) : '—');
+  setGap('ov-seoul-fb-gap', sFbEst, prevYrSFb);
+
+  setText('ov-hh-gg-visit', N(hGgV));
+  setText('ov-hh-gg-est',   hGgEst ? N(hGgEst) : '—');
+  setText('ov-hh-gg-prev',  prevYrHGg ? N(prevYrHGg) : '—');
+  setGap('ov-hh-gg-gap', hGgEst, prevYrHGg);
+
+  setText('ov-hh-fb-visit', N(hFbV));
+  setText('ov-hh-fb-est',   hFbEst ? N(hFbEst) : '—');
+  setText('ov-hh-fb-prev',  prevYrHFb ? N(prevYrHFb) : '—');
+  setGap('ov-hh-fb-gap', hFbEst, prevYrHFb);
 
   setText('ov-seoul-inq',  N(si));  setText('ov-hh-inq',  N(hi));
   setText('ov-seoul-appt', N(sa));  setText('ov-hh-appt', N(ha));
