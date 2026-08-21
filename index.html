@@ -450,6 +450,53 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   </div>
 
+  <!-- CON數 第三層：醫美 廣告% | 醫髮 廣告% -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+
+    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span style="color:#7c3aed;font-weight:700">廣告%數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">Google</span>
+          <span class="scard-rate" id="ov-seoul-gg-pct">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">FB</span>
+          <span class="scard-rate" id="ov-seoul-fb-pct">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">廣告合計</span>
+          <span class="scard-val" id="ov-seoul-ad-pct" style="font-size:22px">—</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-hh">醫髮</span>
+        <span style="color:#2563eb;font-weight:700">廣告%數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">Google</span>
+          <span class="scard-rate" id="ov-hh-gg-pct">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">FB</span>
+          <span class="scard-rate" id="ov-hh-fb-pct">—</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
+          <span style="font-size:11px;color:#94a3b8;min-width:54px">廣告合計</span>
+          <span class="scard-val" id="ov-hh-ad-pct" style="font-size:22px">—</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
   <!-- hidden placeholders to keep existing ID references intact -->
   <span id="ov-seoul-gg" style="display:none"></span>
   <span id="ov-hh-gg" style="display:none"></span>
@@ -2464,6 +2511,15 @@ function renderOverviewStats(){
   setText('ov-hh-fb-est',   hFbEst ? N(hFbEst) : '—');
   setText('ov-hh-fb-prev',  prevYrHFb ? N(prevYrHFb) : '—');
   setGap('ov-hh-fb-gap', hFbEst, prevYrHFb);
+
+  // 廣告%數：Google CON% / FB CON% / 廣告合計% (vs 總到店)
+  const Pp = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
+  setText('ov-seoul-gg-pct', Pp(sGgV, sv));
+  setText('ov-seoul-fb-pct', Pp(sFbV, sv));
+  setText('ov-seoul-ad-pct', Pp(sGgV+sFbV, sv));
+  setText('ov-hh-gg-pct', Pp(hGgV, hv));
+  setText('ov-hh-fb-pct', Pp(hFbV, hv));
+  setText('ov-hh-ad-pct', Pp(hGgV+hFbV, hv));
 
   setText('ov-seoul-inq',  N(si));  setText('ov-hh-inq',  N(hi));
   setText('ov-seoul-appt', N(sa));  setText('ov-hh-appt', N(ha));
