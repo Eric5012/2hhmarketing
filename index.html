@@ -2501,14 +2501,13 @@ function renderGoalTable(month){
   function rows(items, bg){
     return items.map(({label, actual, target, diff})=>{
       const diffColor = diff >= 0 ? '#16a34a' : '#dc2626';
-      const diffBg    = diff >= 0 ? '#dcfce7' : '#fee2e2';
       const diffTxt   = diff >= 0 ? `+${diff}` : `${diff}`;
       const noData    = actual===0 && target===0;
       return `<tr>
-        <td style="${tdL};background:${bg};color:#fff">${label}</td>
+        <td style="${tdL};background:${bg};color:#1e293b">${label}</td>
         <td style="${tdStyle}">${target||'—'}</td>
         <td style="${tdStyle}">${noData?'—':actual}</td>
-        <td style="${tdStyle};font-weight:700;background:${noData?'transparent':diffBg};color:${noData?'#94a3b8':diffColor}">${noData?'—':diffTxt}</td>
+        <td style="${tdStyle};font-weight:700;color:${noData?'#94a3b8':diffColor}">${noData?'—':diffTxt}</td>
       </tr>`;
     }).join('');
   }
@@ -2518,15 +2517,15 @@ function renderGoalTable(month){
   <table style="width:100%;border-collapse:collapse;min-width:280px">
     <thead>
       <tr>
-        <th style="${thStyle};background:#6d6b9e;border-radius:12px 0 0 0">品項</th>
-        <th style="${thStyle};background:#6d6b9e">目標</th>
-        <th style="${thStyle};background:#6d6b9e">實際</th>
-        <th style="${thStyle};background:#6d6b9e;border-radius:0 12px 0 0">落差</th>
+        <th style="${thStyle};background:#7c6fb0;border-radius:12px 0 0 0">品項</th>
+        <th style="${thStyle};background:#7c6fb0">目標</th>
+        <th style="${thStyle};background:#7c6fb0">實際</th>
+        <th style="${thStyle};background:#7c6fb0;border-radius:0 12px 0 0">落差</th>
       </tr>
     </thead>
     <tbody>
-      ${rows(seoulItems, '#7c77b9')}
-      ${rows(hhItems,    '#1e3a5f')}
+      ${rows(seoulItems, '#ede9fe')}
+      ${rows(hhItems,    '#dbeafe')}
     </tbody>
   </table>
   </div>`;
