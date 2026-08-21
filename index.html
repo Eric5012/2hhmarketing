@@ -1688,6 +1688,20 @@ function seedBranchIfEmpty(){
   }
 }
 
+function seedBranchPrevDefaults(){
+  // Always ensure 114年 seed values are present (overwrite only if all zero)
+  const seeds = [
+    {month:'2025-08', brand:'seoul', so:110, tc:69, hc:24},
+    {month:'2025-08', brand:'hh',    so:110, tc:71, hc:37},
+  ];
+  seeds.forEach(seed => {
+    const stored = loadBranchPrevAll().find(r=>r.month===seed.month&&r.brand===seed.brand);
+    if(!stored || !(stored.so||stored.hc||stored.tc)){
+      saveBranchPrevRec(seed);
+    }
+  });
+}
+
 // ──────────────────────────────────────────────────────────────
 // UTILS
 // ──────────────────────────────────────────────────────────────
@@ -3143,6 +3157,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   seedInqIfEmpty();
   seedCSIfEmpty();
   seedBranchIfEmpty();
+  seedBranchPrevDefaults();
   startClock();
   populateMonthSelects();
   populateSeoulYears();
