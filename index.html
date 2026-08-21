@@ -2627,14 +2627,15 @@ const STORAGE_BRANCH_PREV = 'dash_branch_prev_v1';
 function loadBranchPrevAll(){ return JSON.parse(localStorage.getItem(STORAGE_BRANCH_PREV)||'[]'); }
 function saveBranchPrevAll(d){ localStorage.setItem(STORAGE_BRANCH_PREV, JSON.stringify(d)); }
 function loadBranchPrevRec(month, brand){
-  // Default seed values for 2025-08 (from 114年 records)
+  // Default seed values per month (from 114年 records)
   const DEFAULTS = {
     'seoul': {'2025-08':{so:110,tc:69,hc:24}},
     'hh':    {'2025-08':{so:110,tc:71,hc:37}},
   };
-  return loadBranchPrevAll().find(r=>r.month===month&&r.brand===brand) ||
-    (DEFAULTS[brand]&&DEFAULTS[brand][month]) ||
-    {month, brand, so:0, hc:0, tc:0};
+  const stored = loadBranchPrevAll().find(r=>r.month===month&&r.brand===brand);
+  // Use stored only if it has at least one non-zero value
+  if(stored && (stored.so||stored.hc||stored.tc)) return stored;
+  return (DEFAULTS[brand]&&DEFAULTS[brand][month]) || {month, brand, so:0, hc:0, tc:0};
 }
 function saveBranchPrevRec(rec){
   const all = loadBranchPrevAll().filter(r=>!(r.month===rec.month&&r.brand===rec.brand));
