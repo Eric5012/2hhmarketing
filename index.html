@@ -2585,9 +2585,9 @@ function renderGoalTable(month){
     return {label, actual, target, diff: actual - target};
   });
 
-  const thStyle = 'padding:6px 12px;font-size:13px;font-weight:700;color:#fff;text-align:center';
-  const tdStyle = 'padding:5px 12px;font-size:13px;text-align:center;border-bottom:1px solid #d1d5db';
-  const tdL     = 'padding:5px 12px;font-size:13px;font-weight:600;border-bottom:1px solid #d1d5db';
+  const thStyle = 'padding:7px 10px;font-size:13px;font-weight:700;color:#fff;text-align:center';
+  const tdStyle = 'padding:6px 10px;font-size:13px;text-align:center;border:1px solid #d1d5db';
+  const tdL     = 'padding:6px 10px;font-size:13px;font-weight:600;border:1px solid #d1d5db';
 
   function rows(items, bg){
     return items.map(({label, actual, target, diff})=>{
