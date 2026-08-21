@@ -2698,26 +2698,26 @@ function renderBranchDiffTable(month){
   <table style="width:100%;border-collapse:collapse;min-width:300px;font-family:inherit">
     <thead>
       <tr>
-        <th colspan="2" style="${thBase};background:#f0f0f0;color:#374151">對比時間</th>
-        <th colspan="3" style="${thBase};background:#f0f0f0;color:#374151">${dateRange}</th>
+        <th colspan="2" style="${thBase};background:#7c6fb0;color:#fff">對比時間</th>
+        <th colspan="3" style="${thBase};background:#7c6fb0;color:#fff">${dateRange}</th>
       </tr>
       <tr>
-        <th style="${thBase};background:#e8e8e8;color:#374151">品牌</th>
-        <th style="${thBase};background:#e8e8e8;color:#374151">館別</th>
-        <th style="${thBase};background:#e8e8e8;color:#374151">${prevRocY}年</th>
-        <th style="${thBase};background:#e8e8e8;color:#374151">${rocY}年</th>
-        <th style="${thBase};background:#e8e8e8;color:#374151">落差</th>
+        <th style="${thBase};background:#7c6fb0;color:#fff">品牌</th>
+        <th style="${thBase};background:#7c6fb0;color:#fff">館別</th>
+        <th style="${thBase};background:#7c6fb0;color:#fff">${prevRocY}年</th>
+        <th style="${thBase};background:#7c6fb0;color:#fff">${rocY}年</th>
+        <th style="${thBase};background:#7c6fb0;color:#fff">落差</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td rowspan="3" style="${tdBase};background:#5a4fcf;color:#fff;font-weight:700;font-size:14px;vertical-align:middle">醫美</td>
+        <td rowspan="3" style="${tdBase};background:#ede9fe;color:#1e293b;font-weight:700;font-size:14px;vertical-align:middle">醫美</td>
         ${row('SO', s114.so, s115.so).replace('<tr>','').replace('</tr>','')}
       </tr>
       ${row('TC', s114.tc, s115.tc)}
       ${row('HC', s114.hc, s115.hc)}
       <tr>
-        <td rowspan="3" style="${tdBase};background:#1e3a5f;color:#fff;font-weight:700;font-size:14px;vertical-align:middle">醫髮</td>
+        <td rowspan="3" style="${tdBase};background:#dbeafe;color:#1e293b;font-weight:700;font-size:14px;vertical-align:middle">醫髮</td>
         ${row('FS', h114.so, h115.so).replace('<tr>','').replace('</tr>','')}
       </tr>
       ${row('TC', h114.tc, h115.tc)}
