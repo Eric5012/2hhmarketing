@@ -389,7 +389,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <div class="text-sm font-bold text-slate-600 mt-2">總CON數</div>
 
   <!-- CON數 第一層：醫美 Google | 醫髮 Google -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+  <div class="grid fade-up ov-con-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
@@ -420,7 +420,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 
   <!-- CON數 第二層：醫美 FB | 醫髮 FB -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+  <div class="grid fade-up ov-con-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
@@ -451,7 +451,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   </div>
 
   <!-- CON數 第三層：醫美 廣告% | 醫髮 廣告% -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+  <div class="grid fade-up ov-con-grid" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
@@ -1969,6 +1969,10 @@ function applyBrandVisibility(){
   // brand cards grid: 全部 → 2-col (both cards side by side); single brand → 1-col (full width)
   const grid1 = document.querySelector('.ov-grid-1');
   if(grid1){ grid1.style.gridTemplateColumns = isAll ? 'repeat(3,1fr)' : '1fr'; grid1.classList.toggle('ov-single', !isAll); }
+  // CON數 grids: single brand → 1-col (full width)
+  document.querySelectorAll('.ov-con-grid').forEach(g => {
+    g.style.gridTemplateColumns = isAll ? 'repeat(2,1fr)' : '1fr';
+  });
   document.querySelectorAll('.ov-brand-card').forEach(el => {
     el.style.display = (el.dataset.brand==='seoul' ? showS : showH) ? '' : 'none';
   });
