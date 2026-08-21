@@ -388,7 +388,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   <div class="text-sm font-bold text-slate-600 mt-2">總CON數</div>
 
-  <!-- CON數 第一層：醫美 Google + FB -->
+  <!-- CON數 第一層：醫美 Google | 醫髮 Google -->
   <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
@@ -397,54 +397,12 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         <span style="color:#7c3aed;font-weight:700">GOOGLE CON數</span>
       </div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-seoul-gg-visit" style="font-size:26px">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-seoul-gg-est">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-seoul-gg-prev">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-seoul-gg-gap">—</span>
-        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-seoul-gg-visit" style="font-size:26px">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-seoul-gg-est">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-seoul-gg-prev">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-seoul-gg-gap">—</span></div>
       </div>
     </div>
-
-    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
-      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
-        <span class="brand-tag brand-tag-seoul">醫美</span>
-        <span style="color:#7c3aed;font-weight:700">FB CON數</span>
-      </div>
-      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-seoul-fb-visit" style="font-size:26px">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-seoul-fb-est">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-seoul-fb-prev">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-seoul-fb-gap">—</span>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- CON數 第二層：醫髮 Google + FB -->
-  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
 
     <div class="scard ov-brand-card" data-brand="hh" style="border-left:4px solid #2563eb">
       <div class="scard-title" style="display:flex;align-items:center;gap:8px">
@@ -452,22 +410,28 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         <span style="color:#2563eb;font-weight:700">GOOGLE CON數</span>
       </div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-hh-gg-visit" style="font-size:26px">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-hh-gg-est">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-hh-gg-prev">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-hh-gg-gap">—</span>
-        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-hh-gg-visit" style="font-size:26px">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-hh-gg-est">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-hh-gg-prev">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-hh-gg-gap">—</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CON數 第二層：醫美 FB | 醫髮 FB -->
+  <div class="grid fade-up" style="grid-template-columns:repeat(2,1fr);gap:14px">
+
+    <div class="scard ov-brand-card" data-brand="seoul" style="border-left:4px solid #7c3aed">
+      <div class="scard-title" style="display:flex;align-items:center;gap:8px">
+        <span class="brand-tag brand-tag-seoul">醫美</span>
+        <span style="color:#7c3aed;font-weight:700">FB CON數</span>
+      </div>
+      <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-seoul-fb-visit" style="font-size:26px">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-seoul-fb-est">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-seoul-fb-prev">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-seoul-fb-gap">—</span></div>
       </div>
     </div>
 
@@ -477,22 +441,10 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
         <span style="color:#2563eb;font-weight:700">FB CON數</span>
       </div>
       <div class="scard-row" style="flex-direction:column;align-items:flex-start;gap:6px">
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span>
-          <span class="scard-val" id="ov-hh-fb-visit" style="font-size:26px">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span>
-          <span class="scard-rate" id="ov-hh-fb-est">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span>
-          <span class="scard-rate" id="ov-hh-fb-prev">—</span>
-        </div>
-        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline">
-          <span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span>
-          <span class="scard-rate" id="ov-hh-fb-gap">—</span>
-        </div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">實際</span><span class="scard-val" id="ov-hh-fb-visit" style="font-size:26px">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">估值</span><span class="scard-rate" id="ov-hh-fb-est">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">同期</span><span class="scard-rate" id="ov-hh-fb-prev">—</span></div>
+        <div style="display:flex;justify-content:space-between;width:100%;align-items:baseline"><span style="font-size:11px;color:#94a3b8;min-width:28px">落差</span><span class="scard-rate" id="ov-hh-fb-gap">—</span></div>
       </div>
     </div>
 
