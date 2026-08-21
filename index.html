@@ -2627,7 +2627,13 @@ const STORAGE_BRANCH_PREV = 'dash_branch_prev_v1';
 function loadBranchPrevAll(){ return JSON.parse(localStorage.getItem(STORAGE_BRANCH_PREV)||'[]'); }
 function saveBranchPrevAll(d){ localStorage.setItem(STORAGE_BRANCH_PREV, JSON.stringify(d)); }
 function loadBranchPrevRec(month, brand){
+  // Default seed values for 2025-08 (from 114年 records)
+  const DEFAULTS = {
+    'seoul': {'2025-08':{so:110,tc:69,hc:24}},
+    'hh':    {'2025-08':{so:110,tc:71,hc:37}},
+  };
   return loadBranchPrevAll().find(r=>r.month===month&&r.brand===brand) ||
+    (DEFAULTS[brand]&&DEFAULTS[brand][month]) ||
     {month, brand, so:0, hc:0, tc:0};
 }
 function saveBranchPrevRec(rec){
@@ -2640,8 +2646,6 @@ function renderBranchDiffTable(month){
   if(!el) return;
 
   const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
-
-  // Sum SO/HC/TC from branchRec.sources for 115年
   function sumBranch(brand){
     const rec = loadBranchRec(month, brand);
     let so=0, hc=0, tc=0;
@@ -2657,87 +2661,67 @@ function renderBranchDiffTable(month){
   const s114 = loadBranchPrevRec(month, 'seoul');
   const h114 = loadBranchPrevRec(month, 'hh');
 
-  const thS = 'padding:6px 10px;font-size:12px;font-weight:700;color:#fff;text-align:center;background:#7c6fb0';
-  const tdS = 'padding:5px 10px;font-size:13px;text-align:center;border-bottom:1px solid #f1f5f9';
-  const tdL = 'padding:5px 10px;font-size:12px;font-weight:600;border-bottom:1px solid #f1f5f9;color:#374151';
-
-  const diffCell = (cur, prev) => {
-    const d = cur - prev;
-    const hasData = cur>0 || prev>0;
-    if(!hasData) return `<td style="${tdS}">—</td><td style="${tdS}">—</td><td style="${tdS}">—</td>`;
-    const color = d>=0?'#16a34a':'#dc2626';
-    const txt = d>=0?`+${d}`:String(d);
-    return `<td style="${tdS}">${prev||'—'}</td><td style="${tdS}">${cur||'—'}</td><td style="${tdS};font-weight:700;color:${color}">${hasData?txt:'—'}</td>`;
-  };
-
-  // 114年 inline edit support
-  const saveAndRender = (brand, field, val) => {
-    const rec = loadBranchPrevRec(month, brand);
-    rec[field] = parseInt(val)||0;
-    saveBranchPrevRec(rec);
-    renderBranchDiffTable(month);
-  };
-  const inputCell = (brand, field, val) =>
-    `<td style="${tdS};padding:2px 4px"><input type="number" min="0" value="${val||''}" placeholder="—"
-      onchange="(function(el){const r=loadBranchPrevRec('${month}','${brand}');r['${field}']=parseInt(el.value)||0;saveBranchPrevRec(r);renderBranchDiffTable('${month}')})(this)"
-      style="width:54px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;padding:2px 4px;font-size:13px"></td>`;
-
-  // 台灣民國年 display
+  // 台灣民國年
   const [y, m] = month.split('-').map(Number);
-  const rocY = y - 1911;
+  const rocY    = y - 1911;
   const prevRocY = rocY - 1;
-  const monthLabel = `${rocY}年${m}月`;
+  // Date range label: month/1 ~ month/today(if current) or month/last
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear()===y && today.getMonth()+1===m;
+  const lastDay = isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate();
+  const dateRange = `${m}/1-${m}/${lastDay}`;
+
+  // cell styles
+  const border = '1px solid #d1d5db';
+  const thBase = `padding:7px 10px;font-size:12px;font-weight:700;text-align:center;border:${border}`;
+  const tdBase = `padding:6px 10px;font-size:13px;text-align:center;border:${border}`;
+  const tdLbl  = `padding:6px 10px;font-size:13px;font-weight:600;text-align:center;border:${border};background:#f8f8f8`;
+
+  const diff = (cur, prev) => {
+    if(!cur && !prev) return {val:'—', color:'#94a3b8'};
+    const d = cur - prev;
+    return {val: d>=0 ? `+${d}` : String(d), color: d>=0 ? '#16a34a' : '#dc2626'};
+  };
+
+  const row = (lbl, prev, cur) => {
+    const d = diff(cur, prev);
+    return `<tr>
+      <td style="${tdLbl}">${lbl}</td>
+      <td style="${tdBase}">${prev||'—'}</td>
+      <td style="${tdBase}">${cur||'—'}</td>
+      <td style="${tdBase};font-weight:700;color:${d.color}">${d.val}</td>
+    </tr>`;
+  };
 
   el.innerHTML = `
-  <div style="overflow-x:auto;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-top:8px">
-  <table style="width:100%;border-collapse:collapse;min-width:320px">
+  <div style="overflow-x:auto;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08);margin-top:8px">
+  <table style="width:100%;border-collapse:collapse;min-width:300px;font-family:inherit">
     <thead>
       <tr>
-        <th style="${thS};border-radius:12px 0 0 0">館別</th>
-        <th style="${thS}">${prevRocY}年(手動輸入)</th>
-        <th style="${thS}">${rocY}年</th>
-        <th style="${thS};border-radius:0 12px 0 0">落差</th>
+        <th colspan="2" style="${thBase};background:#f0f0f0;color:#374151">對比時間</th>
+        <th colspan="3" style="${thBase};background:#f0f0f0;color:#374151">${dateRange}</th>
+      </tr>
+      <tr>
+        <th style="${thBase};background:#e8e8e8;color:#374151">品牌</th>
+        <th style="${thBase};background:#e8e8e8;color:#374151">館別</th>
+        <th style="${thBase};background:#e8e8e8;color:#374151">${prevRocY}年</th>
+        <th style="${thBase};background:#e8e8e8;color:#374151">${rocY}年</th>
+        <th style="${thBase};background:#e8e8e8;color:#374151">落差</th>
       </tr>
     </thead>
     <tbody>
-      <tr><td colspan="4" style="padding:4px 10px;font-size:11px;font-weight:700;color:#7c6fb0;background:#f5f3ff;border-bottom:1px solid #ede9fe">🏥 醫美 (${monthLabel})</td></tr>
       <tr>
-        <td style="${tdL};background:#faf5ff">SO</td>
-        ${inputCell('seoul','so',s114.so)}
-        <td style="${tdS}">${s115.so||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${s115.so-s114.so>=0?'#16a34a':'#dc2626'}">${s114.so||s115.so ? (s115.so-s114.so>=0?'+':'')+(s115.so-s114.so) : '—'}</td>
+        <td rowspan="3" style="${tdBase};background:#5a4fcf;color:#fff;font-weight:700;font-size:14px;vertical-align:middle">醫美</td>
+        ${row('SO', s114.so, s115.so).replace('<tr>','').replace('</tr>','')}
       </tr>
+      ${row('TC', s114.tc, s115.tc)}
+      ${row('HC', s114.hc, s115.hc)}
       <tr>
-        <td style="${tdL};background:#faf5ff">TC</td>
-        ${inputCell('seoul','tc',s114.tc)}
-        <td style="${tdS}">${s115.tc||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${s115.tc-s114.tc>=0?'#16a34a':'#dc2626'}">${s114.tc||s115.tc ? (s115.tc-s114.tc>=0?'+':'')+(s115.tc-s114.tc) : '—'}</td>
+        <td rowspan="3" style="${tdBase};background:#1e3a5f;color:#fff;font-weight:700;font-size:14px;vertical-align:middle">醫髮</td>
+        ${row('FS', h114.so, h115.so).replace('<tr>','').replace('</tr>','')}
       </tr>
-      <tr>
-        <td style="${tdL};background:#faf5ff">HC</td>
-        ${inputCell('seoul','hc',s114.hc)}
-        <td style="${tdS}">${s115.hc||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${s115.hc-s114.hc>=0?'#16a34a':'#dc2626'}">${s114.hc||s115.hc ? (s115.hc-s114.hc>=0?'+':'')+(s115.hc-s114.hc) : '—'}</td>
-      </tr>
-      <tr><td colspan="4" style="padding:4px 10px;font-size:11px;font-weight:700;color:#2563eb;background:#eff6ff;border-bottom:1px solid #dbeafe">💇 醫髮 (${monthLabel})</td></tr>
-      <tr>
-        <td style="${tdL};background:#f0f9ff">FS</td>
-        ${inputCell('hh','so',h114.so)}
-        <td style="${tdS}">${h115.so||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${h115.so-h114.so>=0?'#16a34a':'#dc2626'}">${h114.so||h115.so ? (h115.so-h114.so>=0?'+':'')+(h115.so-h114.so) : '—'}</td>
-      </tr>
-      <tr>
-        <td style="${tdL};background:#f0f9ff">TC</td>
-        ${inputCell('hh','tc',h114.tc)}
-        <td style="${tdS}">${h115.tc||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${h115.tc-h114.tc>=0?'#16a34a':'#dc2626'}">${h114.tc||h115.tc ? (h115.tc-h114.tc>=0?'+':'')+(h115.tc-h114.tc) : '—'}</td>
-      </tr>
-      <tr>
-        <td style="${tdL};background:#f0f9ff">HC</td>
-        ${inputCell('hh','hc',h114.hc)}
-        <td style="${tdS}">${h115.hc||'—'}</td>
-        <td style="${tdS};font-weight:700;color:${h115.hc-h114.hc>=0?'#16a34a':'#dc2626'}">${h114.hc||h115.hc ? (h115.hc-h114.hc>=0?'+':'')+(h115.hc-h114.hc) : '—'}</td>
-      </tr>
+      ${row('TC', h114.tc, h115.tc)}
+      ${row('HC', h114.hc, h115.hc)}
     </tbody>
   </table>
   </div>`;
