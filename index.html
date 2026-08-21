@@ -504,38 +504,12 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <span id="ov-seoul-fb" style="display:none"></span>
   <span id="ov-hh-fb" style="display:none"></span>
 
-  <!-- 第三行：漏斗指標 -->
-  <div class="grid ov-grid-3 fade-up" style="grid-template-columns:repeat(4,1fr);gap:14px">
-
-    <!-- 詢問數 -->
-    <div class="scard" style="border-left:4px solid #f59e0b">
-      <div class="scard-title">詢問數</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-inq">—</span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-inq">—</span></div></div>
-    </div>
-
-    <!-- 預約數 -->
-    <div class="scard" style="border-left:4px solid #f97316">
-      <div class="scard-title">預約數</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-appt">—</span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-appt">—</span></div></div>
-    </div>
-
-    <!-- 到店數 / 到店率 -->
-    <div class="scard" style="border-left:4px solid #0891b2">
-      <div class="scard-title">到店數 / 到店率</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-visit">—</span><span class="scard-rate" id="ov-seoul-visitpct"></span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-visit">—</span><span class="scard-rate" id="ov-hh-visitpct"></span></div></div>
-    </div>
-
-    <!-- 實際轉換率 -->
-    <div class="scard" style="border-left:4px solid #7c3aed">
-      <div class="scard-title">實際轉換率</div>
-      <div class="scard-row ov-brand-row" data-brand="seoul"><span class="brand-tag brand-tag-seoul">醫美</span><div class="scard-nums"><span class="scard-val" id="ov-seoul-cvr">—</span></div></div>
-      <div class="scard-row ov-brand-row" data-brand="hh"><span class="brand-tag brand-tag-hh">醫髮</span><div class="scard-nums"><span class="scard-val" id="ov-hh-cvr">—</span></div></div>
-    </div>
-
-  </div>
+  <!-- hidden spans to keep JS references intact -->
+  <span id="ov-seoul-inq" style="display:none"></span><span id="ov-hh-inq" style="display:none"></span>
+  <span id="ov-seoul-appt" style="display:none"></span><span id="ov-hh-appt" style="display:none"></span>
+  <span id="ov-seoul-visit" style="display:none"></span><span id="ov-seoul-visitpct" style="display:none"></span>
+  <span id="ov-hh-visit" style="display:none"></span><span id="ov-hh-visitpct" style="display:none"></span>
+  <span id="ov-seoul-cvr" style="display:none"></span><span id="ov-hh-cvr" style="display:none"></span>
 
   <!-- 品項目標達成表 -->
   <div style="padding:8px 0"><div style="border-top:2px solid #e2e8f0"></div></div>
