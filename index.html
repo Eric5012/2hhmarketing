@@ -2675,23 +2675,21 @@ function renderOverviewStats(){
   const W  = v => v ? Math.floor(v/10000).toLocaleString('zh-TW') : '—'; // 萬元
   const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
 
-  // Row 1: 業績 from 月報表 (monthly report) 業績欄
+  // Row 1: 業績 直接套用月報表 (monthly report) 業績欄的數字 — 實際/估值/同期/落差 皆與月報表一致
   const mo = loadMoRec(month);
-  // 估值 = 實際 ÷ 已過天數 × 當月總天數
-  const calcEst = (rev, refMonth) => {
-    const [y, m] = refMonth.split('-').map(Number);
-    const today  = new Date();
-    const totalDays = new Date(y, m, 0).getDate();
-    const isCurrentMonth = (today.getFullYear()===y && today.getMonth()+1===m);
-    const daysSoFar = isCurrentMonth ? today.getDate() : totalDays;
-    return daysSoFar > 0 ? Math.round(rev / daysSoFar * totalDays) : 0;
-  };
+  // 估值 = 實際 ÷ 已過天數（月報表同步天數）× 當月總天數 — 與月報表算法一致，用同一個「截至第 N 天」
+  const [moY, moM] = month.split('-').map(Number);
+  const moTotalDays = new Date(moY, moM, 0).getDate();
+  const moToday = new Date();
+  const moIsCurrentMonth = (moToday.getFullYear()===moY && moToday.getMonth()+1===moM);
+  const moSyncDay = mo.day || (moIsCurrentMonth ? moToday.getDate() : moTotalDays);
+  const calcEst = rev => (moSyncDay>0 && rev) ? Math.round(rev / moSyncDay * moTotalDays) : 0;
   const brand = typeof activeBrand !== 'undefined' ? activeBrand : 'all';
   const showS = brand==='all'||brand==='seoul';
   const showH = brand==='all'||brand==='hh';
   const sRev = showS ? (mo.seoul.rev||0) : 0, hRev = showH ? (mo.hh.rev||0) : 0;
-  const sEst = sRev ? calcEst(sRev, month) : 0;
-  const hEst = hRev ? calcEst(hRev, month) : 0;
+  const sEst = sRev ? calcEst(sRev) : 0;
+  const hEst = hRev ? calcEst(hRev) : 0;
   // 同期：優先從年報表讀去年同月，沒有則 fallback 到 月報表的同期欄
   const [curY, curMi] = month.split('-').map(Number);
   const prevYrSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || mo.seoul.prev_rev || 0;
