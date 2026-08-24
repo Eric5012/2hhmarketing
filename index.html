@@ -1175,18 +1175,7 @@ function renderMoTable(){
       <td style="${tdC};font-weight:700;color:${hRevD.color}">${hRevD.txt}</td>
     </tr>`;
 
-  tfoot.innerHTML = `<tr>
-    <td colspan="2" style="${tdL};background:#f8fafc;font-weight:700">總業績</td>
-    <td colspan="3" style="${tdC};background:#f8fafc"></td>
-    <td style="${tdC};background:#f8fafc;font-weight:700">${N(totEst)}</td>
-    <td style="${tdC};background:#f8fafc;font-size:12px;color:#64748b">同期</td>
-  </tr>
-  <tr>
-    <td colspan="2" style="${tdL};background:#f8fafc"></td>
-    <td colspan="3" style="${tdC};background:#f8fafc"></td>
-    <td style="${tdC};background:#f8fafc"></td>
-    <td style="${tdC};background:#f8fafc;font-weight:700">${N(totPrev)}</td>
-  </tr>`;
+  tfoot.innerHTML = '';
 }
 
 // ──────────────────────────────────────────────────────────────
