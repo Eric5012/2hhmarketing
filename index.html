@@ -2675,8 +2675,8 @@ function renderOverviewStats(){
   const W  = v => v ? Math.floor(v/10000).toLocaleString('zh-TW') : '—'; // 萬元
   const P  = (a,b) => b>0 ? (a/b*100).toFixed(1)+'%' : '—';
 
-  // Row 1: 業績 from monthly overview storage (display-only; future: Google Form)
-  const ov = loadOvRec(month);
+  // Row 1: 業績 from 月報表 (monthly report) 業績欄
+  const mo = loadMoRec(month);
   // 估值 = 實際 ÷ 已過天數 × 當月總天數
   const calcEst = (rev, refMonth) => {
     const [y, m] = refMonth.split('-').map(Number);
@@ -2689,13 +2689,13 @@ function renderOverviewStats(){
   const brand = typeof activeBrand !== 'undefined' ? activeBrand : 'all';
   const showS = brand==='all'||brand==='seoul';
   const showH = brand==='all'||brand==='hh';
-  const sRev = showS ? (ov.seoul.rev||0) : 0, hRev = showH ? (ov.hh.rev||0) : 0;
+  const sRev = showS ? (mo.seoul.rev||0) : 0, hRev = showH ? (mo.hh.rev||0) : 0;
   const sEst = sRev ? calcEst(sRev, month) : 0;
   const hEst = hRev ? calcEst(hRev, month) : 0;
-  // 同期：優先從年報表讀去年同月，沒有則 fallback 到 OV.prev
+  // 同期：優先從年報表讀去年同月，沒有則 fallback 到 月報表的同期欄
   const [curY, curMi] = month.split('-').map(Number);
-  const prevYrSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || ov.seoul.prev || 0;
-  const prevYrHh    = loadYrRec(curY-1, 'hh'   ).months[curMi-1]?.total_rev || ov.hh.prev    || 0;
+  const prevYrSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || mo.seoul.prev_rev || 0;
+  const prevYrHh    = loadYrRec(curY-1, 'hh'   ).months[curMi-1]?.total_rev || mo.hh.prev_rev    || 0;
   const sPrev = showS ? prevYrSeoul : 0;
   const hPrev = showH ? prevYrHh    : 0;
   setText('ov-seoul-rev',  sRev ? W(sRev) : '—');
