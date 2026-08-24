@@ -1578,7 +1578,8 @@ const pct2 = (a,b) => b>0 ? (a/b*100).toFixed(2)+'%' : '—';
 const div2 = (a,b) => b>0 ? Math.round(a/b).toLocaleString('zh-TW') : '—';
 
 function yrInp(year, brand, mi, field, val){
-  return `<span class="yr-inp">${val||'—'}</span>`;
+  const display = (val || val===0) ? N2(val) : '—';
+  return `<span class="yr-inp">${display}</span>`;
 }
 
 function onYrInp(el){
