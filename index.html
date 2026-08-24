@@ -1108,7 +1108,15 @@ function renderMoTable(){
   const sBrand = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#ede9fe;color:#1e293b;vertical-align:middle`;
   const hBrand = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#dbeafe;color:#1e293b;vertical-align:middle`;
   const prevBg = 'background:#fef9c3';
-  const adTd = (txt,clr) => `<td rowspan="4" style="${tdC};font-weight:700;color:${clr};font-size:15px;vertical-align:middle">${txt||'—'}</td>`;
+  const fmtPct = v => {
+    if(!v) return '—';
+    const n = parseFloat(v);
+    if(isNaN(n)) return String(v);
+    // Google Sheets returns percentage as decimal (0.0597 → 5.97%)
+    const pct = n < 1 ? n * 100 : n;
+    return pct.toFixed(2) + '%';
+  };
+  const adTd = (txt,clr) => `<td rowspan="4" style="${tdC};font-weight:700;color:${clr};font-size:15px;vertical-align:middle">${fmtPct(txt)}</td>`;
 
   const sGgD=D(sGgEst,s.prev_gg), sFbD=D(sFbEst,s.prev_fb), sConD=D(sConEst,s.prev_con), sRevD=D(sRevEst,s.prev_rev);
   const hGgD=D(hGgEst,h.prev_gg), hFbD=D(hFbEst,h.prev_fb), hConD=D(hConEst,h.prev_con), hRevD=D(hRevEst,h.prev_rev);
