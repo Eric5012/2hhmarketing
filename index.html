@@ -1051,6 +1051,10 @@ function showRptPanel(id, el){
 const STORAGE_MO = 'dash_mo_v1';
 function loadMoAll(){ return JSON.parse(localStorage.getItem(STORAGE_MO)||'[]'); }
 function saveMoAll(d){ localStorage.setItem(STORAGE_MO, JSON.stringify(d)); }
+
+const STORAGE_GOAL_SYNC = 'dash_goal_sync_v1';
+function loadGoalSync(month){ return JSON.parse(localStorage.getItem(STORAGE_GOAL_SYNC)||'{}')[month] || null; }
+function saveGoalSync(month, rows){ const all=JSON.parse(localStorage.getItem(STORAGE_GOAL_SYNC)||'{}'); all[month]=rows; localStorage.setItem(STORAGE_GOAL_SYNC,JSON.stringify(all)); }
 function loadMoRec(month){
   return loadMoAll().find(r=>r.month===month) || {
     month,
@@ -1319,8 +1323,14 @@ async function syncMoFromSheet(){
     if(data.total_est_rev)  rec.total_est_rev  = data.total_est_rev;
     saveMoRec(rec);
 
+    // 各品項目標
+    if(Array.isArray(data.goal) && data.goal.length){
+      saveGoalSync(month, data.goal);
+    }
+
     if(status){ status.textContent='✓ 同步成功 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color='#16a34a'; }
     renderMoTable();
+    renderOverviewStats();
   } catch(e){
     console.error('MO sync error:',e);
     if(status){ status.textContent='✗ '+e.message; status.style.color='#dc2626'; }
@@ -2760,46 +2770,42 @@ function renderGoalTable(month){
   const el = document.getElementById('ov-goal-table');
   if(!el) return;
 
-  const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
+  // Use Google Sheets synced data if available
+  const synced = loadGoalSync(month);
+  let seoulItems, hhItems;
 
-  // Helper: sum visit/inq for all sources in an INQ rec
-  function sumVisit(rec, gender, svc){
-    return INQ_SRC_KEYS.reduce((a,k)=>{
-      const sd = rec.sources[k]||{};
-      return a + (sd[gender]?.[svc]?.visit||0);
-    }, 0);
+  if(synced && synced.length){
+    // Synced rows: [{label, target, actual, diff, brand}]
+    seoulItems = synced.filter(r=>r.brand==='seoul');
+    hhItems    = synced.filter(r=>r.brand==='hh');
+  } else {
+    const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
+    function sumVisit(rec, gender, svc){
+      return INQ_SRC_KEYS.reduce((a,k)=>{
+        const sd = rec.sources[k]||{};
+        return a + (sd[gender]?.[svc]?.visit||0);
+      }, 0);
+    }
+    const seoulRec = loadInqRec(month, 'seoul');
+    seoulItems = [
+      {label:'拉皮'},{label:'抽補脂'},{label:'眼袋'},{label:'雙眼皮'},
+      {label:'隆鼻'},{label:'玻尿酸',svc:'玻尿酸熊貓針'},{label:'埋線'},{label:'音波'},{label:'電波'},
+    ].map(({label, svc})=>{
+      const s = svc||label;
+      const actual = sumVisit(seoulRec,'female',s);
+      const target = seoulRec.estimates?.female?.[s]||0;
+      return {label, actual, target, diff:actual-target};
+    });
+    const hhRec = loadInqRec(month, 'hh');
+    hhItems = [
+      {label:'生髮(男)',svc:'生髮',gender:'male'},{label:'生髮(女)',svc:'生髮',gender:'female'},
+      {label:'植髮(男)',svc:'植髮',gender:'male'},{label:'植髮(女)',svc:'植髮',gender:'female'},
+    ].map(({label,svc,gender})=>{
+      const actual = sumVisit(hhRec,gender,svc);
+      const target = hhRec.estimates?.[gender]?.[svc]||0;
+      return {label, actual, target, diff:actual-target};
+    });
   }
-
-  // 醫美 (seoul) — female only (cats mode)
-  const seoulRec = loadInqRec(month, 'seoul');
-  const seoulItems = [
-    {label:'拉皮',    svc:'拉皮'},
-    {label:'抽補脂',  svc:'抽補脂'},
-    {label:'眼袋',    svc:'眼袋'},
-    {label:'雙眼皮',  svc:'雙眼皮'},
-    {label:'隆鼻',    svc:'隆鼻'},
-    {label:'玻尿酸',  svc:'玻尿酸熊貓針'},
-    {label:'埋線',    svc:'埋線'},
-    {label:'音波',    svc:'音波'},
-    {label:'電波',    svc:'電波'},
-  ].map(({label, svc})=>{
-    const actual = sumVisit(seoulRec, 'female', svc);
-    const target = seoulRec.estimates?.female?.[svc] || 0;
-    return {label, actual, target, diff: actual - target};
-  });
-
-  // 醫髮 (hh) — male + female
-  const hhRec = loadInqRec(month, 'hh');
-  const hhItems = [
-    {label:'生髮(男)', svc:'生髮', gender:'male'},
-    {label:'生髮(女)', svc:'生髮', gender:'female'},
-    {label:'植髮(男)', svc:'植髮', gender:'male'},
-    {label:'植髮(女)', svc:'植髮', gender:'female'},
-  ].map(({label, svc, gender})=>{
-    const actual = sumVisit(hhRec, gender, svc);
-    const target = hhRec.estimates?.[gender]?.[svc] || 0;
-    return {label, actual, target, diff: actual - target};
-  });
 
   const thStyle = 'padding:7px 10px;font-size:13px;font-weight:700;color:#fff;text-align:center';
   const tdStyle = 'padding:6px 10px;font-size:13px;text-align:center;border:1px solid #d1d5db';
