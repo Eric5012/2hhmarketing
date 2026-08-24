@@ -2790,8 +2790,9 @@ function renderGoalTable(month){
 
   if(synced && synced.length){
     // Synced rows: [{label, target, actual, diff, brand}]
-    seoulItems = synced.filter(r=>r.brand==='seoul');
-    hhItems    = synced.filter(r=>r.brand==='hh');
+    const isHeader = r => !r.label || r.label==='品項' || r.label==='館別' || r.label==='項目';
+    seoulItems = synced.filter(r=>r.brand==='seoul' && !isHeader(r));
+    hhItems    = synced.filter(r=>r.brand==='hh'    && !isHeader(r));
   } else {
     const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
     function sumVisit(rec, gender, svc){
