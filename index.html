@@ -1083,45 +1083,38 @@ function renderMoTable(){
   const rocM = m; const rocY = y-1911;
   const today = new Date();
   const isCurrentMonth = today.getFullYear()===y && today.getMonth()+1===m;
-  const day = isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate();
-  const dayEl = document.getElementById('mo-day-label');
-  if(dayEl) dayEl.textContent = day;
-
-  // calc 估值 = 實際 / day * totalDays
+  const syncDay = rec.day || (isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate());
   const totalDays = new Date(y,m,0).getDate();
-  const est = v => day>0 ? Math.round(v/day*totalDays) : 0;
+  const dayEl = document.getElementById('mo-day-label');
+  if(dayEl) dayEl.textContent = syncDay;
+
+  // 估值 = 實際 / syncDay * totalDays
+  const est = v => syncDay>0 && v ? Math.round(v/syncDay*totalDays) : 0;
 
   const s = rec.seoul, h = rec.hh;
   const sGgEst=est(s.gg), sFbEst=est(s.fb), sConEst=est(s.con), sRevEst=est(s.rev);
   const hGgEst=est(h.gg), hFbEst=est(h.fb), hConEst=est(h.con), hRevEst=est(h.rev);
 
-  const N = v => v ? Number(v).toLocaleString('zh-TW') : '—';
-  const diff = (est,prev) => {
-    if(!est&&!prev) return {txt:'—',color:'#94a3b8'};
-    const d=est-prev; return {txt:(d>=0?'+':'')+d, color:d>=0?'#16a34a':'#dc2626'};
+  const N = v => (v && Number(v)) ? Number(v).toLocaleString('zh-TW') : '—';
+  const D = (e,p) => {
+    if(!e && !p) return {txt:'—', color:'#94a3b8'};
+    const d=e-p; return {txt:(d>=0?'+':'')+d, color:d>=0?'#16a34a':'#dc2626'};
   };
 
-  // cell styles
   const bdr = '1px solid #d1d5db';
   const thS = `padding:7px 10px;font-size:12px;font-weight:700;text-align:center;border:${bdr};background:#7c6fb0;color:#fff`;
-  const tdC = `padding:6px 10px;font-size:13px;text-align:center;border:${bdr}`;
-  const tdL = `padding:6px 10px;font-size:13px;font-weight:600;text-align:center;border:${bdr}`;
-  const sBrandTd = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#ede9fe;color:#1e293b;vertical-align:middle`;
-  const hBrandTd = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#dbeafe;color:#1e293b;vertical-align:middle`;
-  const prevBg  = `background:#fef9c3`; // 同期 yellow
-  const adTd = (txt, color) => `<td rowspan="4" style="${tdC};font-weight:700;color:${color||'#7c6fb0'};font-size:14px;vertical-align:middle">${txt||'—'}</td>`;
+  const tdC = `padding:6px 14px;font-size:13px;text-align:center;border:${bdr}`;
+  const tdL = `padding:6px 12px;font-size:13px;font-weight:600;text-align:center;border:${bdr}`;
+  const sBrand = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#ede9fe;color:#1e293b;vertical-align:middle`;
+  const hBrand = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#dbeafe;color:#1e293b;vertical-align:middle`;
+  const prevBg = 'background:#fef9c3';
+  const adTd = (txt,clr) => `<td rowspan="4" style="${tdC};font-weight:700;color:${clr};font-size:15px;vertical-align:middle">${txt||'—'}</td>`;
 
-  const sGgD=diff(sGgEst,s.prev_gg), sFbD=diff(sFbEst,s.prev_fb), sConD=diff(sConEst,s.prev_con), sRevD=diff(sRevEst,s.prev_rev);
-  const hGgD=diff(hGgEst,h.prev_gg), hFbD=diff(hFbEst,h.prev_fb), hConD=diff(hConEst,h.prev_con), hRevD=diff(hRevEst,h.prev_rev);
-
-  const inp = (brand,field,val,isInt) =>
-    `<td style="${tdC};padding:2px"><input type="${isInt===false?'text':'number'}" value="${val||''}" placeholder="—"
-      onchange="(function(el){const r=loadMoRec('${month}');r['${brand}']['${field}']=el.type==='number'?(parseInt(el.value)||0):el.value;saveMoRec(r);renderMoTable()})(this)"
-      style="width:72px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;padding:3px 5px;font-size:13px;background:#fafafa"></td>`;
-  const inpTop = (field,val) =>
-    `<td style="${tdC};padding:2px"><input type="number" value="${val||''}" placeholder="—"
-      onchange="(function(el){const r=loadMoRec('${month}');r['${field}']=parseInt(el.value)||0;saveMoRec(r);renderMoTable()})(this)"
-      style="width:72px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;padding:3px 5px;font-size:13px;background:#fafafa"></td>`;
+  const sGgD=D(sGgEst,s.prev_gg), sFbD=D(sFbEst,s.prev_fb), sConD=D(sConEst,s.prev_con), sRevD=D(sRevEst,s.prev_rev);
+  const hGgD=D(hGgEst,h.prev_gg), hFbD=D(hFbEst,h.prev_fb), hConD=D(hConEst,h.prev_con), hRevD=D(hRevEst,h.prev_rev);
+  const totEst = sRevEst+hRevEst;
+  const totPrev = rec.total_prev_rev||0;
+  const totD = D(totEst, totPrev);
 
   const thead = document.getElementById('mo-thead');
   const tbody = document.getElementById('mo-tbody');
@@ -1130,7 +1123,7 @@ function renderMoTable(){
 
   thead.innerHTML = `<tr>
     <th style="${thS}">${rocY}年${rocM}月</th>
-    <th style="${thS}">${day}</th>
+    <th style="${thS}">${syncDay}</th>
     <th style="${thS}">Google</th>
     <th style="${thS}">FB</th>
     <th style="${thS}">總CON</th>
@@ -1139,11 +1132,10 @@ function renderMoTable(){
   </tr>`;
 
   tbody.innerHTML = `
-    <!-- SEOUL -->
     <tr>
-      <td rowspan="4" style="${sBrandTd}">SEOUL</td>
+      <td rowspan="4" style="${sBrand}">SEOUL</td>
       <td style="${tdL}">實際</td>
-      ${inp('seoul','gg',s.gg)} ${inp('seoul','fb',s.fb)} ${inp('seoul','con',s.con)} ${inp('seoul','rev',s.rev)}
+      <td style="${tdC}">${N(s.gg)}</td><td style="${tdC}">${N(s.fb)}</td><td style="${tdC}">${N(s.con)}</td><td style="${tdC}">${N(s.rev)}</td>
       ${adTd(s.ad_pct,'#7c6fb0')}
     </tr>
     <tr>
@@ -1152,7 +1144,7 @@ function renderMoTable(){
     </tr>
     <tr>
       <td style="${tdL};${prevBg}">同期</td>
-      ${inp('seoul','prev_gg',s.prev_gg)} ${inp('seoul','prev_fb',s.prev_fb)} ${inp('seoul','prev_con',s.prev_con)} ${inp('seoul','prev_rev',s.prev_rev)}
+      <td style="${tdC};${prevBg}">${N(s.prev_gg)}</td><td style="${tdC};${prevBg}">${N(s.prev_fb)}</td><td style="${tdC};${prevBg}">${N(s.prev_con)}</td><td style="${tdC};${prevBg}">${N(s.prev_rev)}</td>
     </tr>
     <tr>
       <td style="${tdL}">落差</td>
@@ -1161,11 +1153,10 @@ function renderMoTable(){
       <td style="${tdC};font-weight:700;color:${sConD.color}">${sConD.txt}</td>
       <td style="${tdC};font-weight:700;color:${sRevD.color}">${sRevD.txt}</td>
     </tr>
-    <!-- HH -->
     <tr>
-      <td rowspan="4" style="${hBrandTd}">HH</td>
+      <td rowspan="4" style="${hBrand}">HH</td>
       <td style="${tdL}">實際</td>
-      ${inp('hh','gg',h.gg)} ${inp('hh','fb',h.fb)} ${inp('hh','con',h.con)} ${inp('hh','rev',h.rev)}
+      <td style="${tdC}">${N(h.gg)}</td><td style="${tdC}">${N(h.fb)}</td><td style="${tdC}">${N(h.con)}</td><td style="${tdC}">${N(h.rev)}</td>
       ${adTd(h.ad_pct,'#2563eb')}
     </tr>
     <tr>
@@ -1174,7 +1165,7 @@ function renderMoTable(){
     </tr>
     <tr>
       <td style="${tdL};${prevBg}">同期</td>
-      ${inp('hh','prev_gg',h.prev_gg)} ${inp('hh','prev_fb',h.prev_fb)} ${inp('hh','prev_con',h.prev_con)} ${inp('hh','prev_rev',h.prev_rev)}
+      <td style="${tdC};${prevBg}">${N(h.prev_gg)}</td><td style="${tdC};${prevBg}">${N(h.prev_fb)}</td><td style="${tdC};${prevBg}">${N(h.prev_con)}</td><td style="${tdC};${prevBg}">${N(h.prev_rev)}</td>
     </tr>
     <tr>
       <td style="${tdL}">落差</td>
@@ -1184,7 +1175,6 @@ function renderMoTable(){
       <td style="${tdC};font-weight:700;color:${hRevD.color}">${hRevD.txt}</td>
     </tr>`;
 
-  const totEst = sRevEst+hRevEst;
   tfoot.innerHTML = `<tr>
     <td colspan="2" style="${tdL};background:#f8fafc;font-weight:700">總業績</td>
     <td colspan="3" style="${tdC};background:#f8fafc"></td>
@@ -1194,8 +1184,8 @@ function renderMoTable(){
   <tr>
     <td colspan="2" style="${tdL};background:#f8fafc"></td>
     <td colspan="3" style="${tdC};background:#f8fafc"></td>
-    ${inpTop('total_est_rev',rec.total_est_rev)}
-    ${inpTop('total_prev_rev',rec.total_prev_rev)}
+    <td style="${tdC};background:#f8fafc"></td>
+    <td style="${tdC};background:#f8fafc;font-weight:700">${N(totPrev)}</td>
   </tr>`;
 }
 
