@@ -2696,8 +2696,8 @@ function renderOverviewStats(){
   const [curY, curMi] = month.split('-').map(Number);
   const yrPrevSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || 0;
   const yrPrevHh    = loadYrRec(curY-1, 'hh'   ).months[curMi-1]?.total_rev || 0;
-  const prevYrSeoul = yrPrevSeoul ? Math.round(yrPrevSeoul/10000) : (mo.seoul.prev_rev || 0);
-  const prevYrHh    = yrPrevHh    ? Math.round(yrPrevHh/10000)    : (mo.hh.prev_rev    || 0);
+  const prevYrSeoul = yrPrevSeoul ? Math.floor(yrPrevSeoul/10000) : (mo.seoul.prev_rev || 0);
+  const prevYrHh    = yrPrevHh    ? Math.floor(yrPrevHh/10000)    : (mo.hh.prev_rev    || 0);
   const sPrev = showS ? prevYrSeoul : 0;
   const hPrev = showH ? prevYrHh    : 0;
   // 月報表的業績欄位本身就是「萬元」單位（跟表格上顯示的數字一樣），不用再除以 10000
