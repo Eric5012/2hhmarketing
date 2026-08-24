@@ -557,6 +557,7 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
   <!-- Sub-tab nav -->
   <div class="flex gap-0 border-b border-slate-200 mb-5 -mx-5 sm:-mx-8 px-5 sm:px-8">
     <button class="rpt-tab-btn active" onclick="showRptPanel('yr',this)">年報表</button>
+    <button class="rpt-tab-btn" onclick="showRptPanel('mo',this)">月報表</button>
     <button class="rpt-tab-btn" onclick="showRptPanel('cs',this)">客服總表</button>
   </div>
 
@@ -576,6 +577,21 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.06)">
       <table id="yr-table" class="yr-tbl">
         <tbody id="yr-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 月報表 panel ── -->
+  <div id="rpt-mo" class="rpt-panel hidden space-y-5">
+    <div class="flex items-center gap-3 flex-wrap">
+      <select id="mo-month-sel" class="sel" style="font-size:13px;padding:5px 10px" onchange="renderMoTable()"></select>
+      <span style="font-size:12px;color:#94a3b8">截至第 <span id="mo-day-label">—</span> 天</span>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:14px;box-shadow:0 1px 4px rgba(0,0,0,.07)">
+      <table id="mo-table" style="width:100%;border-collapse:collapse;min-width:500px;font-family:inherit;font-size:13px">
+        <thead id="mo-thead"></thead>
+        <tbody id="mo-tbody"></tbody>
+        <tfoot id="mo-tfoot"></tfoot>
       </table>
     </div>
   </div>
@@ -1022,6 +1038,161 @@ function showRptPanel(id, el){
   document.getElementById('rpt-'+id).classList.remove('hidden');
   el.classList.add('active');
   if(id==='cs') renderCSSummary();
+  if(id==='mo') renderMoTable();
+}
+
+// ──────────────────────────────────────────────────────────────
+// 月報表
+// ──────────────────────────────────────────────────────────────
+const STORAGE_MO = 'dash_mo_v1';
+function loadMoAll(){ return JSON.parse(localStorage.getItem(STORAGE_MO)||'[]'); }
+function saveMoAll(d){ localStorage.setItem(STORAGE_MO, JSON.stringify(d)); }
+function loadMoRec(month){
+  return loadMoAll().find(r=>r.month===month) || {
+    month,
+    day: new Date().getDate(),
+    seoul:{ gg:0, fb:0, con:0, rev:0, prev_gg:0, prev_fb:0, prev_con:0, prev_rev:0, ad_pct:'' },
+    hh:  { gg:0, fb:0, con:0, rev:0, prev_gg:0, prev_fb:0, prev_con:0, prev_rev:0, ad_pct:'' },
+    total_prev_rev:0, total_est_rev:0
+  };
+}
+function saveMoRec(rec){ const all=loadMoAll().filter(r=>r.month!==rec.month); all.push(rec); saveMoAll(all); }
+
+function populateMoMonths(){
+  const sel = document.getElementById('mo-month-sel'); if(!sel) return;
+  const today = new Date();
+  const months = [];
+  for(let i=0;i<12;i++){
+    const d = new Date(today.getFullYear(), today.getMonth()-i, 1);
+    months.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  const cur = sel.value || months[0];
+  sel.innerHTML = months.map(m=>`<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+}
+
+function renderMoTable(){
+  populateMoMonths();
+  const sel = document.getElementById('mo-month-sel');
+  const month = sel?.value || getCurrentMonth();
+  const rec = loadMoRec(month);
+  const [y,m] = month.split('-').map(Number);
+  const rocM = m; const rocY = y-1911;
+  const today = new Date();
+  const isCurrentMonth = today.getFullYear()===y && today.getMonth()+1===m;
+  const day = isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate();
+  const dayEl = document.getElementById('mo-day-label');
+  if(dayEl) dayEl.textContent = day;
+
+  // calc 估值 = 實際 / day * totalDays
+  const totalDays = new Date(y,m,0).getDate();
+  const est = v => day>0 ? Math.round(v/day*totalDays) : 0;
+
+  const s = rec.seoul, h = rec.hh;
+  const sGgEst=est(s.gg), sFbEst=est(s.fb), sConEst=est(s.con), sRevEst=est(s.rev);
+  const hGgEst=est(h.gg), hFbEst=est(h.fb), hConEst=est(h.con), hRevEst=est(h.rev);
+
+  const N = v => v ? Number(v).toLocaleString('zh-TW') : '—';
+  const diff = (est,prev) => {
+    if(!est&&!prev) return {txt:'—',color:'#94a3b8'};
+    const d=est-prev; return {txt:(d>=0?'+':'')+d, color:d>=0?'#16a34a':'#dc2626'};
+  };
+
+  // cell styles
+  const bdr = '1px solid #d1d5db';
+  const thS = `padding:7px 10px;font-size:12px;font-weight:700;text-align:center;border:${bdr};background:#7c6fb0;color:#fff`;
+  const tdC = `padding:6px 10px;font-size:13px;text-align:center;border:${bdr}`;
+  const tdL = `padding:6px 10px;font-size:13px;font-weight:600;text-align:center;border:${bdr}`;
+  const sBrandTd = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#ede9fe;color:#1e293b;vertical-align:middle`;
+  const hBrandTd = `padding:6px 10px;font-size:14px;font-weight:700;text-align:center;border:${bdr};background:#dbeafe;color:#1e293b;vertical-align:middle`;
+  const prevBg  = `background:#fef9c3`; // 同期 yellow
+  const adTd = (txt, color) => `<td rowspan="4" style="${tdC};font-weight:700;color:${color||'#7c6fb0'};font-size:14px;vertical-align:middle">${txt||'—'}</td>`;
+
+  const sGgD=diff(sGgEst,s.prev_gg), sFbD=diff(sFbEst,s.prev_fb), sConD=diff(sConEst,s.prev_con), sRevD=diff(sRevEst,s.prev_rev);
+  const hGgD=diff(hGgEst,h.prev_gg), hFbD=diff(hFbEst,h.prev_fb), hConD=diff(hConEst,h.prev_con), hRevD=diff(hRevEst,h.prev_rev);
+
+  const inp = (brand,field,val,isInt) =>
+    `<td style="${tdC};padding:2px"><input type="${isInt===false?'text':'number'}" value="${val||''}" placeholder="—"
+      onchange="(function(el){const r=loadMoRec('${month}');r['${brand}']['${field}']=el.type==='number'?(parseInt(el.value)||0):el.value;saveMoRec(r);renderMoTable()})(this)"
+      style="width:72px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;padding:3px 5px;font-size:13px;background:#fafafa"></td>`;
+  const inpTop = (field,val) =>
+    `<td style="${tdC};padding:2px"><input type="number" value="${val||''}" placeholder="—"
+      onchange="(function(el){const r=loadMoRec('${month}');r['${field}']=parseInt(el.value)||0;saveMoRec(r);renderMoTable()})(this)"
+      style="width:72px;text-align:center;border:1px solid #e2e8f0;border-radius:6px;padding:3px 5px;font-size:13px;background:#fafafa"></td>`;
+
+  const thead = document.getElementById('mo-thead');
+  const tbody = document.getElementById('mo-tbody');
+  const tfoot = document.getElementById('mo-tfoot');
+  if(!thead||!tbody||!tfoot) return;
+
+  thead.innerHTML = `<tr>
+    <th style="${thS}">${rocY}年${rocM}月</th>
+    <th style="${thS}">${day}</th>
+    <th style="${thS}">Google</th>
+    <th style="${thS}">FB</th>
+    <th style="${thS}">總CON</th>
+    <th style="${thS}">業績</th>
+    <th style="${thS}">廣告%數</th>
+  </tr>`;
+
+  tbody.innerHTML = `
+    <!-- SEOUL -->
+    <tr>
+      <td rowspan="4" style="${sBrandTd}">SEOUL</td>
+      <td style="${tdL}">實際</td>
+      ${inp('seoul','gg',s.gg)} ${inp('seoul','fb',s.fb)} ${inp('seoul','con',s.con)} ${inp('seoul','rev',s.rev)}
+      ${adTd(s.ad_pct,'#7c6fb0')}
+    </tr>
+    <tr>
+      <td style="${tdL}">估值</td>
+      <td style="${tdC}">${N(sGgEst)}</td><td style="${tdC}">${N(sFbEst)}</td><td style="${tdC}">${N(sConEst)}</td><td style="${tdC}">${N(sRevEst)}</td>
+    </tr>
+    <tr>
+      <td style="${tdL};${prevBg}">同期</td>
+      ${inp('seoul','prev_gg',s.prev_gg)} ${inp('seoul','prev_fb',s.prev_fb)} ${inp('seoul','prev_con',s.prev_con)} ${inp('seoul','prev_rev',s.prev_rev)}
+    </tr>
+    <tr>
+      <td style="${tdL}">落差</td>
+      <td style="${tdC};font-weight:700;color:${sGgD.color}">${sGgD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${sFbD.color}">${sFbD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${sConD.color}">${sConD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${sRevD.color}">${sRevD.txt}</td>
+    </tr>
+    <!-- HH -->
+    <tr>
+      <td rowspan="4" style="${hBrandTd}">HH</td>
+      <td style="${tdL}">實際</td>
+      ${inp('hh','gg',h.gg)} ${inp('hh','fb',h.fb)} ${inp('hh','con',h.con)} ${inp('hh','rev',h.rev)}
+      ${adTd(h.ad_pct,'#2563eb')}
+    </tr>
+    <tr>
+      <td style="${tdL}">估值</td>
+      <td style="${tdC}">${N(hGgEst)}</td><td style="${tdC}">${N(hFbEst)}</td><td style="${tdC}">${N(hConEst)}</td><td style="${tdC}">${N(hRevEst)}</td>
+    </tr>
+    <tr>
+      <td style="${tdL};${prevBg}">同期</td>
+      ${inp('hh','prev_gg',h.prev_gg)} ${inp('hh','prev_fb',h.prev_fb)} ${inp('hh','prev_con',h.prev_con)} ${inp('hh','prev_rev',h.prev_rev)}
+    </tr>
+    <tr>
+      <td style="${tdL}">落差</td>
+      <td style="${tdC};font-weight:700;color:${hGgD.color}">${hGgD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${hFbD.color}">${hFbD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${hConD.color}">${hConD.txt}</td>
+      <td style="${tdC};font-weight:700;color:${hRevD.color}">${hRevD.txt}</td>
+    </tr>`;
+
+  const totEst = sRevEst+hRevEst;
+  tfoot.innerHTML = `<tr>
+    <td colspan="2" style="${tdL};background:#f8fafc;font-weight:700">總業績</td>
+    <td colspan="3" style="${tdC};background:#f8fafc"></td>
+    <td style="${tdC};background:#f8fafc;font-weight:700">${N(totEst)}</td>
+    <td style="${tdC};background:#f8fafc;font-size:12px;color:#64748b">同期</td>
+  </tr>
+  <tr>
+    <td colspan="2" style="${tdL};background:#f8fafc"></td>
+    <td colspan="3" style="${tdC};background:#f8fafc"></td>
+    ${inpTop('total_est_rev',rec.total_est_rev)}
+    ${inpTop('total_prev_rev',rec.total_prev_rev)}
+  </tr>`;
 }
 
 // ──────────────────────────────────────────────────────────────
