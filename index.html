@@ -492,7 +492,11 @@ input[type=number]::-webkit-inner-spin-button{opacity:.4}
 
   <!-- 品項目標達成表 -->
   <div style="padding:8px 0"><div style="border-top:2px solid #e2e8f0"></div></div>
-  <div class="text-sm font-bold text-slate-600 mt-2">各品項目標</div>
+  <div style="display:flex;align-items:center;gap:10px;margin-top:8px">
+    <div class="text-sm font-bold text-slate-600">各品項目標</div>
+    <button onclick="syncMoFromSheet()" style="padding:3px 12px;border-radius:8px;background:#4f46e5;color:#fff;font-size:11px;font-weight:700;border:none;cursor:pointer">↻ 同步</button>
+    <span id="ov-sync-status" style="font-size:11px;color:#94a3b8"></span>
+  </div>
   <div id="ov-goal-table"></div>
 
   <!-- 各館落差 -->
@@ -1333,12 +1337,17 @@ async function syncMoFromSheet(){
       saveBranchDiffSync(month, data.branch_diff);
     }
 
+    const okMsg = '✓ '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'});
     if(status){ status.textContent='✓ 同步成功 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color='#16a34a'; }
+    const ovStatus = document.getElementById('ov-sync-status');
+    if(ovStatus){ ovStatus.textContent=okMsg; ovStatus.style.color='#16a34a'; }
     renderMoTable();
     renderOverviewStats();
   } catch(e){
     console.error('MO sync error:',e);
     if(status){ status.textContent='✗ '+e.message; status.style.color='#dc2626'; }
+    const ovStatus = document.getElementById('ov-sync-status');
+    if(ovStatus){ ovStatus.textContent='✗ '+e.message; ovStatus.style.color='#dc2626'; }
   }
   if(btn){ btn.textContent='↻ 同步試算表'; btn.disabled=false; }
 }
