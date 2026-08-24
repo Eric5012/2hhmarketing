@@ -1328,6 +1328,11 @@ async function syncMoFromSheet(){
       saveGoalSync(month, data.goal);
     }
 
+    // 各館落差
+    if(data.branch_diff){
+      saveBranchDiffSync(month, data.branch_diff);
+    }
+
     if(status){ status.textContent='✓ 同步成功 '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}); status.style.color='#16a34a'; }
     renderMoTable();
     renderOverviewStats();
@@ -2845,6 +2850,10 @@ function renderGoalTable(month){
 }
 
 // ── 各館落差 prev-year branch storage ──────────────────────────
+const STORAGE_BRANCH_DIFF_SYNC = 'dash_branch_diff_sync_v1';
+function loadBranchDiffSync(month){ return JSON.parse(localStorage.getItem(STORAGE_BRANCH_DIFF_SYNC)||'{}')[month]||null; }
+function saveBranchDiffSync(month,data){ const all=JSON.parse(localStorage.getItem(STORAGE_BRANCH_DIFF_SYNC)||'{}'); all[month]=data; localStorage.setItem(STORAGE_BRANCH_DIFF_SYNC,JSON.stringify(all)); }
+
 const STORAGE_BRANCH_PREV = 'dash_branch_prev_v1';
 function loadBranchPrevAll(){ return JSON.parse(localStorage.getItem(STORAGE_BRANCH_PREV)||'[]'); }
 function saveBranchPrevAll(d){ localStorage.setItem(STORAGE_BRANCH_PREV, JSON.stringify(d)); }
@@ -2868,31 +2877,37 @@ function renderBranchDiffTable(month){
   const el = document.getElementById('ov-branch-diff-table');
   if(!el) return;
 
-  const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
-  function sumBranch(brand){
-    const rec = loadBranchRec(month, brand);
-    let so=0, hc=0, tc=0;
-    INQ_SRC_KEYS.forEach(k=>{
-      const s = rec.sources[k]||{};
-      so += s.so||0; hc += s.hc||0; tc += s.tc||0;
-    });
-    return {so, hc, tc};
-  }
+  // Use synced data from Google Sheets if available
+  const synced = loadBranchDiffSync(month);
 
-  const s115 = sumBranch('seoul');
-  const h115 = sumBranch('hh');
-  const s114 = loadBranchPrevRec(month, 'seoul');
-  const h114 = loadBranchPrevRec(month, 'hh');
-
-  // 台灣民國年
+  let s114, s115, h114, h115, dateRange;
   const [y, m] = month.split('-').map(Number);
-  const rocY    = y - 1911;
+  const rocY = y - 1911;
   const prevRocY = rocY - 1;
-  // Date range label: month/1 ~ month/today(if current) or month/last
-  const today = new Date();
-  const isCurrentMonth = today.getFullYear()===y && today.getMonth()+1===m;
-  const lastDay = isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate();
-  const dateRange = `${m}/1-${m}/${lastDay}`;
+
+  if(synced){
+    s114 = synced.seoul_114;
+    s115 = synced.seoul_115;
+    h114 = synced.hh_114;
+    h115 = synced.hh_115;
+    dateRange = synced.date_range || `${m}/1-${m}/${new Date(y,m,0).getDate()}`;
+  } else {
+    const INQ_SRC_KEYS = ['080','gline','fbline','fb1','fb2','fb3','fbdm','kol','other','mgm'];
+    function sumBranch(brand){
+      const rec = loadBranchRec(month, brand);
+      let so=0, hc=0, tc=0;
+      INQ_SRC_KEYS.forEach(k=>{ const s=rec.sources[k]||{}; so+=s.so||0; hc+=s.hc||0; tc+=s.tc||0; });
+      return {so, hc, tc};
+    }
+    s115 = sumBranch('seoul');
+    h115 = sumBranch('hh');
+    s114 = loadBranchPrevRec(month, 'seoul');
+    h114 = loadBranchPrevRec(month, 'hh');
+    const today = new Date();
+    const isCurrentMonth = today.getFullYear()===y && today.getMonth()+1===m;
+    const lastDay = isCurrentMonth ? today.getDate() : new Date(y,m,0).getDate();
+    dateRange = `${m}/1-${m}/${lastDay}`;
+  }
 
   // cell styles
   const border = '1px solid #d1d5db';
