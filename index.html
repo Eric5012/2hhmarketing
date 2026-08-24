@@ -2692,9 +2692,12 @@ function renderOverviewStats(){
   const sEst = sRev ? calcEst(sRev) : 0;
   const hEst = hRev ? calcEst(hRev) : 0;
   // 同期：優先從年報表讀去年同月，沒有則 fallback 到 月報表的同期欄
+  // 年報表 total_rev 是「原始元」單位，要除以 10000 換算成萬元；月報表 prev_rev 本身已是萬元
   const [curY, curMi] = month.split('-').map(Number);
-  const prevYrSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || mo.seoul.prev_rev || 0;
-  const prevYrHh    = loadYrRec(curY-1, 'hh'   ).months[curMi-1]?.total_rev || mo.hh.prev_rev    || 0;
+  const yrPrevSeoul = loadYrRec(curY-1, 'seoul').months[curMi-1]?.total_rev || 0;
+  const yrPrevHh    = loadYrRec(curY-1, 'hh'   ).months[curMi-1]?.total_rev || 0;
+  const prevYrSeoul = yrPrevSeoul ? Math.round(yrPrevSeoul/10000) : (mo.seoul.prev_rev || 0);
+  const prevYrHh    = yrPrevHh    ? Math.round(yrPrevHh/10000)    : (mo.hh.prev_rev    || 0);
   const sPrev = showS ? prevYrSeoul : 0;
   const hPrev = showH ? prevYrHh    : 0;
   // 月報表的業績欄位本身就是「萬元」單位（跟表格上顯示的數字一樣），不用再除以 10000
